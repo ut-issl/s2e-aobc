@@ -1,0 +1,33 @@
+# CMake and VS directories
+s2e_6u_aocs/CMakeBuilds/
+.vs/
+
+# Log files
+s2e_6u_aocs/data/logs/
+data/
+
+# ExtLibraries
+ExtLibraries/
+src-core/ExtLibraries/
+s2e_6u_aocs/scripts/tmp_cspice/
+
+# Executables
+*.exe
+*.out
+*.app
+
+# OSX
+.DS_Store
+.AppleDouble
+.LSOverride
+Icon
+
+# Ubuntu/Docker
+build/
+
+# Thumbnails
+._*
+
+# Files that might appear on external disk
+.Spotlight-V100
+.Trashes
