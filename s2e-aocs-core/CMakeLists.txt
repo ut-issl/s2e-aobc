@@ -1,8 +1,8 @@
 cmake_policy(SET CMP0048 NEW)
-project(S2E_6U_AOBC
+project(S2E_AOBC
   LANGUAGES CXX
-  DESCRIPTION "S2E_6U_AOBC"
-  VERSION 1.0
+  DESCRIPTION "S2E_AOBC"
+  VERSION 2.0.1
   )
 
 cmake_minimum_required(VERSION 3.13)
@@ -28,7 +28,7 @@ if(NOT DEFINED FLIGHT_SW_DIR)
   set(FLIGHT_SW_DIR ../../FlightSW)
 endif()
 if(NOT DEFINED C2A_NAME)
-  set(C2A_NAME "c2a_issl6u_aobc")
+  set(C2A_NAME "c2a-aobc")
 endif()
 
 if(WIN32)
