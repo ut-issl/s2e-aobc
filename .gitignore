@@ -4,7 +4,6 @@ s2e_6u_aocs/CMakeBuilds/
 
 # Log files
 s2e_6u_aocs/data/logs/
-data/
 
 # ExtLibraries
 ExtLibraries/

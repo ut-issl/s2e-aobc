@@ -38,7 +38,7 @@ int main(int argc, char* argv[])
   UNUSED(argc);
   UNUSED(argv);
   
-  std::string ini_file = "../../data/ini/ISSL6U_SimBase.ini";
+  std::string ini_file = "../../data/initialize_files/simulation_base.ini";
   MCSimExecutor* mc_sim = InitMCSim(ini_file);
   Logger *log_mc_sim = InitLogMC(ini_file,mc_sim->IsEnabled());
 
