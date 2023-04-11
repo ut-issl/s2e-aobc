@@ -32,3 +32,23 @@
   - `set(USE_C2A OFF)` -> `set(USE_C2A ON)`
 - Build `S2E_6U_AOCS`
 - **Note:** When you add new c source file in C2A, you have to modify `C2A/CMakeLists.txt` directory
+
+## Brief history of development
+- 21st Apr. 2020: Development start in a private repository at GitLab.
+- 26th Sep. 2022: Initial development was finished.
+- 03rd Mar. 2023: Move to a private repository at GotHub to prepare publish as OSS
+
+## Contributors in the GitLab repository
+- ISSL, UT
+  - Satoshi Ikari: 158 commits
+  - Hirotaka Sekine: 47 commits
+  - Toshio Imamura: 42 commits
+  - Toshihiro Suzuki: 37 commits
+  - Ryo Suzumoto: 20 commits
+  - Takayuki Hosonuma: 14 commits
+  - Masahiro Fujiwara: 13 commits
+  - Nobuhiro Funabiki: 12 commits
+  - Ryohei Takahashi: 4 commits
+  - Toshifumi Igeta: 2 commits
+  - Yoshinari Gyu: 1 commit
+  - Keidai Iiyama: 1 commit
