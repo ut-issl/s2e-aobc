@@ -9,10 +9,10 @@ on:
     types: [opened, synchronize, reopened, labeled]
     paths:
       - '.github/workflows/build.yml'
-      - 's2e-aobc/CMakeLists.txt'
-      - 's2e-aobc/common.cmake'
-      - 's2e-aobc/CMakeSettings.json'
-      - 's2e-aobc/src/**'
+      - 's2e-aocs-core/CMakeLists.txt'
+      - 's2e-aocs-core/common.cmake'
+      - 's2e-aocs-core/CMakeSettings.json'
+      - 's2e-aocs-core/src/**'
 
 env:
   C2A_CORE_VERSION: develop
@@ -83,7 +83,7 @@ jobs:
 
       - name: build
         shell: cmd
-        working-directory: ./s2e-aobc
+        working-directory: ./s2e-aocs-core
         run: |
           cl.exe
           cmake -G "Visual Studio 17 2022" -A Win32 -DCMAKE_CONFIGURATION_TYPES:STRING="Debug" -DUSE_C2A="OFF"
@@ -166,7 +166,7 @@ jobs:
           ls nrlmsise00/src
 
       - name: build
-        working-directory: ./s2e-aobc
+        working-directory: ./s2e-aocs-core
         env:
           CC:  ${{ steps.compiler.outputs.CC  }}
           CXX: ${{ steps.compiler.outputs.CXX }}
