@@ -1,0 +1,175 @@
+name: Build
+
+on:
+  push:
+    branches:
+      - main
+      - develop
+  pull_request:
+    types: [opened, synchronize, reopened, labeled]
+    paths:
+      - '.github/workflows/build.yml'
+      - 's2e-aobc/CMakeLists.txt'
+      - 's2e-aobc/common.cmake'
+      - 's2e-aobc/CMakeSettings.json'
+      - 's2e-aobc/src/**'
+
+env:
+  C2A_CORE_VERSION: develop
+
+jobs:
+  build_s2e_win:
+    name: Build on Windows VS2022
+    # VS2022 を使うため
+    runs-on: windows-2022
+    strategy:
+      fail-fast: false
+      matrix:
+        use_c2a: ['USE_C2A=OFF'] #, 'USE_C2A=ON'] # とりあえずC2A OFFのみ
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: checkout the submodules
+        uses: actions/checkout@v3
+        with:
+          submodules: recursive
+
+      - name: Configure build for x86
+        uses: ilammy/msvc-dev-cmd@v1
+        with:
+          arch: amd64_x86
+
+      - name: show tools version
+        shell: powershell
+        run: |
+          cmake --version
+
+      - name: cache extlib
+        id: cache-extlib
+        uses: actions/cache@v3
+        with:
+          key: extlib-${{ runner.os }}-${{ hashFiles('./s2e-core/ExtLibraries/**') }}
+          path: ExtLibraries
+
+      - name: build extlib
+        if: steps.cache-extlib.outputs.cache-hit != 'true'
+        shell: powershell
+        working-directory: ./s2e-core/ExtLibraries
+        run: |
+          cmake -G "Visual Studio 17 2022" -A Win32 -DCMAKE_CONFIGURATION_TYPES:STRING="Debug" -D${{ matrix.use_c2a }}
+          cmake --build .
+
+      - name: install extlib
+        if: steps.cache-extlib.outputs.cache-hit != 'true'
+        shell: powershell
+        working-directory: ./s2e-core/ExtLibraries
+        run: |
+          cmake --install .
+
+      - name: check extlib
+        shell: powershell
+        working-directory: ./ExtLibraries
+        run: |
+          ls cspice
+          ls cspice/cspice_msvs/lib
+          ls cspice/include
+          ls cspice/generic_kernels
+          ls nrlmsise00
+          ls nrlmsise00/table
+          ls nrlmsise00/lib
+          ls nrlmsise00/lib/libnrlmsise00.lib
+          ls nrlmsise00/src
+
+      - name: build
+        shell: cmd
+        working-directory: ./s2e-aobc
+        run: |
+          cl.exe
+          cmake -G "Visual Studio 17 2022" -A Win32 -DCMAKE_CONFIGURATION_TYPES:STRING="Debug" -DUSE_C2A="OFF"
+          cmake --build .
+
+  build_s2e_linux:
+    name: Build on Linux
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        compiler: ['gcc-11 g++-11'] # , 'clang clang++'] # 一旦clangは外す
+        build_bit: ['BUILD_64BIT=OFF'] #, 'BUILD_64BIT=ON'] # 一旦32bitのみですすめる
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: checkout the submodules
+        uses: actions/checkout@v3
+        with:
+          submodules: recursive
+
+      - name: set compiler
+        id: compiler
+        run: |
+          COMPILER="${{ matrix.compiler }}"
+          read -r -a COMPILER <<< "$COMPILER"
+          echo "::set-output name=CC::${COMPILER[0]}"
+          echo "::set-output name=CXX::${COMPILER[1]}"
+
+      - name: install deps
+        run: |
+          # FIXME: temporary install gcc-11 in ubuntu:focal
+          if [[ "${{ steps.compiler.outputs.CC }}" =~ "gcc-11" ]]; then
+            sudo add-apt-repository ppa:ubuntu-toolchain-r/test
+          fi
+          sudo apt-get update
+          if [[ "${{ steps.compiler.outputs.CC }}" =~ "gcc" ]]; then
+            sudo apt-get install -y ${{ steps.compiler.outputs.CC }}-multilib \
+                                    ${{ steps.compiler.outputs.CXX }}-multilib
+          else
+            sudo apt-get install -y gcc-multilib g++-multilib
+          fi
+
+      - name: show tools version
+        run: |
+          cmake --version
+          ${{ steps.compiler.outputs.CC  }} --version
+          ${{ steps.compiler.outputs.CXX }} --version
+
+      - name: cache extlib
+        id: cache-extlib
+        uses: actions/cache@v3
+        with:
+          key: extlib-${{ runner.os }}-${{ hashFiles('./s2e-core/ExtLibraries/**') }}-${{ matrix.build_bit }}
+          path: ExtLibraries
+
+      - name: build extlib
+        if: steps.cache-extlib.outputs.cache-hit != 'true'
+        working-directory: ./s2e-core/ExtLibraries
+        run: |
+          cmake -D${{ matrix.build_bit }}
+          cmake --build .
+      - name: install extlib
+        if: steps.cache-extlib.outputs.cache-hit != 'true'
+        working-directory: ./s2e-core/ExtLibraries
+        run: |
+          cmake --install .
+      - name: check extlib
+        working-directory: ./ExtLibraries
+        run: |
+          ls cspice
+          ls cspice/cspice_unix*
+          ls cspice/include
+          ls cspice/generic_kernels
+          ls nrlmsise00
+          ls nrlmsise00/table
+          ls nrlmsise00/lib*
+          ls nrlmsise00/lib*/libnrlmsise00.a
+          ls nrlmsise00/src
+
+      - name: build
+        working-directory: ./s2e-aobc
+        env:
+          CC:  ${{ steps.compiler.outputs.CC  }}
+          CXX: ${{ steps.compiler.outputs.CXX }}
+        run: |
+          cmake . -D${{ matrix.build_bit }}
+          cmake --build .
