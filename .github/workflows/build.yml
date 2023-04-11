@@ -57,7 +57,7 @@ jobs:
         shell: powershell
         working-directory: ./s2e-core/ExtLibraries
         run: |
-          cmake -G "Visual Studio 17 2022" -A Win32 -DCMAKE_CONFIGURATION_TYPES:STRING="Debug" -D${{ matrix.use_c2a }}
+          cmake -G "Visual Studio 17 2022" -A Win32 -DCMAKE_CONFIGURATION_TYPES:STRING="Debug"
           cmake --build .
 
       - name: install extlib
@@ -86,7 +86,7 @@ jobs:
         working-directory: ./s2e-aocs-core
         run: |
           cl.exe
-          cmake -G "Visual Studio 17 2022" -A Win32 -DCMAKE_CONFIGURATION_TYPES:STRING="Debug" -DUSE_C2A="OFF"
+          cmake -G "Visual Studio 17 2022" -A Win32 -DCMAKE_CONFIGURATION_TYPES:STRING="Debug" -D${{ matrix.use_c2a }}
           cmake --build .
 
   build_s2e_linux:
@@ -97,6 +97,7 @@ jobs:
       matrix:
         compiler: ['gcc-11 g++-11'] # , 'clang clang++'] # 一旦clangは外す
         build_bit: ['BUILD_64BIT=OFF'] #, 'BUILD_64BIT=ON'] # 一旦32bitのみですすめる
+        use_c2a: ['USE_C2A=OFF'] #, 'USE_C2A=ON'] # とりあえずC2A OFFのみ
 
     steps:
       - uses: actions/checkout@v3
@@ -171,5 +172,5 @@ jobs:
           CC:  ${{ steps.compiler.outputs.CC  }}
           CXX: ${{ steps.compiler.outputs.CXX }}
         run: |
-          cmake . -D${{ matrix.build_bit }}
+          cmake . -D${{ matrix.build_bit }} -D${{ matrix.use_c2a }}
           cmake --build .
