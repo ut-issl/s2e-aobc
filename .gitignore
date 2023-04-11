@@ -1,14 +1,14 @@
 # CMake and VS directories
-s2e_6u_aocs/CMakeBuilds/
+s2e-aocs-core/CMakeBuilds/
 .vs/
 
 # Log files
-s2e_6u_aocs/data/logs/
+s2e-aocs-core/data/logs/
 
 # ExtLibraries
 ExtLibraries/
 src-core/ExtLibraries/
-s2e_6u_aocs/scripts/tmp_cspice/
+s2e-aocs-core/scripts/tmp_cspice/
 
 # Executables
 *.exe
