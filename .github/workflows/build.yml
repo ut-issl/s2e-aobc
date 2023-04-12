@@ -15,7 +15,7 @@ on:
       - 's2e-aocs-core/src/**'
 
 env:
-  C2A_CORE_VERSION: develop
+  C2A_CORE_VERSION: v5.0.1
 
 jobs:
   build_s2e_win:
@@ -25,7 +25,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        use_c2a: ['USE_C2A=OFF'] #, 'USE_C2A=ON'] # とりあえずC2A OFFのみ
+        use_c2a: ['USE_C2A=OFF', 'USE_C2A=ON']
 
     steps:
       - uses: actions/checkout@v3
