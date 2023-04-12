@@ -35,6 +35,15 @@ jobs:
         with:
           submodules: recursive
 
+      - name: checkout C2A core
+        if: contains(matrix.use_c2a, 'ON')
+        uses: actions/checkout@v3
+        with:
+          path: c2a-aobc
+          repository: ut-issl/c2a-aobc
+          ref: '${{ env.C2A_CORE_VERSION }}'
+          fetch-depth: 1
+
       - name: Configure build for x86
         uses: ilammy/msvc-dev-cmd@v1
         with:
@@ -86,7 +95,7 @@ jobs:
         working-directory: ./s2e-aocs-core
         run: |
           cl.exe
-          cmake -G "Visual Studio 17 2022" -A Win32 -DCMAKE_CONFIGURATION_TYPES:STRING="Debug" -D${{ matrix.use_c2a }}
+          cmake -G "Visual Studio 17 2022" -A Win32 -DCMAKE_CONFIGURATION_TYPES:STRING="Debug" -DFLIGHT_SW_DIR=../ -DC2A_NAME=c2a-aobc -D${{ matrix.use_c2a }}
           cmake --build .
 
   build_s2e_linux:
