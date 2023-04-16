@@ -15,7 +15,7 @@ on:
       - 's2e-aocs-core/src/**'
 
 env:
-  C2A_CORE_VERSION: v5.0.1
+  C2A_AOBC_VERSION: v5.0.1
 
 jobs:
   build_s2e_win:
@@ -41,7 +41,8 @@ jobs:
         with:
           path: c2a-aobc
           repository: ut-issl/c2a-aobc
-          ref: '${{ env.C2A_CORE_VERSION }}'
+          ref: '${{ env.C2A_AOBC_VERSION }}'
+          submodules: recursive
           ssh-key: ${{ secrets.C2A_AOBC_SSH_KEY }}
           fetch-depth: 1
 
