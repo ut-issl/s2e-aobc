@@ -194,5 +194,5 @@ jobs:
           CC:  ${{ steps.compiler.outputs.CC  }}
           CXX: ${{ steps.compiler.outputs.CXX }}
         run: |
-          cmake . -D${{ matrix.build_bit }} -D${{ matrix.use_c2a }}
+          cmake . -D${{ matrix.build_bit }} -DFLIGHT_SW_DIR=../ -DC2A_NAME=c2a-aobc -D${{ matrix.use_c2a }}
           cmake --build .
