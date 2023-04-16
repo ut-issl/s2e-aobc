@@ -35,7 +35,7 @@ jobs:
         with:
           submodules: recursive
 
-      - name: checkout C2A core
+      - name: checkout C2A AOBC
         if: contains(matrix.use_c2a, 'ON')
         uses: actions/checkout@v3
         with:
@@ -108,7 +108,7 @@ jobs:
       matrix:
         compiler: ['gcc-11 g++-11'] # , 'clang clang++'] # 一旦clangは外す
         build_bit: ['BUILD_64BIT=OFF'] #, 'BUILD_64BIT=ON'] # 一旦32bitのみですすめる
-        use_c2a: ['USE_C2A=OFF'] #, 'USE_C2A=ON'] # とりあえずC2A OFFのみ
+        use_c2a: ['USE_C2A=OFF', 'USE_C2A=ON']
 
     steps:
       - uses: actions/checkout@v3
@@ -117,6 +117,17 @@ jobs:
         uses: actions/checkout@v3
         with:
           submodules: recursive
+
+      - name: checkout C2A AOBC
+        if: contains(matrix.use_c2a, 'ON')
+        uses: actions/checkout@v3
+        with:
+          path: c2a-aobc
+          repository: ut-issl/c2a-aobc
+          ref: '${{ env.C2A_AOBC_VERSION }}'
+          submodules: recursive
+          ssh-key: ${{ secrets.C2A_AOBC_SSH_KEY }}
+          fetch-depth: 1
 
       - name: set compiler
         id: compiler
