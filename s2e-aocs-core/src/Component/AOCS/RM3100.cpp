@@ -23,7 +23,7 @@ void RM3100::MainRoutine(int count)
   if (mode_ == 0) // CMM
   {
     magnetic_field_c_nT_ = quaternion_b2c_.FrameConversion(geomagnetic_field_->GetGeomagneticField_b_nT()); // Convert frame
-    magnetic_field_c_nT_ = Measure(magnetic_field_c_nT_);   
+    magnetic_field_c_nT_ = Measure(magnetic_field_c_nT_);
     GenerateTelemetry();
   }
 
@@ -53,7 +53,7 @@ int RM3100::GenerateTelemetry()
   int mag_c_tlm[kMagnetometerDimension] = {0, 0, 0};
   for (size_t i = 0; i < kMagnetometerDimension; i++)
   {
-    mag_c_tlm[i] = ConvertMag2Tlm(magnetic_field_c_nT_ [i]);
+    mag_c_tlm[i] = ConvertMag2Tlm(magnetic_field_c_nT_[i]);
     for (int j = 0; j < 3; j++)
     {
       tlm[i * 3 + j] = (unsigned char)(mag_c_tlm[i] >> kByte2Bit * (3 - j - 1));
