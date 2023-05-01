@@ -1,5 +1,5 @@
 #include "MTQseiren.h"
-#include <Library/utilities/macros.hpp>
+#include <library/utilities/macros.hpp>
 
 MTQseiren::MTQseiren(Magnetorquer mag_torquer,
                      std::vector<int> gpio_ports,
