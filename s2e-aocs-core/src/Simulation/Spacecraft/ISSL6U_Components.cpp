@@ -2,52 +2,48 @@
 #include "ISSL6U_PortConfig.h"
 #include "../../Component/AOCS/AOBC.h"
 
-#include <Component/AOCS/InitGyro.hpp>
-#include <Component/AOCS/InitSunSensor.hpp>
-#include <Component/AOCS/InitMagSensor.hpp>
-#include <Component/AOCS/InitStt.hpp>
-#include <Component/AOCS/InitGnssReceiver.hpp>
-#include <Component/AOCS/InitMagTorquer.hpp>
-#include <Component/AOCS/InitRwModel.hpp>
-#include <Component/Propulsion/InitSimpleThruster.hpp>
-#include <Component/Mission/Telescope/InitTelescope.hpp>
-#include <Component/Power/CsvScenarioInterface.h>
-
-#include <Interface/InitInput/IniAccess.h>
+#include <components/real/aocs/initialize_gnss_receiver.hpp>
+#include <components/real/aocs/initialize_gyro_sensor.hpp>
+#include <components/real/aocs/initialize_magnetometer.hpp>
+#include <components/real/aocs/initialize_magnetorquer.hpp>
+#include <components/real/aocs/initialize_reaction_wheel.hpp>
+#include <components/real/aocs/initialize_star_sensor.hpp>
+#include <components/real/aocs/initialize_sun_sensor.hpp>
+#include <component/real/power/csv_scenario_interface.hpp>
 
 #include <vector>
 
 ISSL6UComponents::ISSL6UComponents(
-  const Dynamics* dynamics,
-  const Structure* structure,
-  const LocalEnvironment* local_env,
-  const GlobalEnvironment* glo_env,
-  const SimulationConfig* config,
-  ClockGenerator* clock_gen,
-  const int sat_id)
-  :dynamics_(dynamics), structure_(structure), local_env_(local_env), glo_env_(glo_env),config_(config)
+    const Dynamics *dynamics,
+    const Structure *structure,
+    const LocalEnvironment *local_env,
+    const GlobalEnvironment *glo_env,
+    const SimulationConfig *config,
+    ClockGenerator *clock_gen,
+    const int sat_id)
+    : dynamics_(dynamics), structure_(structure), local_env_(local_env), glo_env_(glo_env), config_(config)
 {
-  //General
+  // General
   IniAccess iniAccess = IniAccess(config->sat_file_[sat_id]);
-  //Scenario
+  // Scenario
   const std::string scenario_file_path = iniAccess.ReadString("SCENARIO", "scenario_file_path");
   CsvScenarioInterface::Initialize(scenario_file_path);
 
   // CDH
   double compo_step_sec = glo_env_->GetSimTime().GetCompoStepSec();
-  aobc_ = new OBC_C2A(clock_gen,10);
+  aobc_ = new OBC_C2A(clock_gen, 10);
   hils_port_manager_ = new HilsPortManager();
 
   // Power
   // PowerController
-  vector<int> power_gpio_ports = {38, 60, 61, 73, 91, 6, 7, 8, 71, 79, 80}; // TODO iniファイルに移す？
+  vector<int> power_gpio_ports = {38, 60, 61, 73, 91, 6, 7, 8, 71, 79, 80};                           // TODO iniファイルに移す？
   vector<double> power_outout_voltage_list = {3.3, 3.3, 3.3, 3.3, 5.0, 5.0, 5.0, 3.3, 7.6, 7.6, 7.6}; // TODO iniファイルに移す？
   power_controller_ = new PowerController(PCU(1, clock_gen), power_gpio_ports, power_outout_voltage_list, aobc_);
 
   // INA
   int ina_prescaler = 1;
-  PowerPort* ina_power_port = power_controller_->GetPowerPort((int)PowerPortIdx::INA);
-  double ina_min_voltage = 3.3, ina_power_consumption = 0.001;  // TODO 初期化ファイルに移動させる？
+  PowerPort *ina_power_port = power_controller_->GetPowerPort((int)PowerPortIdx::INA);
+  double ina_min_voltage = 3.3, ina_power_consumption = 0.001; // TODO 初期化ファイルに移動させる？
   unsigned char ina_i2c_port = 4;
   unsigned char ina_i2c_addr = 0x40;
   // PICのみ特別
@@ -55,10 +51,10 @@ ISSL6UComponents::ISSL6UComponents(
                             power_controller_->GetPowerPort((int)PowerPortIdx::PIC), ina_i2c_port, ina_i2c_addr, aobc_));
   // RM,SS,MTQ,STIM,STT,OEM,RWX,RWY,RWZ
   vector<unsigned char> ina_i2c_addr_list = {0x44, 0x45, 0x46, 0x41, 0x42, 0x43, 0x47, 0x48, 0x49};
-  for(size_t i = 0; i < ina_i2c_addr_list.size(); i++)
+  for (size_t i = 0; i < ina_i2c_addr_list.size(); i++)
   {
     ina260s_.push_back(INA260(ina_prescaler, clock_gen, ina_power_port, ina_min_voltage, ina_power_consumption,
-                              power_controller_->GetPowerPort(i+2), ina_i2c_port, ina_i2c_addr_list[i], aobc_));  //INAとMPUは観測対象でない
+                              power_controller_->GetPowerPort(i + 2), ina_i2c_port, ina_i2c_addr_list[i], aobc_)); // INAとMPUは観測対象でない
   }
 
   // AOCS
@@ -76,7 +72,7 @@ ISSL6UComponents::ISSL6UComponents(
   rm3100_aobc_ = new RM3100(MagSensor(InitMagSensor(clock_gen, power_controller_->GetPowerPort((int)PowerPortIdx::RM), 1, rm3100_aobc_ini_path, compo_step_sec, &local_env_->GetMag())), 0, rm3100_aobc_hils_port_id, 0x20, aobc_, hils_port_manager_);
   const std::string rm3100_ext_ini_path = iniAccess.ReadString("COMPONENTS_FILE", "magsensor_h_ext_file");
   const unsigned int rm3100_ext_hils_port_id = iniAccess.ReadInt("COM_PORT", "rm3100_ext_hils_port_id");
-  rm3100_ext_  = new RM3100(MagSensor(InitMagSensor(clock_gen, power_controller_->GetPowerPort((int)PowerPortIdx::RM), 2, rm3100_ext_ini_path, compo_step_sec, &local_env_->GetMag())), 0, rm3100_ext_hils_port_id, 0x23, aobc_, hils_port_manager_);
+  rm3100_ext_ = new RM3100(MagSensor(InitMagSensor(clock_gen, power_controller_->GetPowerPort((int)PowerPortIdx::RM), 2, rm3100_ext_ini_path, compo_step_sec, &local_env_->GetMag())), 0, rm3100_ext_hils_port_id, 0x23, aobc_, hils_port_manager_);
 
   const std::string nanoSSOC_D60_ini_path = iniAccess.ReadString("COMPONENTS_FILE", "ss_file");
   const unsigned int nanoSSOC_D60_pz_hils_port_id = iniAccess.ReadInt("COM_PORT", "nanoSSOC_D60_pz_hils_port_id");
@@ -100,7 +96,7 @@ ISSL6UComponents::ISSL6UComponents(
   const std::string sagitta_ini_path = iniAccess.ReadString("COMPONENTS_FILE", "stt_file");
   const unsigned int sagitta_hils_port_id = iniAccess.ReadInt("COM_PORT", "sagitta_hils_port_id");
   const unsigned int sagitta_baud_rate = iniAccess.ReadInt("COM_PORT", "sagitta_baud_rate");
-  sagitta_ = new Sagitta(InitSTT(clock_gen, power_controller_->GetPowerPort((int)PowerPortIdx::STT), 0, sagitta_ini_path, glo_env_->GetSimTime().GetStepSec(), dynamics_,local_env_), 0x05, aobc_, sagitta_hils_port_id, sagitta_baud_rate, hils_port_manager_);
+  sagitta_ = new Sagitta(InitSTT(clock_gen, power_controller_->GetPowerPort((int)PowerPortIdx::STT), 0, sagitta_ini_path, glo_env_->GetSimTime().GetStepSec(), dynamics_, local_env_), 0x05, aobc_, sagitta_hils_port_id, sagitta_baud_rate, hils_port_manager_);
 
   const std::string stim210_ini_path = iniAccess.ReadString("COMPONENTS_FILE", "gyro_h_file");
   const unsigned int stim210_hils_port_id = iniAccess.ReadInt("COM_PORT", "stim210_hils_port_id");
@@ -109,26 +105,26 @@ ISSL6UComponents::ISSL6UComponents(
 
   const std::string rw_ini_path = iniAccess.ReadString("COMPONENTS_FILE", "rw_file");
   const unsigned int rw0003_x_hils_port_id = iniAccess.ReadInt("COM_PORT", "rw0003_x_hils_port_id");
-  rw0003_x_ = new RW0003(InitRWModel(clock_gen, power_controller_->GetPowerPort((int)PowerPortIdx::RWX), 1,rw_ini_path,dynamics_->GetAttitude().GetPropStep(),compo_step_sec), 1, rw0003_x_hils_port_id, 0x11, aobc_, hils_port_manager_);
+  rw0003_x_ = new RW0003(InitRWModel(clock_gen, power_controller_->GetPowerPort((int)PowerPortIdx::RWX), 1, rw_ini_path, dynamics_->GetAttitude().GetPropStep(), compo_step_sec), 1, rw0003_x_hils_port_id, 0x11, aobc_, hils_port_manager_);
   const unsigned int rw0003_y_hils_port_id = iniAccess.ReadInt("COM_PORT", "rw0003_y_hils_port_id");
-  rw0003_y_ = new RW0003(InitRWModel(clock_gen, power_controller_->GetPowerPort((int)PowerPortIdx::RWY), 2,rw_ini_path,dynamics_->GetAttitude().GetPropStep(),compo_step_sec), 1, rw0003_y_hils_port_id, 0x12, aobc_, hils_port_manager_);
+  rw0003_y_ = new RW0003(InitRWModel(clock_gen, power_controller_->GetPowerPort((int)PowerPortIdx::RWY), 2, rw_ini_path, dynamics_->GetAttitude().GetPropStep(), compo_step_sec), 1, rw0003_y_hils_port_id, 0x12, aobc_, hils_port_manager_);
   const unsigned int rw0003_z_hils_port_id = iniAccess.ReadInt("COM_PORT", "rw0003_z_hils_port_id");
-  rw0003_z_ = new RW0003(InitRWModel(clock_gen, power_controller_->GetPowerPort((int)PowerPortIdx::RWZ), 3,rw_ini_path,dynamics_->GetAttitude().GetPropStep(),compo_step_sec), 1, rw0003_z_hils_port_id, 0x13, aobc_, hils_port_manager_);
+  rw0003_z_ = new RW0003(InitRWModel(clock_gen, power_controller_->GetPowerPort((int)PowerPortIdx::RWZ), 3, rw_ini_path, dynamics_->GetAttitude().GetPropStep(), compo_step_sec), 1, rw0003_z_hils_port_id, 0x13, aobc_, hils_port_manager_);
 
-  //Thruster
+  // Thruster
   const std::string thruster_ini_path = iniAccess.ReadString("COMPONENTS_FILE", "thruster_file");
   thruster_ = new SimpleThruster(InitSimpleThruster(clock_gen, 1, thruster_ini_path, structure_, dynamics_));
 
-  //Mission
+  // Mission
   const std::string telescope_ini_path = iniAccess.ReadString("COMPONENTS_FILE", "telescope_file");
   telescope_ = new Telescope(InitTelescope(clock_gen, 1, telescope_ini_path, &(dynamics_->GetAttitude()), &(glo_env_->GetHippCatalog()), &(local_env_->GetCelesInfo())));
 
-  // HILS IF Board
-  #ifdef USE_HILS
-    const unsigned int hils_if_hils_port_id = iniAccess.ReadInt("COM_PORT", "hils_if_hils_port_id");
-    const unsigned int hils_if_baud_rate = iniAccess.ReadInt("COM_PORT", "hils_if_baud_rate");
-    hils_if_driver_ = new HilsIfDriver(1, clock_gen, hils_if_hils_port_id, hils_if_baud_rate, hils_port_manager_, mtq_gpio_ports, aobc_);
-  #endif
+// HILS IF Board
+#ifdef USE_HILS
+  const unsigned int hils_if_hils_port_id = iniAccess.ReadInt("COM_PORT", "hils_if_hils_port_id");
+  const unsigned int hils_if_baud_rate = iniAccess.ReadInt("COM_PORT", "hils_if_baud_rate");
+  hils_if_driver_ = new HilsIfDriver(1, clock_gen, hils_if_hils_port_id, hils_if_baud_rate, hils_port_manager_, mtq_gpio_ports, aobc_);
+#endif
 }
 
 ISSL6UComponents::~ISSL6UComponents()
@@ -152,49 +148,48 @@ ISSL6UComponents::~ISSL6UComponents()
   delete thruster_;
   std::vector<INA260>().swap(ina260s_);
   delete power_controller_;
-  #ifdef USE_HILS
-    delete hils_if_driver_;
-  #endif
+#ifdef USE_HILS
+  delete hils_if_driver_;
+#endif
   delete aobc_;
   delete hils_port_manager_;
 }
 
-
-Vector<3> ISSL6UComponents::GenerateForce_N_b()
+Vector<3> ISSL6UComponents::GenerateForce_b_N()
 {
-  //There is no orbit control component, so it remains 0
-  Vector<3> force_N_b_(0.0);
-  return force_N_b_;
+  // There is no orbit control component, so it remains 0
+  Vector<3> force_b_N_(0.0);
+  return force_b_N_;
 }
 
-Vector<3> ISSL6UComponents::GenerateTorque_Nm_b()
+Vector<3> ISSL6UComponents::GenerateTorque_b_Nm()
 {
-  Vector<3> torque_Nm_b_(0.0);
-  torque_Nm_b_ += mtq_seiren_->GetTorque_b();
-  torque_Nm_b_ += rw0003_x_->GetOutputTorqueB();
-  torque_Nm_b_ += rw0003_y_->GetOutputTorqueB();
-  torque_Nm_b_ += rw0003_z_->GetOutputTorqueB();
+  Vector<3> torque_b_Nm_(0.0);
+  torque_Nm_b_ += mtq_seiren_->GetOutputTorque_b_Nm();
+  torque_Nm_b_ += rw0003_x_->GetOutputTorque_b_Nm(();
+  torque_Nm_b_ += rw0003_y_->GetOutputTorque_b_Nm(();
+  torque_Nm_b_ += rw0003_z_->GetOutputTorque_b_Nm(();
 
-  return torque_Nm_b_;
+  return torque_b_Nm_;
 }
 
-void ISSL6UComponents::LogSetup(Logger& logger)
+void ISSL6UComponents::LogSetup(Logger &logger)
 {
-  logger.AddLoggable(telescope_);
-  logger.AddLoggable(sagitta_);
-  logger.AddLoggable(stim210_);
-  logger.AddLoggable(mpu9250_gyro_);
-  logger.AddLoggable(mpu9250_mag_);
-  logger.AddLoggable(rm3100_aobc_);
-  logger.AddLoggable(rm3100_ext_);
-  logger.AddLoggable(nanoSSOC_D60_pz_);
-  logger.AddLoggable(nanoSSOC_D60_py_);
-  logger.AddLoggable(nanoSSOC_D60_mz_);
-  logger.AddLoggable(nanoSSOC_D60_my_);
-  logger.AddLoggable(mtq_seiren_);
-  logger.AddLoggable(rw0003_x_);
-  logger.AddLoggable(rw0003_y_);
-  logger.AddLoggable(rw0003_z_);
-  logger.AddLoggable(oem7600_);
-  logger.AddLoggable(thruster_);
+  logger.AddLogList(telescope_);
+  logger.AddLogList(sagitta_);
+  logger.AddLogList(stim210_);
+  logger.AddLogList(mpu9250_gyro_);
+  logger.AddLogList(mpu9250_mag_);
+  logger.AddLogList(rm3100_aobc_);
+  logger.AddLogList(rm3100_ext_);
+  logger.AddLogList(nanoSSOC_D60_pz_);
+  logger.AddLogList(nanoSSOC_D60_py_);
+  logger.AddLogList(nanoSSOC_D60_mz_);
+  logger.AddLogList(nanoSSOC_D60_my_);
+  logger.AddLogList(mtq_seiren_);
+  logger.AddLogList(rw0003_x_);
+  logger.AddLogList(rw0003_y_);
+  logger.AddLogList(rw0003_z_);
+  logger.AddLogList(oem7600_);
+  logger.AddLogList(thruster_);
 }
