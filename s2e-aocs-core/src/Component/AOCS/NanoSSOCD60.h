@@ -1,13 +1,13 @@
 #pragma once
-#include "SunSensor.h"
-#include "ObcI2cTargetCommunicationBase.h"
+#include <components/real/aocs/sun_sensor.hpp>
+#include <components/base/i2c_target_communication_with_obc.hpp>
 
 /* References
 Manual: NA
 HowToUse: NA
 */
 
-class NanoSSOCD60: public SunSensor, public ObcI2cTargetCommunicationBase
+class NanoSSOCD60: public SunSensor, public I2cTargetCommunicationWithObc
 {
 public:
   NanoSSOCD60(
@@ -15,7 +15,7 @@ public:
     const int sils_port_id,
     const unsigned int hils_port_id,
     const unsigned char i2c_addr,
-    OBC* obc,
+    OnBoardComputer* obc,
     HilsPortManager* hils_port_manager
   );
   ~NanoSSOCD60();

@@ -2,17 +2,17 @@
 #define _USE_MATH_DEFINES
 #include <algorithm>
 #include <string.h> // for memcpy
-#include <Library/math/Constant.hpp>
-#include <Library/utils/Macros.hpp>
+#include <library/math/constants.hpp>
+#include <library/utilities/macros.hpp>
 
 NanoSSOCD60::NanoSSOCD60(
   SunSensor sun_sensor,
   const int sils_port_id,
   const unsigned int hils_port_id,
   const unsigned char i2c_addr,
-  OBC* obc,
+  OnBoardComputer* obc,
   HilsPortManager* hils_port_manager
-) : SunSensor(sun_sensor), ObcI2cTargetCommunicationBase(sils_port_id, hils_port_id, i2c_addr, obc, hils_port_manager), i2c_addr_(i2c_addr)
+) : SunSensor(sun_sensor), I2cTargetCommunicationWithObc(sils_port_id, hils_port_id, i2c_addr, obc, hils_port_manager), i2c_addr_(i2c_addr)
 {
 
 }
@@ -24,8 +24,8 @@ NanoSSOCD60::~NanoSSOCD60()
 void NanoSSOCD60::MainRoutine(int count)
 {
   UNUSED(count);
-  measure();
-  sun_intensity_percent_ = solar_illuminance_ / srp_->GetSolarConstant() * 100.0;
+  Measure();
+  sun_intensity_percent_ = solar_illuminance_W_m2_ / srp_environment_->GetSolarConstant_W_m2() * 100.0;
 
   GenerateTelemetry();
 
@@ -46,12 +46,12 @@ int NanoSSOCD60::GenerateTelemetry()
   unsigned char tlm[kTlmSize] = {};
   tlm[0] = 0x0E;
 
-  int32_t alpha_tlm = ConvertAngle2Tlm(alpha_);
+  int32_t alpha_tlm = ConvertAngle2Tlm(alpha_rad_);
   for (int i = 0; i < 4; i++)
   {
     tlm[1 + i] = (alpha_tlm >> kByte2Bit * i) & 0xFF;
   }
-  int32_t beta_tlm = ConvertAngle2Tlm(beta_);
+  int32_t beta_tlm = ConvertAngle2Tlm(beta_rad_);
   for (int i = 0; i < 4; i++)
   {
     tlm[5 + i] = (beta_tlm >> kByte2Bit * i) & 0xFF;
@@ -122,7 +122,7 @@ unsigned char NanoSSOCD60::GenerateErrorCode()
 std::string NanoSSOCD60::GetLogHeader() const
 {
   std::string str_tmp = "";
-  const std::string st_id = std::to_string(static_cast<long long>(id_));
+  const std::string st_id = std::to_string(static_cast<long long>(component_id_));
 
   str_tmp += WriteVector("NanoSSOC D60" + st_id, "c", "-", 3);
   str_tmp += WriteScalar("sun_detected_flag" + st_id, "-");
