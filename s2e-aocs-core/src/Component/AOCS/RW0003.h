@@ -1,6 +1,6 @@
 #pragma once
-#include "RWModel.h"
-#include "ObcI2cTargetCommunicationBase.h"
+#include <components/real/aocs/reaction_wheel.hpp>
+#include <components/base/i2c_target_communication_with_obc.hpp>
 #include "../../Library/crc.h"
 
 /* References
@@ -8,15 +8,15 @@ Manual: NA
 Note: Functions not used in the project are not implemented
 */
 
-class RW0003: public RWModel, public ObcI2cTargetCommunicationBase
+class RW0003: public ReactionWheel, public I2cTargetCommunicationWithObc
 {
 public:
   RW0003(
-    RWModel rw,
+    ReactionWheel rw,
     const int sils_port_id,
     const unsigned int hils_port_id,
     const unsigned char i2c_addr,
-    OBC* obc,
+    OnBoardComputer* obc,
     HilsPortManager* hils_port_manager
   );
 
