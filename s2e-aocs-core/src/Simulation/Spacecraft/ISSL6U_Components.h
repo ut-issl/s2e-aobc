@@ -22,7 +22,7 @@
 // Propulsion
 #include <components/real/propulsion/initialize_simple_thruster.hpp>
 // Mission
-#include <component/real/mission/initialize_telescope.hpp>
+#include <components/real/mission/initialize_telescope.hpp>
 // HILS IF
 #include "../../Interface/HILS/HilsIfDriver.h"
 
@@ -41,18 +41,18 @@ public:
 
   // Getter
   // コンポ操作のためconstにしない(privateの意味？)
-  inline MagSensor &GetMagH() { return *rm3100_aobc_; }
-  inline MagTorquer &GetMTQ() { return *mtq_seiren_; }
+  inline Magnetometer &GetMagH() { return *rm3100_aobc_; }
+  inline Magnetorquer &GetMTQ() { return *mtq_seiren_; }
   inline SimpleThruster &GetThruster() { return *thruster_; }
-  inline const LocalEnvironment &GetLocalEnv() { return *local_env_; }
-  inline GNSSReceiver &GetGNSSR() { return *oem7600_; }
+  inline const LocalEnvironment &GetLocalEnv() { return *local_environment_; }
+  inline GnssReceiver &GetGNSSR() { return *oem7600_; }
 
 private:
   // CDH
   ObcWithC2a *aobc_;
   // Power
   PowerController *power_controller_;
-  vector<INA260> ina260s_;
+  std::vector<INA260> ina260s_;
   // AOCS
   MPU9250_GYRO *mpu9250_gyro_;
   MPU9250_MAG *mpu9250_mag_;

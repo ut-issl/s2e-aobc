@@ -16,7 +16,7 @@ public:
 
 private:
   ISSL6USat *spacecraft_;
-  MonteCarloSimulationExecutor &mc_sim_;
+  MonteCarloSimulationExecutor &monte_carlo_simulator_;
 
   /**
    * @fn InitializeTargetObjects

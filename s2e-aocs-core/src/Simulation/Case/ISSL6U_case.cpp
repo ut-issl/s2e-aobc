@@ -1,5 +1,5 @@
 #include "ISSL6U_case.h"
-#include "SimulationConfig.h"
+
 #include <./simulation/monte_carlo_simulation/simulation_object.hpp>
 #include "../Spacecraft/ISSL6Usat.h"
 
@@ -10,12 +10,12 @@ ISSL6UCase::ISSL6UCase(const std::string initialize_base_file, MonteCarloSimulat
 
 ISSL6UCase::~ISSL6UCase() { delete spacecraft_; }
 
-void UserCase::InitializeTargetObjects()
+void ISSL6UCase::InitializeTargetObjects()
 {
   // Instantiate the target of the simulation
   // `spacecraft_id` corresponds to the index of `spacecraft_file` in simulation_base.ini
   const int spacecraft_id = 0;
-  spacecraft_ = new UserSatellite(&simulation_configuration_, global_environment_, spacecraft_id);
+  spacecraft_ = new ISSL6USat(&simulation_configuration_, global_environment_, spacecraft_id);
 
   // Register the log output
   spacecraft_->LogSetup(*(simulation_configuration_.main_logger_));
@@ -27,7 +27,7 @@ void UserCase::InitializeTargetObjects()
   monte_carlo_simulator_.AtTheBeginningOfEachCase();
 }
 
-void UserCase::UpdateTargetObjects()
+void ISSL6UCase::UpdateTargetObjects()
 {
   // Spacecraft Update
   spacecraft_->Update(&(global_environment_->GetSimulationTime()));

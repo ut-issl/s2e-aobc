@@ -1,6 +1,5 @@
 #include "ISSL6Usat.h"
 #include "ISSL6U_Components.h"
-#include "ClockGenerator.h"
 
 ISSL6USat::ISSL6USat(const SimulationConfiguration *simulation_configuration, const GlobalEnvironment *global_environment,
                      const unsigned int spacecraft_id)

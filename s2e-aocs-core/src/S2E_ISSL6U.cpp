@@ -16,8 +16,8 @@
 
 // Simulator includes
 #include <library/utilities/macros.hpp>
+#include <library/logger/initialize_log.hpp>
 #include <simulation/monte_carlo_simulation/initialize_monte_carlo_simulation.hpp>
-#include <library/logger/logger.hpp>
 
 // Add custom include files
 #include "./Simulation/Case/ISSL6U_case.h"
@@ -42,31 +42,33 @@ int main(int argc, char *argv[])
   UNUSED(argv);
 
   std::string ini_file = "../../data/initialize_files/simulation_base.ini";
-  MCSimExecutor *mc_sim = InitMCSim(ini_file);
-  Logger *log_mc_sim = InitLogMC(ini_file, mc_sim->IsEnabled());
+  MonteCarloSimulationExecutor *mc_simulator = InitMonteCarloSimulation(ini_file);
+  Logger *log_mc_simulator = InitMonteCarloLog(ini_file, mc_simulator->IsEnabled());
 
   std::cout << "Starting simulation..." << std::endl;
   std::cout << "\tIni file: ";
   print_path(ini_file);
 
-  while (mc_sim->WillExecuteNextCase())
+  while (mc_simulator->WillExecuteNextCase())
   {
     std::chrono::system_clock::time_point start, end;
     start = std::chrono::system_clock::now();
 
-    auto simcase = ISSL6UCase(ini_file, *mc_sim, log_mc_sim->GetLogPath());
+    auto simcase = ISSL6UCase(ini_file, *mc_simulator, log_mc_simulator->GetLogPath());
     // Initialize
-    log_mc_sim->AddLogList(&simcase);
-    if (mc_sim->GetNumOfExecutionsDone() == 0)
-      log_mc_sim->WriteHeaders();
+    log_mc_simulator->AddLogList(&simcase);
+    if (mc_simulator->GetNumberOfExecutionsDone() == 0)
+    {
+      log_mc_simulator->WriteHeaders();
+    }
     simcase.Initialize();
 
     // Main
-    log_mc_sim->WriteValues(); // log initial value
+    log_mc_simulator->WriteValues(); // log initial value
     simcase.Main();
-    mc_sim->AtTheEndOfEachCase();
-    log_mc_sim->WriteValues(); // log final value
-    log_mc_sim->ClearLogList();
+    mc_simulator->AtTheEndOfEachCase();
+    log_mc_simulator->WriteValues(); // log final value
+    log_mc_simulator->ClearLogList();
 
     end = std::chrono::system_clock::now();
     double time = static_cast<double>(std::chrono::duration_cast<std::chrono::microseconds>(end - start).count() / 1000000.0);
