@@ -1,40 +1,38 @@
 #pragma once
-#include "Gyro.h"
-#include "ObcCommunicationBase.h"
+#include <components/real/aocs/gyro_sensor.hpp>
+#include <components/base/uart_communication_with_obc.hpp>
 #include "../../Library/crc.h"
 
 /* References
 Documents: https://www.sensonor.com/products/gyro-modules/stim210/
 */
 
-class STIM210: public Gyro, public ObcCommunicationBase
+class STIM210 : public GyroSensor, public UartCommunicationWithObc
 {
 public:
   STIM210(
-    Gyro gyro,
-    double compo_step_sec,
-    const int sils_port_id,
-    OBC* obc
-  );
+      GyroSensor gyro,
+      double compo_step_sec,
+      const int sils_port_id,
+      OnBoardComputer *obc);
   STIM210(
-    Gyro gyro,
-    double compo_step_sec,
-    const int sils_port_id,
-    OBC* obc,
-    const unsigned int hils_port_id,
-    const unsigned int baud_rate,
-    HilsPortManager* hils_port_manager
-  );
+      GyroSensor gyro,
+      double compo_step_sec,
+      const int sils_port_id,
+      OnBoardComputer *obc,
+      const unsigned int hils_port_id,
+      const unsigned int baud_rate,
+      HilsPortManager *hils_port_manager);
 
   // Override
   void MainRoutine(int count) override;
   std::string GetLogHeader() const override;
 
 private:
-  libra::Vector<kGyroDim> temperature_c_degC_{30.0};
-  libra::Vector<kGyroDim> angular_velocity_c_rads_{0.0};
-  libra::Vector<kGyroDim> angle_c_rad_{0.0};
-  unsigned char status_  = 0;
+  libra::Vector<kGyroDimension> temperature_c_degC_{30.0};
+  libra::Vector<kGyroDimension> angular_velocity_c_rads_{0.0};
+  libra::Vector<kGyroDimension> angle_c_rad_{0.0};
+  unsigned char status_ = 0;
   unsigned char counter_ = 0; // 内部サンプル周波数の2000Hzでインクリメントされる
   unsigned char latency_ = 0;
 
@@ -129,15 +127,15 @@ private:
     SAMPLE_RATE_MAX
   } SAMPLE_RATE;
 
-  OPERATION_MODE operation_mode_         = OPERATION_INIT_MODE;
+  OPERATION_MODE operation_mode_ = OPERATION_INIT_MODE;
   NORMAL_MODE_FORMAT normal_mode_format_ = NORMAL_MODE_STANDARD;
-  GYRO_OUTPUT_MODE omega_mode_           = GYRO_OUTPUT_ANGULAR_RATE; 
-  TERMINATION_MODE termination_mode_     = TERMINATION_OFF;
-  LPF lpf_freq_                          = LPF_262HZ;
-  SAMPLE_RATE sample_rate_mode_          = SAMPLE_RATE_2000HZ;
+  GYRO_OUTPUT_MODE omega_mode_ = GYRO_OUTPUT_ANGULAR_RATE;
+  TERMINATION_MODE termination_mode_ = TERMINATION_OFF;
+  LPF lpf_freq_ = LPF_262HZ;
+  SAMPLE_RATE sample_rate_mode_ = SAMPLE_RATE_2000HZ;
 
-  const uint8_t normal_mode_format_idx_[STIM210::NORMAL_MODE_MAX] = { 0x90, 0x92, 0xa0, 0xa2, 0xa4, 0xa5, 0x99, 0xa6, 0xa8 }; //!< ノーマルモードでのテレメの1byte目に含まれるidx
-  const uint32_t sample_rate_hz_[STIM210::SAMPLE_RATE_MAX] = { 1, 125, 250, 500, 1000, 2000 };
+  const uint8_t normal_mode_format_idx_[STIM210::NORMAL_MODE_MAX] = {0x90, 0x92, 0xa0, 0xa2, 0xa4, 0xa5, 0x99, 0xa6, 0xa8}; //!< ノーマルモードでのテレメの1byte目に含まれるidx
+  const uint32_t sample_rate_hz_[STIM210::SAMPLE_RATE_MAX] = {1, 125, 250, 500, 1000, 2000};
 
   const unsigned char termination_cr = 0x0d;
   const int kMaxRxSize = 12;
@@ -147,7 +145,7 @@ private:
 
   // Override functions
   int ParseCommand(const int cmd_size) override;
-  int GenerateTelemetry() override; 
+  int GenerateTelemetry() override;
 
   // TLM
   int32_t ConvertOmega2Tlm(double omega);
@@ -155,23 +153,23 @@ private:
 
   // UART telemetry from STIM210
   int GenerateNormalModeTlm();
-  void GenerateFormatTlm(int& offset);
-  void GenerateOmegaTlm(int& offset);
-  void GenerateStatusTlm(int& offset);
-  void GenerateBufferTlm(int& offset);
-  void GenerateTemperatureTlm(int& offset);
-  void GenerateCountTlm(int& offset);
-  void GenerateLatencyTlm(int& offset);
-  void GenerateCRCTlm(int& offset);
-  void GenerateTerminationTlm(int& offset);
-  void SetTlm(vector<unsigned char> tlm, int& offset, size_t tlm_size);
+  void GenerateFormatTlm(int &offset);
+  void GenerateOmegaTlm(int &offset);
+  void GenerateStatusTlm(int &offset);
+  void GenerateBufferTlm(int &offset);
+  void GenerateTemperatureTlm(int &offset);
+  void GenerateCountTlm(int &offset);
+  void GenerateLatencyTlm(int &offset);
+  void GenerateCRCTlm(int &offset);
+  void GenerateTerminationTlm(int &offset);
+  void SetTlm(std::vector<unsigned char> tlm, int &offset, size_t tlm_size);
 
   // CMD
-  int AnalyzeCmdServiceMode(vector<unsigned char> cmd);
-  int AnalyzeCmdNormalMode(vector<unsigned char> cmd);
-  int AnalyzeCmdTermination(vector<unsigned char> cmd);
-  int AnalyzeCmdSetNormalModeFormat(vector<unsigned char> cmd);
-  int AnalyzeCmdSetSampleRate(vector<unsigned char> cmd);
-  int AnalyzeCmdSetOmegaMode(vector<unsigned char> cmd);
-  int AnalyzeCmdSetLPFFrequency(vector<unsigned char> cmd);
+  int AnalyzeCmdServiceMode(std::vector<unsigned char> cmd);
+  int AnalyzeCmdNormalMode(std::vector<unsigned char> cmd);
+  int AnalyzeCmdTermination(std::vector<unsigned char> cmd);
+  int AnalyzeCmdSetNormalModeFormat(std::vector<unsigned char> cmd);
+  int AnalyzeCmdSetSampleRate(std::vector<unsigned char> cmd);
+  int AnalyzeCmdSetOmegaMode(std::vector<unsigned char> cmd);
+  int AnalyzeCmdSetLPFFrequency(std::vector<unsigned char> cmd);
 };
