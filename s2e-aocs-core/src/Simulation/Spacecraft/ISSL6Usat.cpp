@@ -2,8 +2,9 @@
 #include "ISSL6U_Components.h"
 #include "ClockGenerator.h"
 
-ISSL6USat::ISSL6USat(SimulationConfig* sim_config, const GlobalEnvironment* glo_env, const int sat_id)
-  :Spacecraft(sim_config, glo_env, sat_id)
+ISSL6USat::ISSL6USat(const SimulationConfiguration *simulation_configuration, const GlobalEnvironment *global_environment,
+                     const unsigned int spacecraft_id)
+    : Spacecraft(simulation_configuration, global_environment, spacecraft_id)
 {
-  components_ = new ISSL6UComponents(dynamics_, structure_, local_env_, glo_env, sim_config, &clock_gen_, sat_id);
+  components_ = new ISSL6UComponents(dynamics_, structure_, local_environment_, global_environment, simulation_configuration, &clock_generator_, spacecraft_id);
 }
