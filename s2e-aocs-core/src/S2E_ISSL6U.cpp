@@ -1,3 +1,7 @@
+/**
+ * @file S2E_ISSL6U.cpp
+ * @brief The main file of S2E-USER
+ */
 
 #ifdef WIN32
 	#define _WINSOCKAPI_    // stops windows.h including winsock.h
@@ -9,12 +13,11 @@
 #include <iostream>
 #include <string>
 #include <cstdlib>
-#include <Library/utils/Macros.hpp>
 
 // Simulator includes
-#include "SimulationCase.h"
-#include <Simulation/MCSim/InitMcSim.hpp>
-#include <Interface/LogOutput/InitLog.hpp>
+#include <library/utilities/macros.hpp>
+#include <simulation/monte_carlo_simulation/initialize_monte_carlo_simulation.hpp>
+#include <library/logger/logger.hpp>
 
 //Add custom include files
 #include "./Simulation/Case/ISSL6U_case.h"
@@ -52,15 +55,16 @@ int main(int argc, char* argv[])
 
     auto simcase = ISSL6UCase(ini_file, *mc_sim, log_mc_sim->GetLogPath());
     // Initialize
-    log_mc_sim->AddLoggable(&simcase);
+    log_mc_sim->AddLogList(&simcase);
     if (mc_sim->GetNumOfExecutionsDone() == 0) log_mc_sim->WriteHeaders();
     simcase.Initialize();
 
     //Main
     log_mc_sim->WriteValues(); //log initial value
     simcase.Main();
+    mc_sim->AtTheEndOfEachCase();
     log_mc_sim->WriteValues(); //log final value
-    log_mc_sim->ClearLoggables();
+    log_mc_sim->ClearLogList();
 
     end = std::chrono::system_clock::now();
     double time = static_cast<double>(std::chrono::duration_cast<std::chrono::microseconds>(end - start).count() / 1000000.0);
