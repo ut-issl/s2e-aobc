@@ -1,6 +1,6 @@
 #pragma once
-#include "MagSensor.h"
-#include "ObcI2cTargetCommunicationBase.h"
+#include <components/real/aocs/magnetometer.hpp>
+#include <components/base/i2c_target_communication_with_obc.hpp>
 
 /* References
 Manual: https://www.pnicorp.com/wp-content/uploads/RM3100-Testing-Boards-User-Manual-r04-1.pdf
@@ -8,15 +8,15 @@ HowToUse: NA
 Note: Functions not used in the project are not implemented
 */
 
-class RM3100: public MagSensor, public ObcI2cTargetCommunicationBase
+class RM3100: public Magnetometer, public I2cTargetCommunicationWithObc
 {
 public:
   RM3100(
-    MagSensor mag_sensor,
+    Magnetometer mag_sensor,
     const int sils_port_id,
     const unsigned int hils_port_id,
     const unsigned char i2c_addr,
-    OBC* obc,
+    OnBoardComputer* obc,
     HilsPortManager* hils_port_manager
   );
 
