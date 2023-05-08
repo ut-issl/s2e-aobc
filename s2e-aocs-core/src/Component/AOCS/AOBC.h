@@ -1,10 +1,9 @@
 #pragma once
-#include "ComponentBase.h"
-#include "Vector.hpp"
+#include <components/base/component.hpp>
 
 class ISSL6UComponents;
 
-class AOBC: public ComponentBase
+class AOBC: public Component
 {
 public:
   AOBC(ClockGenerator* clock_gen, ISSL6UComponents* components);

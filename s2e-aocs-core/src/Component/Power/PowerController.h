@@ -1,15 +1,15 @@
 #pragma once
-#include "PCU.h"
-#include "ObcGpioBase.h"
+#include <components/real/power/power_control_unit.hpp>
+#include <components/base/gpio_connection_with_obc.hpp>
 
-class PowerController: public PCU, public ObcGpioBase
+class PowerController: public PowerControlUnit, public GpioConnectionWithObc
 {
 public:
   PowerController(
-    PCU pcu,
+    PowerControlUnit pcu,
     const std::vector<int> gpio_ports,  // GPIOのポート番号リスト
     const std::vector<double> output_voltage_list, // 出力電圧リスト
-    OBC* obc
+    OnBoardComputer* obc
   );
   // Override: PCU functions
   void MainRoutine(int count) override;

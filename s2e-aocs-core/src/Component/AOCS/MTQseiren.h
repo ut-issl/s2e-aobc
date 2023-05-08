@@ -1,20 +1,18 @@
 #pragma once
-#include "MagTorquer.h"
-#include "ObcGpioBase.h"
+#include <components/real/aocs/magnetorquer.hpp>
+#include <components/base/gpio_connection_with_obc.hpp>
 
 /* References
 Manual: NA
 HowToUse: NA
 */
 
-class MTQseiren: public MagTorquer, public ObcGpioBase
+class MTQseiren : public Magnetorquer, public GpioConnectionWithObc
 {
 public:
-  MTQseiren(
-    MagTorquer mag_torquer,
-    vector<int> gpio_ports,
-    OBC* obc
-  );
+  MTQseiren(Magnetorquer mag_torquer,
+            std::vector<int> gpio_ports,
+            OnBoardComputer *obc);
   ~MTQseiren();
 
   // Override: MagTorquer functions
@@ -32,7 +30,7 @@ private:
     GPIO_Z_NEGATIVE,
   } MtqGpioIdx;
 
-  libra::Vector<kMtqDim> polarity_;
+  libra::Vector<kMtqDimension> polarity_;
 
   // Read GPIO state and determine MTQ polarity
   // return:

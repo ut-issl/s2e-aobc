@@ -1,6 +1,6 @@
 #pragma once
-#include "../../../../s2e-core/src/Component/AOCS/Gyro.h"
-#include "../../../../s2e-core/src/Component/Abstract/ObcI2cTargetCommunicationBase.h"
+#include <components/real/aocs/gyro_sensor.hpp>
+#include <components/base/i2c_target_communication_with_obc.hpp>
 
 /* References
 Manual: https://media.digikey.com/pdf/Data%20Sheets/TDK%20PDFs/MPU-9250_Rev_1.1.pdf
@@ -10,15 +10,15 @@ Note: Functions not used in the project are not implemented
 
 const unsigned char kMpuTlmSize_ = 2;
 
-class MPU9250_GYRO: public Gyro, public ObcI2cTargetCommunicationBase
+class MPU9250_GYRO: public GyroSensor, public I2cTargetCommunicationWithObc
 {
 public:
   MPU9250_GYRO(
-    Gyro gyro,
+    GyroSensor gyro,
     const int sils_port_id,
     const unsigned int hils_port_id,
     const unsigned char i2c_addr,
-    OBC* obc,
+    OnBoardComputer* obc,
     HilsPortManager* hils_port_manager
   );
 
@@ -43,7 +43,7 @@ private:
   const double temp_offset_degC_          = 21.0;
   
   // Dummy data
-  double acc_c_G_[kGyroDim] = {-0.02, 0.01, -1.0}; // とりあえずテキトウな値を入れる
+  double acc_c_G_[kGyroDimension] = {-0.02, 0.01, -1.0}; // とりあえずテキトウな値を入れる
   double temperature_degC_ = 30.0; // 温度補正に合わせて設定
 
   // Registers

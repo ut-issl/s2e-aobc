@@ -1,15 +1,15 @@
 #include "MPU9250_GYRO.h"
-#include <Library/math/Constant.hpp>
-#include <Library/utils/Macros.hpp>
+#include <library/math/constants.hpp>
+#include <library/utilities/macros.hpp>
 
 MPU9250_GYRO::MPU9250_GYRO(
-  Gyro gyro,
+  GyroSensor gyro,
   const int sils_port_id,
   const unsigned int hils_port_id,
   const unsigned char i2c_addr,
-  OBC* obc,
+  OnBoardComputer* obc,
   HilsPortManager* hils_port_manager
-):Gyro(gyro), ObcI2cTargetCommunicationBase(sils_port_id, hils_port_id, i2c_addr, obc, hils_port_manager)
+):GyroSensor(gyro), I2cTargetCommunicationWithObc(sils_port_id, hils_port_id, i2c_addr, obc, hils_port_manager)
 {
   unsigned char tmp = 0xff;
   WriteRegister(kCmdGyroEnable_, &tmp, 1); // 初期値としてはGyro OFF
@@ -27,8 +27,8 @@ void MPU9250_GYRO::MainRoutine(int count)
   // Generate TLM
   if (is_gyro_on_ == true)
   {
-    omega_c_ = q_b2c_.frame_conv(dynamics_->GetAttitude().GetOmega_b()); //Convert frame
-    omega_c_ = Measure(omega_c_); //Add noises
+    angular_velocity_c_rad_s_ = quaternion_b2c_.FrameConversion(dynamics_->GetAttitude().GetAngularVelocity_b_rad_s()); //Convert frame
+    angular_velocity_c_rad_s_ = Measure(angular_velocity_c_rad_s_); //Add noises
     WriteGyroTlm();
   }
 
@@ -90,7 +90,7 @@ void MPU9250_GYRO::WriteGyroTlm()
   unsigned char reg_id = kRegObsGyro_;
 
   // Acc
-  for (size_t i=0; i<kGyroDim; i++)
+  for (size_t i=0; i<kGyroDimension; i++)
   {
     Convert2Tlm(tlm, acc_c_G_[i] * acc_convert_G_to_raw_);
     WriteRegister(reg_id, tlm, kMpuTlmSize_);
@@ -101,9 +101,9 @@ void MPU9250_GYRO::WriteGyroTlm()
   WriteRegister(reg_id, tlm, kMpuTlmSize_);
   reg_id += kMpuTlmSize_;
   // Gyro
-  for (size_t i=0; i<kGyroDim; i++)
+  for (size_t i=0; i<kGyroDimension; i++)
   {
-    double omega_c_deg_s = omega_c_[i] * libra::rad_to_deg;
+    double omega_c_deg_s = angular_velocity_c_rad_s_[i] * libra::rad_to_deg;
     Convert2Tlm(tlm, omega_c_deg_s * omega_convert_deg_s_to_raw_);
     WriteRegister(reg_id, tlm, kMpuTlmSize_);
     reg_id += kMpuTlmSize_;

@@ -1,31 +1,29 @@
 #include "Sagitta.h"
-#include "slip.h"
-
+#include <library/utilities/slip.hpp>
 
 Sagitta::Sagitta(
-  STT stt,
-  const int sils_port_id,
-  OBC* obc
-):STT(stt), ObcCommunicationBase(sils_port_id, obc)
+    StarSensor stt,
+    const int sils_port_id,
+    OnBoardComputer *obc) : StarSensor(stt), UartCommunicationWithObc(sils_port_id, obc)
 {
-
 }
 
 Sagitta::Sagitta(
-  STT stt,
-  const int sils_port_id,
-  OBC* obc,
-  const unsigned int hils_port_id,
-  const unsigned int baud_rate,
-  HilsPortManager* hils_port_manager
-):STT(stt), ObcCommunicationBase(sils_port_id, obc, hils_port_id, baud_rate, hils_port_manager)
-{}
+    StarSensor stt,
+    const int sils_port_id,
+    OnBoardComputer *obc,
+    const unsigned int hils_port_id,
+    const unsigned int baud_rate,
+    HilsPortManager *hils_port_manager) : StarSensor(stt), UartCommunicationWithObc(sils_port_id, obc, hils_port_id, baud_rate, hils_port_manager)
+{
+}
 
 void Sagitta::MainRoutine(int count)
 {
   int receive_data_size = ReceiveCommand(0, kMaxCmdSize_);
 
-  if (tlm_reply_mode_ == TLM_REPLY_MODE_SYNCHRONOUS && receive_data_size < 1) return; // テレメ送信コマンドが送られていない場合
+  if (tlm_reply_mode_ == TLM_REPLY_MODE_SYNCHRONOUS && receive_data_size < 1)
+    return; // テレメ送信コマンドが送られていない場合
   if (!is_initialized_)
   {
     runtime_ms_ = 0;
@@ -34,15 +32,15 @@ void Sagitta::MainRoutine(int count)
   }
   status_ = 0;
   counter_ += count; // TODO: 内部カウンタに合わせて修正
-  runtime_ms_ += uint32_t(step_time_ * 1000);
-  unix_time_us_ += uint64_t(step_time_ * 1000000); // TODO: unix時間にする。simtimeを内部でもつ？
+  runtime_ms_ += uint32_t(step_time_s_ * 1000);
+  unix_time_us_ += uint64_t(step_time_s_ * 1000000); // TODO: unix時間にする。simtimeを内部でもつ？
   // Quaternionの更新
-  measure(&(local_env_->GetCelesInfo()), &(dynamics_->GetAttitude()));
+  Measure(&(local_environment_->GetCelestialInformation()), &(dynamics_->GetAttitude()));
 
-  q_tlm_i2c_[0] = static_cast<float>(q_stt_i2c_[3]); // Sagittaでは1要素目，S2Eでは4要素目がスカラー．
+  q_tlm_i2c_[0] = static_cast<float>(measured_quaternion_i2c_[3]); // Sagittaでは1要素目，S2Eでは4要素目がスカラー．
   for (uint8_t i = 0; i < 3; i++)
   {
-    q_tlm_i2c_[i + 1] = static_cast<float>(q_stt_i2c_[i]);
+    q_tlm_i2c_[i + 1] = static_cast<float>(measured_quaternion_i2c_[i]);
   }
   mcu_temperature_degC_ = 26.0f;
   cmos_temperature_degC_ = 24.0f;
@@ -54,12 +52,13 @@ void Sagitta::MainRoutine(int count)
   return;
 }
 
-
 int Sagitta::ParseCommand(const int cmd_size)
 {
-  if (cmd_size < 1) return -1;
+  if (cmd_size < 1)
+    return -1;
   std::vector<uint8_t> decoded_rx = decode_slip_with_header(rx_buffer_);
-  if (decoded_rx.size() < sizeof(kAddress_) + kXxhashSize_) return -1;
+  if (decoded_rx.size() < sizeof(kAddress_) + kXxhashSize_)
+    return -1;
 
   if (!is_initialized_)
   {
@@ -120,17 +119,17 @@ int Sagitta::AnalyzeCmdBoot(std::vector<uint8_t> decoded_rx)
 {
   const int kCmdSize = 4;
   // 最初のkCmdSizeのみ見て判断
-  unsigned char kCmdBoot[kCmdSize] = 
-  {
-    kAddress_,
-    kCmdAction_,
-    kActionIdBoot_,
-    kParamRegion_
-  };
+  unsigned char kCmdBoot[kCmdSize] =
+      {
+          kAddress_,
+          kCmdAction_,
+          kActionIdBoot_,
+          kParamRegion_};
 
   for (int i = 0; i < kCmdSize; i++)
   {
-    if (decoded_rx[i] != kCmdBoot[i]) return -1;
+    if (decoded_rx[i] != kCmdBoot[i])
+      return -1;
   }
 
   is_initialized_ = 1;
@@ -140,7 +139,8 @@ int Sagitta::AnalyzeCmdBoot(std::vector<uint8_t> decoded_rx)
 
 int Sagitta::AnalyzeCmdRequestTlm(std::vector<uint8_t> decoded_rx)
 {
-  if (decoded_rx[0] != kAddress_) return -1;
+  if (decoded_rx[0] != kAddress_)
+    return -1;
 
   if (decoded_rx[1] == kCmdSetParam_ && decoded_rx[2] == kParamSubscription)
   {

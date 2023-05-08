@@ -1,6 +1,6 @@
 ﻿#include "OEM7600.h"
 #include <algorithm> // toupper
-#include <Library/utils/Macros.hpp>
+#include <library/utilities/macros.hpp>
 
 #define MAX_CMD_LEN 1024 // TBD
 #define MAX_TLM_LEN 1024 // TBD
@@ -12,25 +12,25 @@
 //#define TLM_FUNCTION_DEBUG_MODE
 
 OEM7600::OEM7600(
-  GNSSReceiver gnssr,
+  GnssReceiver gnssr,
   const int sils_port_id,
-  OBC* obc,
+  OnBoardComputer* obc,
   const unsigned char oem_tlm_ch
-):GNSSReceiver(gnssr), ObcCommunicationBase(sils_port_id, obc), oem_tlm_ch_(oem_tlm_ch)
+):GnssReceiver(gnssr), UartCommunicationWithObc(sils_port_id, obc), oem_tlm_ch_(oem_tlm_ch)
 {
 
 }
 
 OEM7600::OEM7600(
-  GNSSReceiver gnssr,
+  GnssReceiver gnssr,
   const int sils_port_id,
-  OBC* obc,
+  OnBoardComputer* obc,
   const unsigned char oem_tlm_ch,
   const unsigned int hils_port_id,
   const unsigned int baud_rate,
   HilsPortManager* hils_port_manager
-):GNSSReceiver(gnssr),
-  ObcCommunicationBase(sils_port_id, obc, hils_port_id, baud_rate, hils_port_manager),
+):GnssReceiver(gnssr),
+  UartCommunicationWithObc(sils_port_id, obc, hils_port_id, baud_rate, hils_port_manager),
   oem_tlm_ch_(oem_tlm_ch)
 {}
 
@@ -66,27 +66,27 @@ void OEM7600::MainRoutine(int count)
 void OEM7600::Update_local()
 {
   // check visibility (transfered method from GNSSReciever Class)
-  Vector<3> pos_true_eci_m = dynamics_->GetOrbit().GetSatPosition_i();
-  Quaternion q_i2b = dynamics_->GetQuaternion_i2b();
+  Vector<3> pos_true_eci_m = dynamics_->GetOrbit().GetPosition_i_m();
+  libra::Quaternion q_i2b = dynamics_->GetAttitude().GetQuaternion_i2b();
 
   CheckAntenna(pos_true_eci_m, q_i2b);
 
-  if (is_gnss_sats_visible_ == 1) {  //Antenna of GNSS-R can detect GNSS signal
+  if (is_gnss_visible_ == 1) {  //Antenna of GNSS-R can detect GNSS signal
 
     // should be modified to add noise in the future
-    Vector<3> pos_true_ecef_m = dynamics_->GetOrbit().GetSatPosition_ecef();
-    velocity_ecef_ = dynamics_->GetOrbit().GetSatVelocity_ecef();
+    Vector<3> pos_true_ecef_m = dynamics_->GetOrbit().GetPosition_ecef_m();
+    velocity_ecef_m_s_ = dynamics_->GetOrbit().GetVelocity_ecef_m_s();
     position_llh_  = dynamics_->GetOrbit().GetLatLonAlt();
     AddNoise(pos_true_eci_m, pos_true_ecef_m);
 
-    last_position_fix_time_local_ = simtime_->GetElapsedSec(); // store position fixed time [sec]
-    utc_ = simtime_->GetCurrentUTC();
-    ConvertJulianDayToGPSTime(simtime_->GetCurrentJd());
+    last_position_fix_time_local_ = simulation_time_->GetElapsedTime_s(); // store position fixed time [sec]
+    utc_ = simulation_time_->GetCurrentUtc();
+    ConvertJulianDayToGPSTime(simulation_time_->GetCurrentTime_jd());
   }
   else 
   {
-    utc_ = simtime_->GetCurrentUTC();
-    ConvertJulianDayToGPSTime(simtime_->GetCurrentJd());
+    utc_ = simulation_time_->GetCurrentUtc();
+    ConvertJulianDayToGPSTime(simulation_time_->GetCurrentTime_jd());
   }
 
 }
@@ -367,7 +367,7 @@ std::string OEM7600::Gen_TLM_Header_Ascii(const std::string tlm_name)
   str_tmp += ",90.5"; // CPU idle time (currently dummy data is padded)
 
   // Time status
-  if (is_gnss_sats_visible_)
+  if (is_gnss_visible_)
   {
     str_tmp += ",FINESTEERING";
   }
@@ -376,8 +376,8 @@ std::string OEM7600::Gen_TLM_Header_Ascii(const std::string tlm_name)
     str_tmp += ",UNKNOWN";
   }
 
-  str_tmp += WriteScalar(gpstime_week_);
-  str_tmp += WriteScalar(gpstime_sec_);
+  str_tmp += WriteScalar(gps_time_week_);
+  str_tmp += WriteScalar(gps_time_s_);
   str_tmp += "02000000";   // Receiver status summary (currently dummy data is padded)
   str_tmp += str_reserved; // footer
 
@@ -428,7 +428,7 @@ std::string OEM7600::Gen_TLM_Header_Binary(const std::string tlm_name)
   // dummy data of cpu idle time(0~200) and time status
   tlm[tlm_parse_pointer++] = 0xB2;
 
-  if (is_gnss_sats_visible_)
+  if (is_gnss_visible_)
   {
     tlm[tlm_parse_pointer++] = 0xB4; // Fine Steering
   }
@@ -438,10 +438,10 @@ std::string OEM7600::Gen_TLM_Header_Binary(const std::string tlm_name)
   }
 
   // week(uint16),msec(uint32)
-  tlm[tlm_parse_pointer++] = (unsigned char)(((unsigned short)(gpstime_week_) & 0x00ff));
-  tlm[tlm_parse_pointer++] = (unsigned char)(((unsigned short)(gpstime_week_) & 0xff00) >> 8);
+  tlm[tlm_parse_pointer++] = (unsigned char)(((unsigned short)(gps_time_week_) & 0x00ff));
+  tlm[tlm_parse_pointer++] = (unsigned char)(((unsigned short)(gps_time_week_) & 0xff00) >> 8);
 
-  unsigned int gps_time_msec = (unsigned int)(gpstime_sec_ * 1000.0);
+  unsigned int gps_time_msec = (unsigned int)(gps_time_s_ * 1000.0);
   tlm[tlm_parse_pointer++] = (unsigned char)((gps_time_msec & 0x000000ff));
   tlm[tlm_parse_pointer++] = (unsigned char)((gps_time_msec & 0x0000ff00) >> 8);
   tlm[tlm_parse_pointer++] = (unsigned char)((gps_time_msec & 0x00ff0000) >> 16);
@@ -473,7 +473,7 @@ std::string OEM7600::Gen_BestXYZTlm_Ascii(void)
   std::string sol_staus;
 
   // solution sutatus
-  if (is_gnss_sats_visible_)
+  if (is_gnss_visible_)
   {
     sol_staus = "SOL_COMPUTED";
   }
@@ -483,11 +483,11 @@ std::string OEM7600::Gen_BestXYZTlm_Ascii(void)
   }
 
   str_tmp += sol_staus + ",SINGLE,";            // position solution status
-  str_tmp += WriteVector(position_ecef_,11);    // postion computed
+  str_tmp += WriteVector(position_ecef_m_,11);    // postion computed
   str_tmp += "72.5816,61.3924,159.6638,";       // std 1-sigma of computed position(currently dummy data is padded)
 
   str_tmp += sol_staus + ",DOPPLER_VELOCITY,";  // velocity solution sutatus
-  str_tmp += WriteVector(velocity_ecef_,8);     // velocity computed
+  str_tmp += WriteVector(velocity_ecef_m_s_,8);     // velocity computed
   str_tmp += "0.5747,0.4413,1.4830,";           // std 1-sigma of computed velocity(currently dummy data is padded)
 
   str_tmp += " ,";                              // base station ID of differenctial positioning (ignored in this model)
@@ -495,12 +495,12 @@ std::string OEM7600::Gen_BestXYZTlm_Ascii(void)
   str_tmp += "0.000,";                          // diff_age (differential age in seconds, basically the ouput value is fixed to zero)
 
   // sol_age (solution age in seconds)
-  double sol_age = simtime_->GetElapsedSec() - last_position_fix_time_local_;
+  double sol_age = simulation_time_->GetElapsedTime_s() - last_position_fix_time_local_;
   str_tmp += WriteScalar(sol_age);
 
-  str_tmp += WriteScalar(gnss_sats_visible_num_);   // number of satellites tracked
-  str_tmp += WriteScalar(gnss_sats_visible_num_);   // number of satellites used in solution (currently dummy data is padded)
-  str_tmp += WriteScalar(gnss_sats_visible_num_);   // number of satellites with L1/E1/B1 signals used in solution (currently dummy data is padded)
+  str_tmp += WriteScalar(visible_satellite_number_);   // number of satellites tracked
+  str_tmp += WriteScalar(visible_satellite_number_);   // number of satellites used in solution (currently dummy data is padded)
+  str_tmp += WriteScalar(visible_satellite_number_);   // number of satellites with L1/E1/B1 signals used in solution (currently dummy data is padded)
   str_tmp += "0,";                                  // number of satellites with multi-frequency signals used in solution (currently dummy data is padded)
 
   str_tmp += "0,";    // reserved
@@ -519,8 +519,8 @@ std::string OEM7600::Gen_BestXYZTlm_Binary(void)
   unsigned int  tlm_parse_pointer = 0;
   const unsigned char kByteSizeLongDouble = 8;
   const unsigned char kByteSizeIntFloat   = 4;
-  vector<unsigned char> byte_buffer_double;
-  vector<unsigned char> byte_buffer_float;
+  std::vector<unsigned char> byte_buffer_double;
+  std::vector<unsigned char> byte_buffer_float;
 
   // position, velocity fix status
   unsigned int position_solution_status;
@@ -528,7 +528,7 @@ std::string OEM7600::Gen_BestXYZTlm_Binary(void)
   unsigned int valocity_solution_status;
   unsigned int velocity_solution_type;
 
-  if (is_gnss_sats_visible_)
+  if (is_gnss_visible_)
   {
     position_solution_status = 0;  // Solution computed
     position_solution_type   = 16; // Single (Sololy based on GNSSR Signal)
@@ -558,7 +558,7 @@ std::string OEM7600::Gen_BestXYZTlm_Binary(void)
   // position in ECEF[m]
   for (int axis = 0; axis < 3; axis++)
   {
-    byte_buffer_double = ConvertDoubleToByte(position_ecef_[axis]);
+    byte_buffer_double = ConvertDoubleToByte(position_ecef_m_[axis]);
     for (int i = 0; i < kByteSizeLongDouble; i++)
     {
       tlm[tlm_parse_pointer++] = byte_buffer_double[i];
@@ -591,7 +591,7 @@ std::string OEM7600::Gen_BestXYZTlm_Binary(void)
   // velocity in ECEF[m]
   for (int axis = 0; axis < 3; axis++)
   {
-    byte_buffer_double = ConvertDoubleToByte(velocity_ecef_[axis]);
+    byte_buffer_double = ConvertDoubleToByte(velocity_ecef_m_s_[axis]);
     for (int i = 0; i < kByteSizeLongDouble; i++)
     {
       tlm[tlm_parse_pointer++] = byte_buffer_double[i];
@@ -633,7 +633,7 @@ std::string OEM7600::Gen_BestXYZTlm_Binary(void)
   }
 
   // solution age (elapsed time since last position fixed time [sec])
-  float sol_age_sec = (float)(simtime_->GetElapsedSec() - last_position_fix_time_local_);
+  float sol_age_sec = (float)(simulation_time_->GetElapsedTime_s() - last_position_fix_time_local_);
   byte_buffer_float = ConvertFloatToByte(sol_age_sec);
   for (int i = 0; i < kByteSizeIntFloat; i++)
   {
@@ -641,10 +641,10 @@ std::string OEM7600::Gen_BestXYZTlm_Binary(void)
   }
 
   // number of satellites tracked, number of satellites used in solution, number of satellites with L1/E1/B1 signals used, number of satellites with multi-frequency signals
-  tlm[tlm_parse_pointer++] = (unsigned char)gnss_sats_visible_num_;
-  tlm[tlm_parse_pointer++] = (unsigned char)gnss_sats_visible_num_;
-  tlm[tlm_parse_pointer++] = (unsigned char)gnss_sats_visible_num_;
-  tlm[tlm_parse_pointer++] = (unsigned char)gnss_sats_visible_num_;
+  tlm[tlm_parse_pointer++] = (unsigned char)visible_satellite_number_;
+  tlm[tlm_parse_pointer++] = (unsigned char)visible_satellite_number_;
+  tlm[tlm_parse_pointer++] = (unsigned char)visible_satellite_number_;
+  tlm[tlm_parse_pointer++] = (unsigned char)visible_satellite_number_;
 
   // reserved and extended solution status (usually fixed to 0x00, 0x02)
   tlm[tlm_parse_pointer++] = 0x00;
@@ -667,7 +667,7 @@ std::string OEM7600::Gen_TimeTlm_Ascii(void)
   std::string clock_status;
 
   // clock sutatus
-  if (is_gnss_sats_visible_)
+  if (is_gnss_visible_)
   {
     clock_status += "VALID";
   }
@@ -686,8 +686,8 @@ std::string OEM7600::Gen_TimeTlm_Ascii(void)
   str_tmp += WriteScalar(utc_.month);
   str_tmp += WriteScalar(utc_.day);
   str_tmp += WriteScalar(utc_.hour);
-  str_tmp += WriteScalar(utc_.min);
-  str_tmp += WriteScalar((unsigned int)(utc_.sec*1000)); // sec in [msec] format
+  str_tmp += WriteScalar(utc_.minute);
+  str_tmp += WriteScalar((unsigned int)(utc_.second*1000)); // sec in [msec] format
   str_tmp += clock_status;  // UTC status (in real HW, UTC status is not always equal to clock status, but is deal to be equal in this model )
 
   return str_tmp;
@@ -708,7 +708,7 @@ std::string OEM7600::Gen_HWMonitorTlm_Binary(void)
   unsigned char tlm[OEM7600_HWMONITOR_BINARY_TLM_SIZE] = {};
   unsigned int  tlm_parse_pointer = 0;
   const unsigned char kByteSizeIntFloat = 4;
-  vector<unsigned char> byte_buffer_float;
+  std::vector<unsigned char> byte_buffer_float;
 
   // number of output
   unsigned int num_of_output_contenst = 6;
@@ -819,7 +819,7 @@ std::string OEM7600::Gen_GPGGATlm(void)
   std::string str_tmp = "$GPGGA,";
 
   // if 100 sec passed from last position fix timing, all the succeeding outputs reset to blank
-  double elapsed_sec = simtime_->GetElapsedSec() - last_position_fix_time_local_;
+  double elapsed_sec = simulation_time_->GetElapsedTime_s() - last_position_fix_time_local_;
   if (elapsed_sec > 100.0)
   {
     str_tmp += ",,,,,0,,,,,,,,*66";
@@ -832,11 +832,11 @@ std::string OEM7600::Gen_GPGGATlm(void)
     str_utc_tmp.erase(str_utc_tmp.end() - 1); // since "," added in "WriteScalar" is unnecessary in this case, erase it here
     str_tmp += string_zeropad_local(str_utc_tmp, 2);
 
-    str_utc_tmp = WriteScalar(utc_.min, 2);
+    str_utc_tmp = WriteScalar(utc_.minute, 2);
     str_utc_tmp.erase(str_utc_tmp.end() - 1); // since "," added in "WriteScalar" is unnecessary in this case, erase it here
     str_tmp += string_zeropad_local(str_utc_tmp, 2);
 
-    str_utc_tmp = WriteScalar(utc_.sec, 4);
+    str_utc_tmp = WriteScalar(utc_.second, 4);
     str_tmp += string_zeropad_local(str_utc_tmp, 6);
 
     // lat in [ddmm.mm] + indicator "N" or "S"
@@ -846,7 +846,7 @@ std::string OEM7600::Gen_GPGGATlm(void)
     str_tmp += convLatLontoNMEA(position_llh_[1], "lon");
 
     // quality
-    if (is_gnss_sats_visible_)
+    if (is_gnss_visible_)
     {
       str_tmp += "1,";
     }
@@ -856,7 +856,7 @@ std::string OEM7600::Gen_GPGGATlm(void)
     }
 
     // number of vis sat
-    str_tmp += WriteScalar(gnss_sats_visible_num_);
+    str_tmp += WriteScalar(visible_satellite_number_);
 
     // hdop (currently dummy data is padded)
     str_tmp += "1.0,";
@@ -1003,7 +1003,7 @@ std::string OEM7600::string_zeropad_local(const std::string str_org, const unsig
 }
 
 // convert position,velocity data in double format into byte format
-vector<unsigned char> OEM7600::ConvertDoubleToByte(const double double_data)
+std::vector<unsigned char> OEM7600::ConvertDoubleToByte(const double double_data)
 {
   union {
     double   buffer_double_format;
@@ -1011,7 +1011,7 @@ vector<unsigned char> OEM7600::ConvertDoubleToByte(const double double_data)
   }convertbuffer_double_byte;
 
   const unsigned char kByteSizeDouble = 8;
-  vector<unsigned char> byte_vector;
+  std::vector<unsigned char> byte_vector;
 
   convertbuffer_double_byte.buffer_double_format = double_data;
 
@@ -1029,7 +1029,7 @@ vector<unsigned char> OEM7600::ConvertDoubleToByte(const double double_data)
 }
 
 // convert position,velocity data in float format into byte format
-vector<unsigned char> OEM7600::ConvertFloatToByte(const float float_data)
+std::vector<unsigned char> OEM7600::ConvertFloatToByte(const float float_data)
 {
   union {
     float        buffer_float_format;
@@ -1037,7 +1037,7 @@ vector<unsigned char> OEM7600::ConvertFloatToByte(const float float_data)
   }convertbuffer_float_byte;
 
   const unsigned char kByteSizeFloat = 4;
-  vector<unsigned char> byte_vector;
+  std::vector<unsigned char> byte_vector;
 
   convertbuffer_float_byte.buffer_float_format = float_data;
 

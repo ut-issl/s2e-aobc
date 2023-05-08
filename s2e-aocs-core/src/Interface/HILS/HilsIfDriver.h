@@ -1,20 +1,19 @@
 #pragma once
-#include "ComponentBase.h"
-#include "ObcCommunicationBase.h"
+#include <components/base/component.hpp>
+#include <components/base/uart_communication_with_obc.hpp>
 #include "../../Component/AOCS/MTQseiren.h"
 
-class HilsIfDriver: public ComponentBase, public ObcCommunicationBase, public ObcGpioBase
+class HilsIfDriver : public Component, public UartCommunicationWithObc, public GpioConnectionWithObc
 {
 public:
   HilsIfDriver(
-    const int prescaler,
-    ClockGenerator *clock_gen,
-    const unsigned int hils_port_id,
-    const unsigned int baud_rate,
-    HilsPortManager* hils_port_manager,
-    vector<int> gpio_ports,
-    OBC* obc
-  );
+      const int prescaler,
+      ClockGenerator *clock_gen,
+      const unsigned int hils_port_id,
+      const unsigned int baud_rate,
+      HilsPortManager *hils_port_manager,
+      std::vector<int> gpio_ports,
+      OnBoardComputer *obc);
   ~HilsIfDriver();
 
   void MainRoutine(int count) override;
