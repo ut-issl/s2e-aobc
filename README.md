@@ -2,7 +2,7 @@
 ## Overview
 
 - S2E-AOBC is the S2E's user side repository for AOCS sub-system.
-- This repository manages source codes and initialize files for simulation scenario definition since this is just a user repository. 
+- This repository manages source codes and initialize files for simulation scenario definition since this is just a user repository.
 
 ## Development style
 
@@ -33,7 +33,7 @@
 ## C2A Integration
 
 - Make `FlightSW` directory at same directory with `S2E-AOBC`
-- Make `C2A` directory in `FlighSW` and clone a [C2A-AOBC](https://github.com/ut-issl/c2a-aobc) repository
+- Make `C2A` directory in `FlightSW` and clone a [C2A-AOBC](https://github.com/ut-issl/c2a-aobc) repository
 - Edit `S2E-AOBC/CMakeLists.txt` as follows
   - `set(USE_C2A OFF)` -> `set(USE_C2A ON)`
 - Build `S2E-AOBC`
