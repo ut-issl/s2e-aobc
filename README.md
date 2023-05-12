@@ -33,7 +33,7 @@
 ## C2A Integration
 
 - Make `FlightSW` directory at same directory with `S2E-AOBC`
-- Make `C2A` directory in `FlightSW` and clone a [C2A-AOBC](https://github.com/ut-issl/c2a-aobc) repository
+- Clone a [C2A-AOBC](https://github.com/ut-issl/c2a-aobc) repository into `FlightSW`
 - Edit `S2E-AOBC/CMakeLists.txt` as follows
   - `set(USE_C2A OFF)` -> `set(USE_C2A ON)`
 - Build `S2E-AOBC`
