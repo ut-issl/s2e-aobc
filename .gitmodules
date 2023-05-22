@@ -1,3 +1,3 @@
 [submodule "s2e-core"]
 	path = s2e-core
-	url = https://github.com/ut-issl/s2e-core
+	url = git@github.com:ut-issl/s2e-core.git
