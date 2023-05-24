@@ -18,7 +18,6 @@ endif()
 
 ## set directory path
 set(S2E_CORE_DIR ${CMAKE_CURRENT_LIST_DIR}/s2e-core)
-set(S2E_AOCS_DIR ${CMAKE_CURRENT_LIST_DIR}/s2e-aocs-core)
 
 if(NOT DEFINED EXT_LIB_DIR)
   set(EXT_LIB_DIR ${CMAKE_CURRENT_LIST_DIR}/ExtLibraries)
@@ -77,7 +76,7 @@ add_subdirectory(${S2E_CORE_DIR}/src/library s2e_core/library)
 add_subdirectory(${S2E_CORE_DIR}/src/simulation s2e_core/simulation)
 
 # Add source files
-file(GLOB_RECURSE SOURCE_FILES ${S2E_AOCS_DIR}/src/*.cpp)
+file(GLOB_RECURSE SOURCE_FILES ${CMAKE_CURRENT_LIST_DIR}/src/*.cpp)
 
 # Create executable file
 add_executable(${PROJECT_NAME} ${SOURCE_FILES})
