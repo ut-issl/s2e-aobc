@@ -9,10 +9,9 @@ on:
     types: [opened, synchronize, reopened, labeled]
     paths:
       - '.github/workflows/build.yml'
-      - 's2e-aocs-core/CMakeLists.txt'
-      - 's2e-aocs-core/common.cmake'
-      - 's2e-aocs-core/CMakeSettings.json'
-      - 's2e-aocs-core/src/**'
+      - 'CMakeLists.txt'
+      - 'CMakeSettings.json'
+      - 'src/**'
 
 env:
   C2A_AOBC_VERSION: v5.0.1
@@ -94,10 +93,10 @@ jobs:
 
       - name: build
         shell: cmd
-        working-directory: ./s2e-aocs-core
+        working-directory: .
         run: |
           cl.exe
-          cmake -G "Visual Studio 17 2022" -A Win32 -DCMAKE_CONFIGURATION_TYPES:STRING="Debug" -DFLIGHT_SW_DIR=../ -DC2A_NAME=c2a-aobc -D${{ matrix.use_c2a }}
+          cmake -G "Visual Studio 17 2022" -A Win32 -DCMAKE_CONFIGURATION_TYPES:STRING="Debug" -DFLIGHT_SW_DIR=. -DC2A_NAME=c2a-aobc -D${{ matrix.use_c2a }}
           cmake --build .
 
   build_s2e_linux:
@@ -189,10 +188,10 @@ jobs:
           ls nrlmsise00/src
 
       - name: build
-        working-directory: ./s2e-aocs-core
+        working-directory: .
         env:
           CC:  ${{ steps.compiler.outputs.CC  }}
           CXX: ${{ steps.compiler.outputs.CXX }}
         run: |
-          cmake . -D${{ matrix.build_bit }} -DFLIGHT_SW_DIR=../ -DC2A_NAME=c2a-aobc -D${{ matrix.use_c2a }}
+          cmake . -D${{ matrix.build_bit }} -DFLIGHT_SW_DIR=. -DC2A_NAME=c2a-aobc -D${{ matrix.use_c2a }}
           cmake --build .
