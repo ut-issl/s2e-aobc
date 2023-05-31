@@ -18,7 +18,8 @@ void Sagitta::MainRoutine(int count) {
     return;
   }
   status_ = 0;
-  counter_ += count;                                  // TODO: 内部カウンタに合わせて修正
+  counter_ += count;  // TODO: 内部カウンタに合わせて修正
+
   runtime_ms_ += uint32_t(step_time_s_ * 1000);
   unix_time_us_ += uint64_t(step_time_s_ * 1000000);  // TODO: unix時間にする。simtimeを内部でもつ？
   // Quaternionの更新

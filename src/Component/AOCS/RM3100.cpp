@@ -21,6 +21,7 @@ void RM3100::MainRoutine(int count) {
 
   int cmd_size = ReceiveCommand();
   if (cmd_size != 1) return;  // length == 1 means setting of read register address
+
   //  これ以降はHILS用に事前にテレメトリを溜めておく
   const int kTlmSize = 9;  //(24bit = 3 Byte) * 3 axis
   StoreTelemetry(kStoredFrameSize, kTlmSize);

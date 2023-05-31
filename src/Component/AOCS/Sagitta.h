@@ -41,7 +41,6 @@ class Sagitta : public StarSensor, public UartCommunicationWithObc {
   float mcu_temperature_degC_ = 25.0f;   // temperature of the microcontroller
   float cmos_temperature_degC_ = 23.0f;  // temperature of the image sensor
   float fpga_temperature_degC_ = 24.0f;  // temperature of the FPGA
-
   uint8_t status_ = 1;                   // status of telemetry (0:OK, 1:not implemented, 2-255:tlm error)
   uint32_t counter_ = 0;                 // internal counter
   uint64_t unix_time_us_ = 0;            // telemetry dummy data [microseconds] Ref. 2.4.6

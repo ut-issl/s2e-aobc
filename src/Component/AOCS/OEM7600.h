@@ -88,18 +88,21 @@ class OEM7600 : public GnssReceiver, public UartCommunicationWithObc {
   unsigned int OEM7600_calculate_crc32_subroutine(const unsigned int initial_value);
 
   // Other utility functions for tlm/cmd string manipuration
-  bool TLM_NameSearch(const std::string tlm_name);                           // check wether the designated tlm name in "log" cmd is valid or not
-  OEM7600_BINARY_TLM_ID GetTlmIdOfBinaryTlm(const std::string tlm_name);     // get tlm id for binary format tlm packet
-  unsigned short GetTlmLengthOfBinaryTlm(const std::string tlm_name);        // get tlm length of variable part for binary format tlm
-  std::string convLatLontoNMEA(const double rad,
-                               const std::string type);                      // convert lat/lon in [rad] to NMEA format
-  std::string string_zeropad_local(const std::string str_org,
-                                   const unsigned int len);                  // zero padding(to be removed and improved after
-                                                                             // core_oss modification)
-  std::vector<unsigned char> ConvertDoubleToByte(const double double_data);  // convert position,velocity data in double
-                                                                             // format into byte format
-  std::vector<unsigned char> ConvertFloatToByte(const float float_data);     // convert position,velocity data in float format
-                                                                             // into byte format
+
+  // check wether the designated tlm name in "log" cmd is valid or not
+  bool TLM_NameSearch(const std::string tlm_name);
+  // get tlm id for binary format tlm packet
+  OEM7600_BINARY_TLM_ID GetTlmIdOfBinaryTlm(const std::string tlm_name);
+  // get tlm length of variable part for binary format tlm
+  unsigned short GetTlmLengthOfBinaryTlm(const std::string tlm_name);
+  // convert lat/lon in [rad] to NMEA format
+  std::string convLatLontoNMEA(const double rad, const std::string type);
+  // zero padding(to be removed and improved after core_oss modification)
+  std::string string_zeropad_local(const std::string str_org, const unsigned int len);
+  // convert position,velocity data in double format into byte format
+  std::vector<unsigned char> ConvertDoubleToByte(const double double_data);
+  // convert position,velocity data in float format into byte format
+  std::vector<unsigned char> ConvertFloatToByte(const float float_data);
 
   // TLM name list (additinoal tlm names will be added in the future as needed)
   const std::string tlm_name_dictionary_[OEM7600_MAX_TLM_LIST] = {"bestxyza", "timea", "gpgga", "hwmonitora", "bestxyzb", "hwmonitorb"};

@@ -13,8 +13,7 @@ Note: Functions not used in the project are not implemented
 class INA260 : public Component, public I2cTargetCommunicationWithObc {
  public:
   INA260(int prescaler, ClockGenerator *clock_gen,
-         PowerPort *ina_power_port,          // Power port witch provides electrical
-                                             // power to INA260
+         PowerPort *ina_power_port,          // Power port witch provides electrical power to INA260
          const double ina_minimum_voltage, const double ina_assumed_power_consumption,
          PowerPort *observation_power_port,  // Power port witch is observed by INA260
          const int i2c_port_id, const unsigned char i2c_addr, OnBoardComputer *obc);
