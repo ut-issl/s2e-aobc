@@ -17,15 +17,16 @@ if(WIN32)
 endif()
 
 ## set directory path
-set(S2E_CORE_DIR ../s2e-core)
+set(S2E_CORE_DIR ${CMAKE_CURRENT_LIST_DIR}/s2e-core)
+
 if(NOT DEFINED EXT_LIB_DIR)
-  set(EXT_LIB_DIR ../ExtLibraries)
+  set(EXT_LIB_DIR ${CMAKE_CURRENT_LIST_DIR}/ExtLibraries)
 endif()
 set(CSPICE_DIR ${EXT_LIB_DIR}/cspice)
 set(NRLMSISE00_DIR ${EXT_LIB_DIR}/nrlmsise00)
 
 if(NOT DEFINED FLIGHT_SW_DIR)
-  set(FLIGHT_SW_DIR ../../FlightSW)
+  set(FLIGHT_SW_DIR ${CMAKE_CURRENT_SOURCE_DIR}/../FlightSW)
 endif()
 if(NOT DEFINED C2A_NAME)
   set(C2A_NAME "c2a-aobc")
@@ -33,7 +34,7 @@ endif()
 
 if(WIN32)
 elseif(APPLE)
-  set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ./out)  #set build path
+  set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_CURRENT_LIST_DIR}/out)  #set build path
 endif()
 
 ## options to use C2A
@@ -60,8 +61,6 @@ if(USE_HILS AND WIN32)
   message(${WS2_32_LIB})
 endif()
 
-set(S2E_DIR ${CMAKE_CURRENT_COURCE_DIR})
-
 ## include directories of S2E-CORE
 include_directories(${CSPICE_DIR}/include)
 include_directories(${NRLMSISE00_DIR}/src)
@@ -76,27 +75,11 @@ add_subdirectory(${S2E_CORE_DIR}/src/environment/local s2e_core/environment/loca
 add_subdirectory(${S2E_CORE_DIR}/src/library s2e_core/library)
 add_subdirectory(${S2E_CORE_DIR}/src/simulation s2e_core/simulation)
 
+# Add all cpp files as SOURCE_FILES
+file(GLOB_RECURSE SOURCE_FILES ${CMAKE_CURRENT_LIST_DIR}/src/*.cpp)
+# Uncomment the following line to exclude any files that match the REGEX from SOURCE_FILES
+# list(FILTER SOURCE_FILES EXCLUDE REGEX ${CMAKE_CURRENT_LIST_DIR}/src/Example/example.cpp)
 
-set(SOURCE_FILES
-  src/S2E_ISSL6U.cpp
-  src/Component/AOCS/AOBC.cpp
-  src/Component/AOCS/MPU9250_GYRO.cpp
-  src/Component/AOCS/MPU9250_MAG.cpp
-  src/Component/AOCS/RM3100.cpp
-  src/Component/AOCS/NanoSSOCD60.cpp
-  src/Component/AOCS/Sagitta.cpp
-  src/Component/AOCS/OEM7600.cpp
-  src/Component/AOCS/STIM210.cpp
-  src/Component/AOCS/MTQseiren.cpp
-  src/Component/AOCS/RW0003.cpp
-  src/Component/Power/PowerController.cpp
-  src/Component/Power/INA260.cpp
-  src/Simulation/Case/ISSL6U_case.cpp
-  src/Simulation/Spacecraft/ISSL6Usat.cpp
-  src/Simulation/Spacecraft/ISSL6U_Components.cpp
-  src/Library/crc.cpp
-  src/Interface/HILS/HilsIfDriver.cpp
-)
 # Create executable file
 add_executable(${PROJECT_NAME} ${SOURCE_FILES})
 
