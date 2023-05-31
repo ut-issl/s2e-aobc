@@ -1,17 +1,15 @@
 #pragma once
-#include <components/real/aocs/magnetorquer.hpp>
 #include <components/base/gpio_connection_with_obc.hpp>
+#include <components/real/aocs/magnetorquer.hpp>
 
 /* References
 Manual: NA
 HowToUse: NA
 */
 
-class MTQseiren : public Magnetorquer, public GpioConnectionWithObc
-{
+class MTQseiren : public Magnetorquer, public GpioConnectionWithObc {
 public:
-  MTQseiren(Magnetorquer mag_torquer,
-            std::vector<int> gpio_ports,
+  MTQseiren(Magnetorquer mag_torquer, std::vector<int> gpio_ports,
             OnBoardComputer *obc);
   ~MTQseiren();
 
@@ -20,8 +18,7 @@ public:
   std::string GetLogHeader() const override;
 
 private:
-  typedef enum
-  {
+  typedef enum {
     GPIO_X_POSITIVE = 0,
     GPIO_X_NEGATIVE,
     GPIO_Y_POSITIVE,
@@ -37,7 +34,8 @@ private:
   // +1: positive
   // -1: negative
   //  0: zero (no output)
-  int ConvertGPIOState2Polarity(int positive_gpio_pin_idx, int negative_gpio_pin_idx);
+  int ConvertGPIOState2Polarity(int positive_gpio_pin_idx,
+                                int negative_gpio_pin_idx);
 
   void ConvertPolarity2OutputMag();
 };

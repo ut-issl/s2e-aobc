@@ -2,8 +2,7 @@
 // コンポとポート番号の対応表
 
 // H/WとしてPowerControllerで定義される
-enum class PowerPortIdx
-{
+enum class PowerPortIdx {
   INA = 0,
   MPU,
   RM,
@@ -16,13 +15,8 @@ enum class PowerPortIdx
   RWY,
   RWZ,
   MAX,
-  PIC  // INA用にPICを用意する。電源操作されないのでMAXより大きくしておく。
+  PIC // INA用にPICを用意する。電源操作されないのでMAXより大きくしておく。
 };
-
 
 // これはOBCソフトウェア側との対応と合わせること！
-enum UARTPortConfig
-{
-  GYRO = 0,
-  UART_COMPONENT_MAX
-};
+enum UARTPortConfig { GYRO = 0, UART_COMPONENT_MAX };

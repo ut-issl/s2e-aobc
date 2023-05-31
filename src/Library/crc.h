@@ -1,7 +1,7 @@
 #pragma once
 
-#include <stdint.h>
 #include <stddef.h>
+#include <stdint.h>
 
 // CRC
 
@@ -17,7 +17,8 @@
  * @param[in] rev_flag: 反転しない:false, 反転する:true
  * @return uint8_t: 計算結果
  */
-uint8_t crc_8_atm_left(uint8_t crc, const unsigned char* data, const size_t size, const bool rev_flag);
+uint8_t crc_8_atm_left(uint8_t crc, const unsigned char *data,
+                       const size_t size, const bool rev_flag);
 
 /**
  * @brief CRC-16-CCITT
@@ -31,4 +32,5 @@ uint8_t crc_8_atm_left(uint8_t crc, const unsigned char* data, const size_t size
  * @param[in] rev_flag: 反転しない:false, 反転する:true
  * @return uint16_t: 計算結果
  */
-uint16_t crc_16_ccitt_right(uint16_t crc, const unsigned char* data, const size_t size, const bool rev_flag);
+uint16_t crc_16_ccitt_right(uint16_t crc, const unsigned char *data,
+                            const size_t size, const bool rev_flag);

@@ -1,36 +1,33 @@
 #include "STIM210.h"
+
 #include <library/utilities/macros.hpp>
 
-STIM210::STIM210(
-    GyroSensor gyro,
-    double compo_step_sec,
-    const int sils_port_id,
-    OnBoardComputer *obc) : GyroSensor(gyro), UartCommunicationWithObc(sils_port_id, obc), counter_(0), compo_step_sec_(compo_step_sec)
-{
-}
+STIM210::STIM210(GyroSensor gyro, double compo_step_sec, const int sils_port_id,
+                 OnBoardComputer *obc)
+    : GyroSensor(gyro), UartCommunicationWithObc(sils_port_id, obc),
+      counter_(0), compo_step_sec_(compo_step_sec) {}
 
-STIM210::STIM210(
-    GyroSensor gyro,
-    double compo_step_sec,
-    const int sils_port_id,
-    OnBoardComputer *obc,
-    const unsigned int hils_port_id,
-    const unsigned int baud_rate,
-    HilsPortManager *hils_port_manager) : GyroSensor(gyro),
-                                          UartCommunicationWithObc(sils_port_id, obc, hils_port_id, baud_rate, hils_port_manager), counter_(0),
-                                          compo_step_sec_(compo_step_sec)
-{
-}
+STIM210::STIM210(GyroSensor gyro, double compo_step_sec, const int sils_port_id,
+                 OnBoardComputer *obc, const unsigned int hils_port_id,
+                 const unsigned int baud_rate,
+                 HilsPortManager *hils_port_manager)
+    : GyroSensor(gyro),
+      UartCommunicationWithObc(sils_port_id, obc, hils_port_id, baud_rate,
+                               hils_port_manager),
+      counter_(0), compo_step_sec_(compo_step_sec) {}
 
-void STIM210::MainRoutine(int count)
-{
+void STIM210::MainRoutine(int count) {
   UNUSED(count);
   ReceiveCommand(0, kMaxRxSize);
-  angular_velocity_c_rad_s_ = quaternion_b2c_.FrameConversion(dynamics_->GetAttitude().GetAngularVelocity_b_rad_s()); // Convert frame
-  angular_velocity_c_rad_s_ = Measure(angular_velocity_c_rad_s_);                                                     // Add noises                                                                 // Add noises
-  counter_ += (unsigned char)(prescaler_ * compo_step_sec_ * sample_rate_hz_[SAMPLE_RATE_2000HZ]);                    // 2000Hzでインクリメントされる
-  for (size_t i = 0; i < kGyroDimension; i++)
-  {
+  angular_velocity_c_rad_s_ = quaternion_b2c_.FrameConversion(
+      dynamics_->GetAttitude().GetAngularVelocity_b_rad_s()); // Convert frame
+  angular_velocity_c_rad_s_ =
+      Measure(angular_velocity_c_rad_s_); // Add noises // Add noises
+  counter_ +=
+      (unsigned char)(prescaler_ * compo_step_sec_ *
+                      sample_rate_hz_
+                          [SAMPLE_RATE_2000HZ]); // 2000Hzでインクリメントされる
+  for (size_t i = 0; i < kGyroDimension; i++) {
     temperature_c_degC_[i] = 30.0 + ((double)i) * 0.1; // TODO: 温度の反映
   }
   // Send Tlmetry
@@ -39,8 +36,7 @@ void STIM210::MainRoutine(int count)
   return;
 }
 
-std::string STIM210::GetLogHeader() const
-{
+std::string STIM210::GetLogHeader() const {
   std::string str_tmp = "";
   std::string MSSection = "STIM210";
   str_tmp += WriteVector(MSSection, "c", "deg/s", 3);
@@ -48,20 +44,17 @@ std::string STIM210::GetLogHeader() const
   return str_tmp;
 }
 
-int STIM210::ParseCommand(const int cmd_size)
-{
+int STIM210::ParseCommand(const int cmd_size) {
   std::vector<unsigned char> cmd = rx_buffer_;
   int idx = 0;
   int ret;
-  for (int i = 0; i < cmd_size; i++)
-  {
+  for (int i = 0; i < cmd_size; i++) {
     cmd[idx] = rx_buffer_[i];
     idx++;
     if (rx_buffer_[i] == termination_cr) // CRでコマンドを区切る
     {
       idx = 0;
-      switch (cmd[0])
-      {
+      switch (cmd[0]) {
       case 'S':
         if (operation_mode_ != OPERATION_SERVICE_MODE)
           ret = AnalyzeCmdServiceMode(cmd);
@@ -99,11 +92,9 @@ int STIM210::ParseCommand(const int cmd_size)
   return ret;
 }
 
-int STIM210::GenerateTelemetry()
-{
+int STIM210::GenerateTelemetry() {
   tx_buffer_.assign(kMaxTxSize, 0);
-  switch (operation_mode_)
-  {
+  switch (operation_mode_) {
   case OPERATION_INIT_MODE:
     // このテレメは利用しないのでテレメを返さない
     return 0;
@@ -117,15 +108,13 @@ int STIM210::GenerateTelemetry()
   }
 }
 
-int STIM210::GenerateNormalModeTlm()
-{
+int STIM210::GenerateNormalModeTlm() {
   int tlm_size = 0;
   GenerateFormatTlm(tlm_size);
   GenerateOmegaTlm(tlm_size);
   GenerateStatusTlm(tlm_size);
 
-  switch (normal_mode_format_)
-  {
+  switch (normal_mode_format_) {
   case NORMAL_MODE_STANDARD:
     break;
   case NORMAL_MODE_EXTENDED:
@@ -166,16 +155,15 @@ int STIM210::GenerateNormalModeTlm()
   return tlm_size;
 }
 
-void STIM210::GenerateFormatTlm(int &offset)
-{
+void STIM210::GenerateFormatTlm(int &offset) {
   const int kTlmSize = 1;
-  std::vector<unsigned char> tlm = {normal_mode_format_idx_[normal_mode_format_]};
+  std::vector<unsigned char> tlm = {
+      normal_mode_format_idx_[normal_mode_format_]};
   SetTlm(tlm, offset, kTlmSize);
   return;
 }
 
-void STIM210::GenerateOmegaTlm(int &offset)
-{
+void STIM210::GenerateOmegaTlm(int &offset) {
   const int kByte2Bit = 8;
   const int kOmegaByte = 3; // 1軸当たりのバイト数
   const int kTlmSize = kOmegaByte * kGyroDimension;
@@ -184,84 +172,78 @@ void STIM210::GenerateOmegaTlm(int &offset)
 
   // TODO: LPFの実装
 
-  for (size_t i = 0; i < kGyroDimension; i++)
-  {
+  for (size_t i = 0; i < kGyroDimension; i++) {
     omega_c_tlm[i] = ConvertOmega2Tlm(angular_velocity_c_rad_s_[i]);
-    for (size_t j = 0; j < kOmegaByte; j++)
-    {
-      tlm[i * kOmegaByte + j] = (unsigned char)(omega_c_tlm[i] >> kByte2Bit * (kOmegaByte - j - 1)) & 0xff;
+    for (size_t j = 0; j < kOmegaByte; j++) {
+      tlm[i * kOmegaByte + j] =
+          (unsigned char)(omega_c_tlm[i] >> kByte2Bit * (kOmegaByte - j - 1)) &
+          0xff;
     }
   }
   SetTlm(tlm, offset, kTlmSize);
   return;
 }
 
-void STIM210::GenerateStatusTlm(int &offset)
-{
+void STIM210::GenerateStatusTlm(int &offset) {
   const int kTlmSize = 1;
   std::vector<unsigned char> tlm = {status_};
   SetTlm(tlm, offset, kTlmSize);
   return;
 }
 
-void STIM210::GenerateBufferTlm(int &offset)
-{
+void STIM210::GenerateBufferTlm(int &offset) {
   const int kTlmSize = 3;
   std::vector<unsigned char> tlm(kTlmSize, 0);
   SetTlm(tlm, offset, kTlmSize);
   return;
 }
 
-void STIM210::GenerateTemperatureTlm(int &offset)
-{
+void STIM210::GenerateTemperatureTlm(int &offset) {
   const int kByte2Bit = 8;
   const int kTempByte = 2; // 1軸当たりのバイト数
   const int kTlmSize = kTempByte * kGyroDimension;
   std::vector<unsigned char> tlm(kTlmSize, 0);
   int temperature_c_tlm[kGyroDimension] = {0, 0, 0};
-  for (size_t i = 0; i < kGyroDimension; i++)
-  {
+  for (size_t i = 0; i < kGyroDimension; i++) {
     temperature_c_tlm[i] = ConvertTemp2Tlm(temperature_c_degC_[i]);
-    for (int j = 0; j < kTempByte; j++)
-    {
-      tlm[i * kTempByte + j] = (unsigned char)(temperature_c_tlm[i] >> kByte2Bit * (kTempByte - j - 1)) & 0xff;
+    for (int j = 0; j < kTempByte; j++) {
+      tlm[i * kTempByte + j] =
+          (unsigned char)(temperature_c_tlm[i] >>
+                          kByte2Bit * (kTempByte - j - 1)) &
+          0xff;
     }
   }
   SetTlm(tlm, offset, kTlmSize);
   return;
 }
 
-void STIM210::GenerateCountTlm(int &offset)
-{
+void STIM210::GenerateCountTlm(int &offset) {
   const int kTlmSize = 1;
   std::vector<unsigned char> tlm = {counter_};
   SetTlm(tlm, offset, kTlmSize);
   return;
 }
 
-void STIM210::GenerateLatencyTlm(int &offset)
-{
+void STIM210::GenerateLatencyTlm(int &offset) {
   const int kTlmSize = 2;
   std::vector<unsigned char> tlm = {2, 6};
   SetTlm(tlm, offset, kTlmSize);
   return;
 }
 
-void STIM210::GenerateCRCTlm(int &offset)
-{
+void STIM210::GenerateCRCTlm(int &offset) {
   const int kTlmSize = 1;
-  std::vector<unsigned char> tlm = {crc_8_atm_left(kCrcInitial, &tx_buffer_[0], offset, kRevFlag)};
+  std::vector<unsigned char> tlm = {
+      crc_8_atm_left(kCrcInitial, &tx_buffer_[0], offset, kRevFlag)};
   SetTlm(tlm, offset, kTlmSize);
   return;
 }
 
-void STIM210::GenerateTerminationTlm(int &offset)
-{
+void STIM210::GenerateTerminationTlm(int &offset) {
   const int kTlmSize = 2;
   std::vector<unsigned char> tlm = {0x0d, termination_cr};
 
-  switch (termination_mode_)
-  {
+  switch (termination_mode_) {
   case TERMINATION_OFF:
     break;
   case TERMINATION_CRLF:
@@ -274,18 +256,16 @@ void STIM210::GenerateTerminationTlm(int &offset)
   return;
 }
 
-void STIM210::SetTlm(std::vector<unsigned char> tlm, int &offset, size_t tlm_size)
-{
-  for (size_t i = 0; i < tlm_size; i++)
-  {
+void STIM210::SetTlm(std::vector<unsigned char> tlm, int &offset,
+                     size_t tlm_size) {
+  for (size_t i = 0; i < tlm_size; i++) {
     tx_buffer_[i + offset] = tlm[i];
   }
   offset += tlm_size;
   return;
 }
 
-int32_t STIM210::ConvertOmega2Tlm(double omega_c_rad_s)
-{
+int32_t STIM210::ConvertOmega2Tlm(double omega_c_rad_s) {
   double omega_c_dps = omega_c_rad_s * 180.0 / libra::pi;
   int32_t omega_c_bit = int32_t(omega_c_dps * pow(2, 14));
 
@@ -295,19 +275,15 @@ int32_t STIM210::ConvertOmega2Tlm(double omega_c_rad_s)
   omega_c_bit = (std::min)(upper_limit, omega_c_bit);
   omega_c_bit = (std::max)(lower_limit, omega_c_bit);
   // 24 bit
-  if (omega_c_bit >= 0)
-  {
+  if (omega_c_bit >= 0) {
     omega_c_bit = omega_c_bit & upper_limit;
-  }
-  else
-  {
+  } else {
     omega_c_bit = (omega_c_bit & upper_limit) | (upper_limit + 1);
   }
   return omega_c_bit;
 }
 
-int16_t STIM210::ConvertTemp2Tlm(double temp)
-{
+int16_t STIM210::ConvertTemp2Tlm(double temp) {
   int16_t temp_c_bit = int16_t(temp * pow(2, 8));
 
   // Limits
@@ -316,23 +292,19 @@ int16_t STIM210::ConvertTemp2Tlm(double temp)
   temp_c_bit = (std::min)(upper_limit, temp_c_bit);
   temp_c_bit = (std::max)(lower_limit, temp_c_bit);
   // 16 bit
-  if (temp_c_bit >= 0)
-  {
+  if (temp_c_bit >= 0) {
     temp_c_bit = temp_c_bit & upper_limit;
-  }
-  else
-  {
+  } else {
     temp_c_bit = (temp_c_bit & upper_limit) | (upper_limit + 1);
   }
   return temp_c_bit;
 }
 
-int STIM210::AnalyzeCmdServiceMode(std::vector<unsigned char> cmd)
-{
+int STIM210::AnalyzeCmdServiceMode(std::vector<unsigned char> cmd) {
   const int kTlmSize = 12;
-  unsigned char cmd_servicemode[kTlmSize] = {'S', 'E', 'R', 'V', 'I', 'C', 'E', 'M', 'O', 'D', 'E', termination_cr};
-  for (int i = 0; i < kTlmSize; i++)
-  {
+  unsigned char cmd_servicemode[kTlmSize] = {
+      'S', 'E', 'R', 'V', 'I', 'C', 'E', 'M', 'O', 'D', 'E', termination_cr};
+  for (int i = 0; i < kTlmSize; i++) {
     if (cmd_servicemode[i] != cmd[i])
       return -1;
   }
@@ -342,12 +314,10 @@ int STIM210::AnalyzeCmdServiceMode(std::vector<unsigned char> cmd)
   return 0;
 }
 
-int STIM210::AnalyzeCmdNormalMode(std::vector<unsigned char> cmd)
-{
+int STIM210::AnalyzeCmdNormalMode(std::vector<unsigned char> cmd) {
   const int kTlmSize = 4;
   unsigned char cmd_servicemode[kTlmSize] = {'x', ' ', 'N', termination_cr};
-  for (int i = 0; i < kTlmSize; i++)
-  {
+  for (int i = 0; i < kTlmSize; i++) {
     if (cmd_servicemode[i] != cmd[i])
       return -1;
   }
@@ -357,12 +327,10 @@ int STIM210::AnalyzeCmdNormalMode(std::vector<unsigned char> cmd)
   return 0;
 }
 
-int STIM210::AnalyzeCmdTermination(std::vector<unsigned char> cmd)
-{
+int STIM210::AnalyzeCmdTermination(std::vector<unsigned char> cmd) {
   if (cmd[1] != ' ')
     return -1;
-  switch (cmd[2])
-  {
+  switch (cmd[2]) {
   case '2':
     termination_mode_ = TERMINATION_OFF;
     break;
@@ -375,15 +343,13 @@ int STIM210::AnalyzeCmdTermination(std::vector<unsigned char> cmd)
   return 0;
 }
 
-int STIM210::AnalyzeCmdSetNormalModeFormat(std::vector<unsigned char> cmd)
-{
+int STIM210::AnalyzeCmdSetNormalModeFormat(std::vector<unsigned char> cmd) {
   unsigned char param = cmd[2];
   if (cmd[1] != ' ')
     return -1;
   if (cmd[3] != termination_cr)
     return -1;
-  switch (param)
-  {
+  switch (param) {
   case 's':
     normal_mode_format_ = NORMAL_MODE_STANDARD;
     break;
@@ -417,27 +383,21 @@ int STIM210::AnalyzeCmdSetNormalModeFormat(std::vector<unsigned char> cmd)
   return 0;
 }
 
-int STIM210::AnalyzeCmdSetSampleRate(std::vector<unsigned char> cmd)
-{
+int STIM210::AnalyzeCmdSetSampleRate(std::vector<unsigned char> cmd) {
   if (cmd[1] != ' ')
     return -1;
   int tmp = 1;
   // 文字数によって処理を変える
-  if (cmd[5] == termination_cr)
-  {
+  if (cmd[5] == termination_cr) {
     tmp = int(cmd[2]) * 100 + int(cmd[3]) * 10 + int(cmd[4]);
-  }
-  else if (cmd[6] == termination_cr)
-  {
-    tmp = int(cmd[2]) * 1000 + int(cmd[3]) * 100 + int(cmd[4]) * 10 + int(cmd[5]);
-  }
-  else
-  {
+  } else if (cmd[6] == termination_cr) {
+    tmp =
+        int(cmd[2]) * 1000 + int(cmd[3]) * 100 + int(cmd[4]) * 10 + int(cmd[5]);
+  } else {
     return -1;
   }
 
-  switch (tmp)
-  {
+  switch (tmp) {
   case 125:
     sample_rate_mode_ = SAMPLE_RATE_125HZ;
     break;
@@ -463,12 +423,10 @@ int STIM210::AnalyzeCmdSetSampleRate(std::vector<unsigned char> cmd)
   return 0;
 }
 
-int STIM210::AnalyzeCmdSetOmegaMode(std::vector<unsigned char> cmd)
-{
+int STIM210::AnalyzeCmdSetOmegaMode(std::vector<unsigned char> cmd) {
   if (cmd[1] != ' ')
     return -1;
-  switch (cmd[2])
-  {
+  switch (cmd[2]) {
   case 'a':
     omega_mode_ = GYRO_OUTPUT_ANGULAR_RATE;
     break;
@@ -487,27 +445,20 @@ int STIM210::AnalyzeCmdSetOmegaMode(std::vector<unsigned char> cmd)
   return 0;
 }
 
-int STIM210::AnalyzeCmdSetLPFFrequency(std::vector<unsigned char> cmd)
-{
+int STIM210::AnalyzeCmdSetLPFFrequency(std::vector<unsigned char> cmd) {
   if (cmd[1] != ' ')
     return -1;
   int tmp = 1;
   // 終端子の文字数によって処理を変える
-  if (cmd[4] == termination_cr)
-  {
+  if (cmd[4] == termination_cr) {
     tmp = int(cmd[2]) * 10 + int(cmd[3]);
-  }
-  else if (cmd[5] == termination_cr)
-  {
+  } else if (cmd[5] == termination_cr) {
     tmp = int(cmd[2]) * 100 + int(cmd[3]) * 10 + int(cmd[4]);
-  }
-  else
-  {
+  } else {
     return -1;
   }
 
-  switch (tmp)
-  {
+  switch (tmp) {
   case 16:
     lpf_freq_ = LPF_16HZ;
     break;

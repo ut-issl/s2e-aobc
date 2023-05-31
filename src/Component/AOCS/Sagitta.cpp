@@ -1,31 +1,22 @@
 #include "Sagitta.h"
+
 #include <library/utilities/slip.hpp>
 
-Sagitta::Sagitta(
-    StarSensor stt,
-    const int sils_port_id,
-    OnBoardComputer *obc) : StarSensor(stt), UartCommunicationWithObc(sils_port_id, obc)
-{
-}
+Sagitta::Sagitta(StarSensor stt, const int sils_port_id, OnBoardComputer *obc)
+    : StarSensor(stt), UartCommunicationWithObc(sils_port_id, obc) {}
 
-Sagitta::Sagitta(
-    StarSensor stt,
-    const int sils_port_id,
-    OnBoardComputer *obc,
-    const unsigned int hils_port_id,
-    const unsigned int baud_rate,
-    HilsPortManager *hils_port_manager) : StarSensor(stt), UartCommunicationWithObc(sils_port_id, obc, hils_port_id, baud_rate, hils_port_manager)
-{
-}
+Sagitta::Sagitta(StarSensor stt, const int sils_port_id, OnBoardComputer *obc,
+                 const unsigned int hils_port_id, const unsigned int baud_rate,
+                 HilsPortManager *hils_port_manager)
+    : StarSensor(stt), UartCommunicationWithObc(sils_port_id, obc, hils_port_id,
+                                                baud_rate, hils_port_manager) {}
 
-void Sagitta::MainRoutine(int count)
-{
+void Sagitta::MainRoutine(int count) {
   int receive_data_size = ReceiveCommand(0, kMaxCmdSize_);
 
   if (tlm_reply_mode_ == TLM_REPLY_MODE_SYNCHRONOUS && receive_data_size < 1)
     return; // テレメ送信コマンドが送られていない場合
-  if (!is_initialized_)
-  {
+  if (!is_initialized_) {
     runtime_ms_ = 0;
     unix_time_us_ = 0;
     return;
@@ -33,13 +24,16 @@ void Sagitta::MainRoutine(int count)
   status_ = 0;
   counter_ += count; // TODO: 内部カウンタに合わせて修正
   runtime_ms_ += uint32_t(step_time_s_ * 1000);
-  unix_time_us_ += uint64_t(step_time_s_ * 1000000); // TODO: unix時間にする。simtimeを内部でもつ？
+  unix_time_us_ += uint64_t(
+      step_time_s_ * 1000000); // TODO: unix時間にする。simtimeを内部でもつ？
   // Quaternionの更新
-  Measure(&(local_environment_->GetCelestialInformation()), &(dynamics_->GetAttitude()));
+  Measure(&(local_environment_->GetCelestialInformation()),
+          &(dynamics_->GetAttitude()));
 
-  q_tlm_i2c_[0] = static_cast<float>(measured_quaternion_i2c_[3]); // Sagittaでは1要素目，S2Eでは4要素目がスカラー．
-  for (uint8_t i = 0; i < 3; i++)
-  {
+  q_tlm_i2c_[0] = static_cast<float>(
+      measured_quaternion_i2c_
+          [3]); // Sagittaでは1要素目，S2Eでは4要素目がスカラー．
+  for (uint8_t i = 0; i < 3; i++) {
     q_tlm_i2c_[i + 1] = static_cast<float>(measured_quaternion_i2c_[i]);
   }
   mcu_temperature_degC_ = 26.0f;
@@ -52,31 +46,25 @@ void Sagitta::MainRoutine(int count)
   return;
 }
 
-int Sagitta::ParseCommand(const int cmd_size)
-{
+int Sagitta::ParseCommand(const int cmd_size) {
   if (cmd_size < 1)
     return -1;
   std::vector<uint8_t> decoded_rx = decode_slip_with_header(rx_buffer_);
   if (decoded_rx.size() < sizeof(kAddress_) + kXxhashSize_)
     return -1;
 
-  if (!is_initialized_)
-  {
+  if (!is_initialized_) {
     return AnalyzeCmdBoot(decoded_rx);
-  }
-  else
-  {
+  } else {
     return AnalyzeCmdRequestTlm(decoded_rx);
   }
 }
 
-int Sagitta::GenerateTelemetry()
-{
+int Sagitta::GenerateTelemetry() {
   tx_buffer_.assign(kMaxTlmSize_, 0);
 
   uint8_t cmd_reply_tlm;
-  switch (tlm_reply_mode_)
-  {
+  switch (tlm_reply_mode_) {
   case TLM_REPLY_MODE_SYNCHRONOUS:
     cmd_reply_tlm = kCmdReplyTelemSync_;
     break;
@@ -84,13 +72,11 @@ int Sagitta::GenerateTelemetry()
     if (tlm_counter_ % 10 == 1 && is_subscribed_temperature_ == true) // 1[Hz]
     {
       rec_mode_ = REC_MODE_TEMPERATURE;
-    }
-    else if (tlm_counter_ % 2 == 0 && is_subscribed_quaternion_ == true) // 5[Hz]
+    } else if (tlm_counter_ % 2 == 0 &&
+               is_subscribed_quaternion_ == true) // 5[Hz]
     {
       rec_mode_ = REC_MODE_QUATERNION;
-    }
-    else
-    {
+    } else {
       rec_mode_ = REC_MODE_OTHERS;
     }
     tlm_counter_++;
@@ -100,8 +86,7 @@ int Sagitta::GenerateTelemetry()
     return -1;
   }
 
-  switch (rec_mode_)
-  {
+  switch (rec_mode_) {
   case REC_MODE_RUN_TIME:
     return GenerateTelemetryRunTime(cmd_reply_tlm);
   case REC_MODE_QUATERNION:
@@ -115,19 +100,13 @@ int Sagitta::GenerateTelemetry()
   }
 }
 
-int Sagitta::AnalyzeCmdBoot(std::vector<uint8_t> decoded_rx)
-{
+int Sagitta::AnalyzeCmdBoot(std::vector<uint8_t> decoded_rx) {
   const int kCmdSize = 4;
   // 最初のkCmdSizeのみ見て判断
-  unsigned char kCmdBoot[kCmdSize] =
-      {
-          kAddress_,
-          kCmdAction_,
-          kActionIdBoot_,
-          kParamRegion_};
+  unsigned char kCmdBoot[kCmdSize] = {kAddress_, kCmdAction_, kActionIdBoot_,
+                                      kParamRegion_};
 
-  for (int i = 0; i < kCmdSize; i++)
-  {
+  for (int i = 0; i < kCmdSize; i++) {
     if (decoded_rx[i] != kCmdBoot[i])
       return -1;
   }
@@ -137,49 +116,37 @@ int Sagitta::AnalyzeCmdBoot(std::vector<uint8_t> decoded_rx)
   return 1;
 }
 
-int Sagitta::AnalyzeCmdRequestTlm(std::vector<uint8_t> decoded_rx)
-{
+int Sagitta::AnalyzeCmdRequestTlm(std::vector<uint8_t> decoded_rx) {
   if (decoded_rx[0] != kAddress_)
     return -1;
 
-  if (decoded_rx[1] == kCmdSetParam_ && decoded_rx[2] == kParamSubscription)
-  {
+  if (decoded_rx[1] == kCmdSetParam_ && decoded_rx[2] == kParamSubscription) {
     tlm_reply_mode_ = TLM_REPLY_MODE_ASYNCHRONOUS;
     // TODO 3種類以上の非同期テレメに対応
-    if (decoded_rx[3] == kTelemIdTemperature_ || decoded_rx[4] == kTelemIdTemperature_)
-    {
+    if (decoded_rx[3] == kTelemIdTemperature_ ||
+        decoded_rx[4] == kTelemIdTemperature_) {
       is_subscribed_temperature_ = true;
-    }
-    else
-    {
+    } else {
       is_subscribed_temperature_ = false;
     }
-    if (decoded_rx[3] == kTelemIdSolution_ || decoded_rx[4] == kTelemIdSolution_)
-    {
+    if (decoded_rx[3] == kTelemIdSolution_ ||
+        decoded_rx[4] == kTelemIdSolution_) {
       is_subscribed_quaternion_ = true;
-    }
-    else
-    {
+    } else {
       is_subscribed_quaternion_ = false;
     }
-  }
-  else if (decoded_rx[1] == kCmdRequestTelem_)
-  {
+  } else if (decoded_rx[1] == kCmdRequestTelem_) {
     tlm_reply_mode_ = TLM_REPLY_MODE_SYNCHRONOUS;
     return AnalyzeTlmId(decoded_rx[2]);
-  }
-  else
-  {
+  } else {
     return -1;
   }
 
   return 1;
 }
 
-int Sagitta::AnalyzeTlmId(const uint8_t tlm_id)
-{
-  switch (tlm_id)
-  {
+int Sagitta::AnalyzeTlmId(const uint8_t tlm_id) {
+  switch (tlm_id) {
   case kTelemIdTime_:
     rec_mode_ = REC_MODE_RUN_TIME;
     break;
@@ -196,8 +163,7 @@ int Sagitta::AnalyzeTlmId(const uint8_t tlm_id)
   return 1;
 }
 
-int Sagitta::GenerateTelemetryRunTime(const uint8_t cmd_reply_tlm)
-{
+int Sagitta::GenerateTelemetryRunTime(const uint8_t cmd_reply_tlm) {
   const int kTlmSize = 32;
   std::vector<uint8_t> tlm(kTlmSize, 0);
   memset(&tlm[0], 0x00, kTlmSize);
@@ -210,7 +176,8 @@ int Sagitta::GenerateTelemetryRunTime(const uint8_t cmd_reply_tlm)
   memcpy(&tlm[8], &unix_time_us_, 8);
   memcpy(&tlm[16], &runtime_ms_, 4);
   memcpy(&tlm[20], &unix_time_us_, 8);
-  uint32_t xxhash = XXHash32::hash(&tlm[0], kTlmSize - kXxhashSize_, kXxhashSeed_);
+  uint32_t xxhash =
+      XXHash32::hash(&tlm[0], kTlmSize - kXxhashSize_, kXxhashSeed_);
   memcpy(&tlm[kTlmSize - kXxhashSize_], &xxhash, sizeof(xxhash));
 
   std::vector<uint8_t> encoded_tx = encode_slip_with_header(tlm);
@@ -218,8 +185,7 @@ int Sagitta::GenerateTelemetryRunTime(const uint8_t cmd_reply_tlm)
   return (int)encoded_tx.size();
 }
 
-int Sagitta::GenerateTelemetryQuaternion(const uint8_t cmd_reply_tlm)
-{
+int Sagitta::GenerateTelemetryQuaternion(const uint8_t cmd_reply_tlm) {
   const int kTlmSize = 87;
   std::vector<uint8_t> tlm(kTlmSize, 0);
   memset(&tlm[0], 0x00, kTlmSize);
@@ -230,13 +196,13 @@ int Sagitta::GenerateTelemetryQuaternion(const uint8_t cmd_reply_tlm)
   memcpy(&tlm[3], &status_, 1);
   memcpy(&tlm[4], &counter_, 4);
   memcpy(&tlm[8], &unix_time_us_, 8);
-  for (uint8_t i = 0; i < 4; i++)
-  {
+  for (uint8_t i = 0; i < 4; i++) {
     memcpy(&tlm[16 + 4 * i], &q_tlm_i2c_[i], 4);
   }
   bool is_valid = !error_flag_;
   memcpy(&tlm[77], &is_valid, 1);
-  uint32_t xxhash = XXHash32::hash(&tlm[0], kTlmSize - kXxhashSize_, kXxhashSeed_);
+  uint32_t xxhash =
+      XXHash32::hash(&tlm[0], kTlmSize - kXxhashSize_, kXxhashSeed_);
   memcpy(&tlm[kTlmSize - kXxhashSize_], &xxhash, sizeof(xxhash));
 
   std::vector<uint8_t> encoded_tx = encode_slip_with_header(tlm);
@@ -244,8 +210,7 @@ int Sagitta::GenerateTelemetryQuaternion(const uint8_t cmd_reply_tlm)
   return (int)encoded_tx.size();
 }
 
-int Sagitta::GenerateTelemetryTemperature(const uint8_t cmd_reply_tlm)
-{
+int Sagitta::GenerateTelemetryTemperature(const uint8_t cmd_reply_tlm) {
   const int kTlmSize = 32;
   std::vector<uint8_t> tlm(kTlmSize, 0);
   memset(&tlm[0], 0x00, kTlmSize);
@@ -259,7 +224,8 @@ int Sagitta::GenerateTelemetryTemperature(const uint8_t cmd_reply_tlm)
   memcpy(&tlm[16], &mcu_temperature_degC_, sizeof(mcu_temperature_degC_));
   memcpy(&tlm[20], &cmos_temperature_degC_, sizeof(cmos_temperature_degC_));
   memcpy(&tlm[24], &fpga_temperature_degC_, sizeof(fpga_temperature_degC_));
-  uint32_t xxhash = XXHash32::hash(&tlm[0], kTlmSize - kXxhashSize_, kXxhashSeed_);
+  uint32_t xxhash =
+      XXHash32::hash(&tlm[0], kTlmSize - kXxhashSize_, kXxhashSeed_);
   memcpy(&tlm[kTlmSize - kXxhashSize_], &xxhash, sizeof(xxhash));
 
   std::vector<uint8_t> encoded_tx = encode_slip_with_header(tlm);

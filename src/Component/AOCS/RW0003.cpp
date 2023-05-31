@@ -1,26 +1,24 @@
 #include "RW0003.h"
-#include <math.h>
-#include <library/utilities/slip.hpp>
-#include <library/utilities/macros.hpp>
 
-RW0003::RW0003(
-    ReactionWheel rw,
-    const int sils_port_id,
-    const unsigned int hils_port_id,
-    const unsigned char i2c_addr,
-    OnBoardComputer* obc,
-    HilsPortManager *hils_port_manager) : ReactionWheel(rw), I2cTargetCommunicationWithObc(sils_port_id, hils_port_id, i2c_addr, obc, hils_port_manager)
-{
+#include <math.h>
+
+#include <library/utilities/macros.hpp>
+#include <library/utilities/slip.hpp>
+
+RW0003::RW0003(ReactionWheel rw, const int sils_port_id,
+               const unsigned int hils_port_id, const unsigned char i2c_addr,
+               OnBoardComputer *obc, HilsPortManager *hils_port_manager)
+    : ReactionWheel(rw),
+      I2cTargetCommunicationWithObc(sils_port_id, hils_port_id, i2c_addr, obc,
+                                    hils_port_manager) {
   Initialize();
 }
 
-void RW0003::MainRoutine(int count)
-{
+void RW0003::MainRoutine(int count) {
   UNUSED(count);
   // TODO: HILSで回転数テレメ要求と温度テレメ要求を別々に受け取れているか確認
   // 必要に応じてHILS時のCompoUpdateIntervalSecを小さくする
-  if (ReceiveCommand() > 0)
-  {
+  if (ReceiveCommand() > 0) {
     is_cmd_written_ = true;
   }
 
@@ -28,8 +26,7 @@ void RW0003::MainRoutine(int count)
   ReadCmd();
 
   // Generate TLM
-  if (is_rw_initialized_ == true)
-  {
+  if (is_rw_initialized_ == true) {
     CalcTorque();
     WriteFloatTlm(kReadAddressTemperature_, temperture_degC_);
     WriteFloatTlm(kReadAddressSpeed_, (float)angular_velocity_rad_s_);
@@ -39,8 +36,7 @@ void RW0003::MainRoutine(int count)
   return;
 }
 
-std::string RW0003::GetLogHeader() const
-{
+std::string RW0003::GetLogHeader() const {
   std::string str_tmp = "";
 
   str_tmp += WriteScalar("RW0003_angular_velocity", "rad/s");
@@ -48,8 +44,7 @@ std::string RW0003::GetLogHeader() const
   str_tmp += WriteScalar("RW0003_angular_velocity_upperlimit", "rpm");
   str_tmp += WriteScalar("RW0003_angular_acceleration", "rad/s^2");
 
-  if (is_logged_jitter_)
-  {
+  if (is_logged_jitter_) {
     str_tmp += WriteVector("RW0003_jitter_force", "c", "N", 3);
     str_tmp += WriteVector("RW0003_jitter_torque", "c", "Nm", 3);
   }
@@ -57,8 +52,7 @@ std::string RW0003::GetLogHeader() const
   return str_tmp;
 }
 
-void RW0003::ReadCmd()
-{
+void RW0003::ReadCmd() {
   uint8_t rx_data[kMaxCmdLength_] = {0};
   ReadCommand(rx_data, kMaxCmdLength_);
 
@@ -76,8 +70,10 @@ void RW0003::ReadCmd()
   // CRC
   const unsigned char i2c_address = GetI2cAddress();
   uint16_t calced_crc = kCrcInitial_;
-  calced_crc = crc_16_ccitt_right(calced_crc, &i2c_address, sizeof(i2c_address), kCrcRevFlag_);
-  calced_crc = crc_16_ccitt_right(calced_crc, &decoded_rx[0], decoded_rx.size(), kCrcRevFlag_);
+  calced_crc = crc_16_ccitt_right(calced_crc, &i2c_address, sizeof(i2c_address),
+                                  kCrcRevFlag_);
+  calced_crc = crc_16_ccitt_right(calced_crc, &decoded_rx[0], decoded_rx.size(),
+                                  kCrcRevFlag_);
   if (calced_crc != 0x0000)
     return; // CRC error
 
@@ -88,11 +84,11 @@ void RW0003::ReadCmd()
   UNUSED(reply_flag);
 
   // Payload
-  std::vector<uint8_t> payload{decoded_rx.begin() + kHeaderSize_, decoded_rx.end() - kCrcSize_};
+  std::vector<uint8_t> payload{decoded_rx.begin() + kHeaderSize_,
+                               decoded_rx.end() - kCrcSize_};
 
   // Command handling
-  switch (cmd_id)
-  {
+  switch (cmd_id) {
   case kCmdIdInit_:
     ReadCmdInit(payload);
     break;
@@ -109,8 +105,7 @@ void RW0003::ReadCmd()
   return;
 }
 
-uint8_t RW0003::decode_mcf(uint8_t *cmd_id, const uint8_t mcf)
-{
+uint8_t RW0003::decode_mcf(uint8_t *cmd_id, const uint8_t mcf) {
   uint8_t mask = 0x7f;
   *cmd_id = mcf & mask;
   if (mcf & 0x80)
@@ -119,15 +114,14 @@ uint8_t RW0003::decode_mcf(uint8_t *cmd_id, const uint8_t mcf)
     return 0; // without reply
 }
 
-void RW0003::ReadCmdInit(const std::vector<uint8_t> payload)
-{
+void RW0003::ReadCmdInit(const std::vector<uint8_t> payload) {
   if (payload.size() != 4)
     return;
   std::vector<uint8_t> initial_address{0x00, 0x10, 0x00, 0x00};
-  bool is_equal = std::equal(payload.cbegin(), payload.cend(), initial_address.cbegin());
+  bool is_equal =
+      std::equal(payload.cbegin(), payload.cend(), initial_address.cbegin());
 
-  if (is_equal == true)
-  {
+  if (is_equal == true) {
     is_rw_initialized_ = true;
     SetDriveFlag(true);
   }
@@ -135,8 +129,7 @@ void RW0003::ReadCmdInit(const std::vector<uint8_t> payload)
   return;
 }
 
-void RW0003::ReadCmdWriteFile(const std::vector<uint8_t> payload)
-{
+void RW0003::ReadCmdWriteFile(const std::vector<uint8_t> payload) {
   if (payload.size() != 6)
     return;
   if (payload[0] != 0x00)
@@ -144,8 +137,7 @@ void RW0003::ReadCmdWriteFile(const std::vector<uint8_t> payload)
 
   uint8_t cmd_id = payload[1];
 
-  switch (cmd_id)
-  {
+  switch (cmd_id) {
   case kWriteCmdIdle_:
     SetDriveFlag(false);
     SetTargetTorque_rw_Nm(0.0);
@@ -165,8 +157,7 @@ void RW0003::ReadCmdWriteFile(const std::vector<uint8_t> payload)
   return;
 }
 
-void RW0003::ReadCmdReadFile(const std::vector<uint8_t> payload)
-{
+void RW0003::ReadCmdReadFile(const std::vector<uint8_t> payload) {
   if (payload.size() != 1)
     return;
   if (is_rw_initialized_ != true)
@@ -177,23 +168,22 @@ void RW0003::ReadCmdReadFile(const std::vector<uint8_t> payload)
   unsigned char rx[1];
   const int kTlmSize = 15;
 
-  if (payload[0] == kReadAddressTemperature_ || payload[0] == kReadAddressSpeed_)
-  {
+  if (payload[0] == kReadAddressTemperature_ ||
+      payload[0] == kReadAddressSpeed_) {
     // Set register address to kReadAddressSpeed_
     ReadRegister(kReadAddressSpeed_, rx, 1);
-    SendTelemetry(kTlmSize); // Send only speed telemetry. Temperature Tlm will be abnormal value.
+    SendTelemetry(kTlmSize); // Send only speed telemetry. Temperature Tlm will
+                             // be abnormal value.
   }
 }
 
-void RW0003::WriteFloatTlm(uint8_t address, float value)
-{
+void RW0003::WriteFloatTlm(uint8_t address, float value) {
   std::vector<uint8_t> tlm{kMcfReadEdac_};
   tlm.push_back(address);
 
   uint8_t value_u8[sizeof(float)];
   memcpy(value_u8, &value, sizeof(float));
-  for (unsigned int i = 0; i < sizeof(float); i++)
-  {
+  for (unsigned int i = 0; i < sizeof(float); i++) {
     tlm.push_back(value_u8[i]);
   }
 
@@ -201,12 +191,12 @@ void RW0003::WriteFloatTlm(uint8_t address, float value)
   const unsigned char i2c_address = GetI2cAddress();
   uint16_t crc = kCrcInitial_;
   crc = crc_16_ccitt_right(crc, &kSrcAddr_, sizeof(kSrcAddr_), kCrcRevFlag_);
-  crc = crc_16_ccitt_right(crc, &i2c_address, sizeof(i2c_address), kCrcRevFlag_);
+  crc =
+      crc_16_ccitt_right(crc, &i2c_address, sizeof(i2c_address), kCrcRevFlag_);
   crc = crc_16_ccitt_right(crc, &tlm[0], tlm.size(), kCrcRevFlag_);
   uint8_t crc_u8[kCrcSize_];
   memcpy(crc_u8, &crc, kCrcSize_);
-  for (unsigned int i = 0; i < kCrcSize_; i++)
-  {
+  for (unsigned int i = 0; i < kCrcSize_; i++) {
     tlm.push_back(crc_u8[i]);
   }
 
@@ -218,8 +208,7 @@ void RW0003::WriteFloatTlm(uint8_t address, float value)
   WriteRegister(address, &tlm_slip[0], tlm_slip.size());
 }
 
-void RW0003::Initialize()
-{
+void RW0003::Initialize() {
   // HILS用に事前にテレメトリを溜めておく
   unsigned char rx[1];
   const int kTlmSize = 15;
@@ -227,9 +216,9 @@ void RW0003::Initialize()
   // Set register address to kReadAddressSpeed_
   ReadRegister(kReadAddressSpeed_, rx, 1);
   // SLIPを用いたRWでは、ObcI2cTargetCommunicationBaseクラスのstored_frame_counterが機能しない
-  // 最初にkStoredFrameSize分のフレームをUSB-I2C Target変換器にためておき、ためたフレーム数を維持する方針
-  for (size_t i = 0; i < kStoredFrameSize; i++)
-  {
+  // 最初にkStoredFrameSize分のフレームをUSB-I2C
+  // Target変換器にためておき、ためたフレーム数を維持する方針
+  for (size_t i = 0; i < kStoredFrameSize; i++) {
     SendTelemetry(kTlmSize);
   }
 }

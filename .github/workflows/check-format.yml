@@ -9,11 +9,8 @@ on:
     types: [opened, synchronize, reopened, labeled]
     paths:
       - '.github/workflows/check-format.yml'
-      # - '.clang-format'
+      - '.clang-format'
       - 'src/**'
-env:
-  CLANG_FORMAT_PATH: './s2e-core/.clang-format'
-
 jobs:
   clang-format:
     runs-on: ubuntu-latest
@@ -49,12 +46,7 @@ jobs:
         if: github.event_name == 'pull_request'
         run: |
           git-clang-format --commit ${{ github.event.pull_request.base.sha }} --diff | tee format.patch
-
-      - name: check format(labeled)
-        if: contains(github.event.pull_request.labels.*.name, 'C2A')
-        run: |
-          clang-format -style=file:CLANG_FORMAT_PATH
-
+           
       - name: check
         run: |
           git apply --allow-empty format.patch

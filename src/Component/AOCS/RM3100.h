@@ -1,23 +1,19 @@
 #pragma once
-#include <components/real/aocs/magnetometer.hpp>
 #include <components/base/i2c_target_communication_with_obc.hpp>
+#include <components/real/aocs/magnetometer.hpp>
 
 /* References
-Manual: https://www.pnicorp.com/wp-content/uploads/RM3100-Testing-Boards-User-Manual-r04-1.pdf
+Manual:
+https://www.pnicorp.com/wp-content/uploads/RM3100-Testing-Boards-User-Manual-r04-1.pdf
 HowToUse: NA
 Note: Functions not used in the project are not implemented
 */
 
-class RM3100 : public Magnetometer, public I2cTargetCommunicationWithObc
-{
+class RM3100 : public Magnetometer, public I2cTargetCommunicationWithObc {
 public:
-  RM3100(
-      Magnetometer mag_sensor,
-      const int sils_port_id,
-      const unsigned int hils_port_id,
-      const unsigned char i2c_addr,
-      OnBoardComputer *obc,
-      HilsPortManager *hils_port_manager);
+  RM3100(Magnetometer mag_sensor, const int sils_port_id,
+         const unsigned int hils_port_id, const unsigned char i2c_addr,
+         OnBoardComputer *obc, HilsPortManager *hils_port_manager);
 
   // Override: MagSensor functions
   void MainRoutine(int count) override;
