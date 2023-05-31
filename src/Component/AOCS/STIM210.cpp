@@ -19,8 +19,9 @@ void STIM210::MainRoutine(int count) {
   angular_velocity_c_rad_s_ = Measure(angular_velocity_c_rad_s_);                                                      // Add noises
 
   counter_ += (unsigned char)(prescaler_ * compo_step_sec_ * sample_rate_hz_[SAMPLE_RATE_2000HZ]);  // 2000Hzでインクリメントされる
+
   for (size_t i = 0; i < kGyroDimension; i++) {
-    temperature_c_degC_[i] = 30.0 + ((double)i) * 0.1;                                              // TODO: 温度の反映
+    temperature_c_degC_[i] = 30.0 + ((double)i) * 0.1;  // TODO: 温度の反映
   }
   // Send Tlmetry
   SendTelemetry(0);

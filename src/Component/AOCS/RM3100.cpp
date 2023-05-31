@@ -12,9 +12,9 @@ void RM3100::MainRoutine(int count) {
   ReadCommand(mode_data, 2);
   if (mode_data[0] == kModeSetRegId && mode_data[1] == kCmmModeSettings) mode_ = 0;
 
-  if (mode_ == 0)                                                                                            // CMM
-  {
-    magnetic_field_c_nT_ = quaternion_b2c_.FrameConversion(geomagnetic_field_->GetGeomagneticField_b_nT());  // Convert frame
+  if (mode_ == 0) {  // CMM
+    // Convert frame
+    magnetic_field_c_nT_ = quaternion_b2c_.FrameConversion(geomagnetic_field_->GetGeomagneticField_b_nT());
     magnetic_field_c_nT_ = Measure(magnetic_field_c_nT_);
     GenerateTelemetry();
   }

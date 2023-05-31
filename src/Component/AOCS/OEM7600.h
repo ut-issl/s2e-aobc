@@ -79,16 +79,16 @@ class OEM7600 : public GnssReceiver, public UartCommunicationWithObc {
   std::string Gen_HWMonitorTlm_Binary(void);                      // function correspond to "hwmonitorb" tlm
 
   // CMD
-  OEM7600_CMD DecodeCommand();          // command decoder
-  int Cmd_LOG(const std::string comport_ID, const std::string tlm_name, const std::string type,
-              const std::string freq);  // decoder correspond to "log" command
+  // command decoder
+  OEM7600_CMD DecodeCommand();
+  // decoder correspond to "log" command
+  int Cmd_LOG(const std::string comport_ID, const std::string tlm_name, const std::string type, const std::string freq);
 
   // CRC Calculation
   unsigned int OEM7600_calculate_crc32(const char *tlm_data_for_crc, const size_t data_length);
   unsigned int OEM7600_calculate_crc32_subroutine(const unsigned int initial_value);
 
   // Other utility functions for tlm/cmd string manipuration
-
   // check wether the designated tlm name in "log" cmd is valid or not
   bool TLM_NameSearch(const std::string tlm_name);
   // get tlm id for binary format tlm packet
