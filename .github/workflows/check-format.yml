@@ -46,7 +46,7 @@ jobs:
           git-clang-format -style=file:CLANG_FORMAT_PATH --commit ${{ github.event.pull_request.base.sha }} --diff | tee format.patch
 
       - name: check format(labeled)
-        if: contains(github.event.pull_request.labels.*.name, 'automation::force-check-format')
+        if: contains(github.event.pull_request.labels.*.name, 'C2A')
         run: |
           clang-format -style=file:CLANG_FORMAT_PATH
 
