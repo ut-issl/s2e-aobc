@@ -36,8 +36,7 @@ void print_path(std::string path)
 #endif
 }
 
-int main(int argc, char *argv[])
-{
+int main(int argc, char *argv[]){
   UNUSED(argc);
   UNUSED(argv);
 
