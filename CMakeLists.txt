@@ -75,8 +75,10 @@ add_subdirectory(${S2E_CORE_DIR}/src/environment/local s2e_core/environment/loca
 add_subdirectory(${S2E_CORE_DIR}/src/library s2e_core/library)
 add_subdirectory(${S2E_CORE_DIR}/src/simulation s2e_core/simulation)
 
-# Add source files
+# Add all cpp files as SOURCE_FILES
 file(GLOB_RECURSE SOURCE_FILES ${CMAKE_CURRENT_LIST_DIR}/src/*.cpp)
+# Uncomment the following line to exclude any files that match the REGEX from SOURCE_FILES
+# list(FILTER SOURCE_FILES EXCLUDE REGEX ${CMAKE_CURRENT_LIST_DIR}/src/Example/example.cpp)
 
 # Create executable file
 add_executable(${PROJECT_NAME} ${SOURCE_FILES})
