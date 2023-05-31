@@ -4,19 +4,15 @@
 
 #include "../../Component/AOCS/MTQseiren.h"
 
-class HilsIfDriver : public Component,
-                     public UartCommunicationWithObc,
-                     public GpioConnectionWithObc {
-public:
-  HilsIfDriver(const int prescaler, ClockGenerator *clock_gen,
-               const unsigned int hils_port_id, const unsigned int baud_rate,
-               HilsPortManager *hils_port_manager, std::vector<int> gpio_ports,
-               OnBoardComputer *obc);
+class HilsIfDriver : public Component, public UartCommunicationWithObc, public GpioConnectionWithObc {
+ public:
+  HilsIfDriver(const int prescaler, ClockGenerator *clock_gen, const unsigned int hils_port_id, const unsigned int baud_rate,
+               HilsPortManager *hils_port_manager, std::vector<int> gpio_ports, OnBoardComputer *obc);
   ~HilsIfDriver();
 
   void MainRoutine(int count) override;
 
-protected:
+ protected:
   int ParseCommand(const int cmd_size) override;
   int GenerateTelemetry() override;
   void ControlGpio();

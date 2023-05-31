@@ -10,21 +10,18 @@ Note: Functions not used in the project are not implemented
 
 // Magnetometer
 class MPU9250_MAG : public Magnetometer, public I2cTargetCommunicationWithObc {
-public:
-  MPU9250_MAG(Magnetometer mag_sensor, const int sils_port_id,
-              const unsigned int hils_port_id, const unsigned char i2c_addr,
-              OnBoardComputer *obc, HilsPortManager *hils_port_manager,
-              const bool *is_mag_on);
+ public:
+  MPU9250_MAG(Magnetometer mag_sensor, const int sils_port_id, const unsigned int hils_port_id, const unsigned char i2c_addr, OnBoardComputer *obc,
+              HilsPortManager *hils_port_manager, const bool *is_mag_on);
 
   // Override: MagSensor functions
   void MainRoutine(int count) override;
 
-private:
+ private:
   // Status
-  const bool *is_mag_on_; // mag_onはMPU9250_GYROが管理している
+  const bool *is_mag_on_;     // mag_onはMPU9250_GYROが管理している
   unsigned char config_ = 0x00;
-  unsigned char status_ =
-      0; // TODO: ちゃんと実装する？今の所この情報は使っていないみたい
+  unsigned char status_ = 0;  // TODO: ちゃんと実装する？今の所この情報は使っていないみたい
 
   // TlmCmd parameters
   const unsigned char kTlmSize_ = 2;

@@ -8,17 +8,16 @@ HowToUse: NA
 */
 
 class NanoSSOCD60 : public SunSensor, public I2cTargetCommunicationWithObc {
-public:
-  NanoSSOCD60(SunSensor sun_sensor, const int sils_port_id,
-              const unsigned int hils_port_id, const unsigned char i2c_addr,
-              OnBoardComputer *obc, HilsPortManager *hils_port_manager);
+ public:
+  NanoSSOCD60(SunSensor sun_sensor, const int sils_port_id, const unsigned int hils_port_id, const unsigned char i2c_addr, OnBoardComputer *obc,
+              HilsPortManager *hils_port_manager);
   ~NanoSSOCD60();
 
   // Override: SunSensor functions
   void MainRoutine(int count) override;
   std::string GetLogHeader() const override;
 
-private:
+ private:
   const unsigned char i2c_addr_;
   const unsigned int kStoredFrameSize = 3;
 

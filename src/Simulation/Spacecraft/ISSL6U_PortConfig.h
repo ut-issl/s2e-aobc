@@ -15,7 +15,7 @@ enum class PowerPortIdx {
   RWY,
   RWZ,
   MAX,
-  PIC // INA用にPICを用意する。電源操作されないのでMAXより大きくしておく。
+  PIC  // INA用にPICを用意する。電源操作されないのでMAXより大きくしておく。
 };
 
 // これはOBCソフトウェア側との対応と合わせること！

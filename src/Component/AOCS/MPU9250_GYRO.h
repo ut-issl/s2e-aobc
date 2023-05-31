@@ -12,17 +12,16 @@ Note: Functions not used in the project are not implemented
 const unsigned char kMpuTlmSize_ = 2;
 
 class MPU9250_GYRO : public GyroSensor, public I2cTargetCommunicationWithObc {
-public:
-  MPU9250_GYRO(GyroSensor gyro, const int sils_port_id,
-               const unsigned int hils_port_id, const unsigned char i2c_addr,
-               OnBoardComputer *obc, HilsPortManager *hils_port_manager);
+ public:
+  MPU9250_GYRO(GyroSensor gyro, const int sils_port_id, const unsigned int hils_port_id, const unsigned char i2c_addr, OnBoardComputer *obc,
+               HilsPortManager *hils_port_manager);
 
   // Override: MagSensor functions
   void MainRoutine(int count) override;
 
   inline const bool *GetIsMagOn(void) const { return &is_mag_on_; }
 
-private:
+ private:
   bool is_gyro_on_ = false;
   bool is_mag_on_ = false;
 
@@ -39,9 +38,8 @@ private:
   const double temp_offset_degC_ = 21.0;
 
   // Dummy data
-  double acc_c_G_[kGyroDimension] = {-0.02, 0.01,
-                                     -1.0}; // とりあえずテキトウな値を入れる
-  double temperature_degC_ = 30.0; // 温度補正に合わせて設定
+  double acc_c_G_[kGyroDimension] = {-0.02, 0.01, -1.0};  // とりあえずテキトウな値を入れる
+  double temperature_degC_ = 30.0;                        // 温度補正に合わせて設定
 
   // Registers
   const unsigned char kRegObsGyro_ = 0x3b;
@@ -60,13 +58,10 @@ private:
   // Cmd
   void ReadCmdGyroEnable();
   void ReadCmdMagEnable();
-  void
-  ReadCmdGyroLpf(); // TODO 6Uでの利用では固定値なので、中身の実装は優先度低
-  void
-  ReadCmdGyroRange(); // TODO 6Uでの利用では固定値なので、中身の実装は優先度低
-  void ReadCmdAccLpf(); // TODO 6Uでの利用では固定値なので、中身の実装は優先度低
-  void
-  ReadCmdAccRange(); // TODO 6Uでの利用では固定値なので、中身の実装は優先度低
+  void ReadCmdGyroLpf();    // TODO 6Uでの利用では固定値なので、中身の実装は優先度低
+  void ReadCmdGyroRange();  // TODO 6Uでの利用では固定値なので、中身の実装は優先度低
+  void ReadCmdAccLpf();     // TODO 6Uでの利用では固定値なので、中身の実装は優先度低
+  void ReadCmdAccRange();   // TODO 6Uでの利用では固定値なので、中身の実装は優先度低
 
   // TLM
   void WriteGyroTlm();

@@ -4,11 +4,8 @@
 
 #include "../Spacecraft/ISSL6Usat.h"
 
-ISSL6UCase::ISSL6UCase(const std::string initialize_base_file,
-                       MonteCarloSimulationExecutor &monte_carlo_simulator,
-                       const std::string log_path)
-    : SimulationCase(initialize_base_file, monte_carlo_simulator, log_path),
-      monte_carlo_simulator_(monte_carlo_simulator) {}
+ISSL6UCase::ISSL6UCase(const std::string initialize_base_file, MonteCarloSimulationExecutor &monte_carlo_simulator, const std::string log_path)
+    : SimulationCase(initialize_base_file, monte_carlo_simulator, log_path), monte_carlo_simulator_(monte_carlo_simulator) {}
 
 ISSL6UCase::~ISSL6UCase() { delete spacecraft_; }
 
@@ -17,8 +14,7 @@ void ISSL6UCase::InitializeTargetObjects() {
   // `spacecraft_id` corresponds to the index of `spacecraft_file` in
   // simulation_base.ini
   const int spacecraft_id = 0;
-  spacecraft_ = new ISSL6USat(&simulation_configuration_, global_environment_,
-                              spacecraft_id);
+  spacecraft_ = new ISSL6USat(&simulation_configuration_, global_environment_, spacecraft_id);
 
   // Register the log output
   spacecraft_->LogSetup(*(simulation_configuration_.main_logger_));
@@ -46,10 +42,8 @@ std::string ISSL6UCase::GetLogHeader() const {
 
 std::string ISSL6UCase::GetLogValue() const {
   std::string str_tmp = "";
-  str_tmp +=
-      WriteScalar(global_environment_->GetSimulationTime().GetElapsedTime_s());
-  str_tmp += WriteVector(
-      spacecraft_->GetDynamics().GetAttitude().GetAngularVelocity_b_rad_s(), 3);
+  str_tmp += WriteScalar(global_environment_->GetSimulationTime().GetElapsedTime_s());
+  str_tmp += WriteVector(spacecraft_->GetDynamics().GetAttitude().GetAngularVelocity_b_rad_s(), 3);
 
   return str_tmp;
 }

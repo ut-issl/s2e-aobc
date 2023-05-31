@@ -1,33 +1,23 @@
 ﻿#include "OEM7600.h"
 
-#include <algorithm> // toupper
+#include <algorithm>  // toupper
 #include <library/utilities/macros.hpp>
 
-#define MAX_CMD_LEN 1024 // TBD
-#define MAX_TLM_LEN 1024 // TBD
-#define OEM7600_COMMON_BINARY_HEADER_SIZE                                      \
-  (28) // Binary format Tlmの固定長部分のテレメサイズ
-#define OEM7600_BESTXYZ_BINARY_TLM_SIZE                                        \
-  (112) // Binary formatの位置情報テレメサイズ
-#define OEM7600_HWMONITOR_BINARY_TLM_SIZE                                      \
-  (52) // Binary formatのhardware monitor tlm テレメサイズ
+#define MAX_CMD_LEN 1024                        // TBD
+#define MAX_TLM_LEN 1024                        // TBD
+#define OEM7600_COMMON_BINARY_HEADER_SIZE (28)  // Binary format Tlmの固定長部分のテレメサイズ
+#define OEM7600_BESTXYZ_BINARY_TLM_SIZE (112)   // Binary formatの位置情報テレメサイズ
+#define OEM7600_HWMONITOR_BINARY_TLM_SIZE (52)  // Binary formatのhardware monitor tlm テレメサイズ
 
 #define _USE_MATH_DEFINES
 // #define TLM_FUNCTION_DEBUG_MODE
 
-OEM7600::OEM7600(GnssReceiver gnssr, const int sils_port_id,
-                 OnBoardComputer *obc, const unsigned char oem_tlm_ch)
-    : GnssReceiver(gnssr), UartCommunicationWithObc(sils_port_id, obc),
-      oem_tlm_ch_(oem_tlm_ch) {}
+OEM7600::OEM7600(GnssReceiver gnssr, const int sils_port_id, OnBoardComputer *obc, const unsigned char oem_tlm_ch)
+    : GnssReceiver(gnssr), UartCommunicationWithObc(sils_port_id, obc), oem_tlm_ch_(oem_tlm_ch) {}
 
-OEM7600::OEM7600(GnssReceiver gnssr, const int sils_port_id,
-                 OnBoardComputer *obc, const unsigned char oem_tlm_ch,
-                 const unsigned int hils_port_id, const unsigned int baud_rate,
-                 HilsPortManager *hils_port_manager)
-    : GnssReceiver(gnssr),
-      UartCommunicationWithObc(sils_port_id, obc, hils_port_id, baud_rate,
-                               hils_port_manager),
-      oem_tlm_ch_(oem_tlm_ch) {}
+OEM7600::OEM7600(GnssReceiver gnssr, const int sils_port_id, OnBoardComputer *obc, const unsigned char oem_tlm_ch, const unsigned int hils_port_id,
+                 const unsigned int baud_rate, HilsPortManager *hils_port_manager)
+    : GnssReceiver(gnssr), UartCommunicationWithObc(sils_port_id, obc, hils_port_id, baud_rate, hils_port_manager), oem_tlm_ch_(oem_tlm_ch) {}
 
 void OEM7600::MainRoutine(int count) {
   UNUSED(count);
@@ -63,7 +53,7 @@ void OEM7600::Update_local() {
 
   CheckAntenna(pos_true_eci_m, q_i2b);
 
-  if (is_gnss_visible_ == 1) { // Antenna of GNSS-R can detect GNSS signal
+  if (is_gnss_visible_ == 1) {  // Antenna of GNSS-R can detect GNSS signal
 
     // should be modified to add noise in the future
     Vector<3> pos_true_ecef_m = dynamics_->GetOrbit().GetPosition_ecef_m();
@@ -71,8 +61,7 @@ void OEM7600::Update_local() {
     position_llh_ = dynamics_->GetOrbit().GetLatLonAlt();
     AddNoise(pos_true_eci_m, pos_true_ecef_m);
 
-    last_position_fix_time_local_ =
-        simulation_time_->GetElapsedTime_s(); // store position fixed time [sec]
+    last_position_fix_time_local_ = simulation_time_->GetElapsedTime_s();  // store position fixed time [sec]
     utc_ = simulation_time_->GetCurrentUtc();
     ConvertJulianDayToGPSTime(simulation_time_->GetCurrentTime_jd());
   } else {
@@ -94,8 +83,7 @@ int OEM7600::ParseCommand(const int cmd_size) {
   // comparing its format to the expected one from its name
   else {
     if (rcvd_cmd.cmd_name == "log") {
-      return Cmd_LOG(rcvd_cmd.cmd_args[0], rcvd_cmd.cmd_args[1],
-                     rcvd_cmd.cmd_args[2], rcvd_cmd.cmd_args[3]);
+      return Cmd_LOG(rcvd_cmd.cmd_args[0], rcvd_cmd.cmd_args[1], rcvd_cmd.cmd_args[2], rcvd_cmd.cmd_args[3]);
     }
 
     // command actions for the other types of command will be implimented in the
@@ -111,18 +99,15 @@ int OEM7600::GenerateTelemetry() {
 
   // find all tlm must be padded from tlm list
   for (size_t i = 0; i < tlm_list_.size(); i++) {
-    tlm_list_[i].count_up(); // tlm output timing is adjusted to previously
-                             // commanded one
+    tlm_list_[i].count_up();  // tlm output timing is adjusted to previously
+                              // commanded one
 
-    if ((tlm_list_[i].count_to_out == 0) ||
-        ((tlm_list_[i].out_type == "once") ||
-         (tlm_list_[i].out_type == "onnext"))) {
+    if ((tlm_list_[i].count_to_out == 0) || ((tlm_list_[i].out_type == "once") || (tlm_list_[i].out_type == "onnext"))) {
       tlm_all += Gen_TLM_Packet(tlm_list_[i].tlm_name);
 
       // delete "once" or "onnext" type tlm from the list so as not to be padded
       // again without activation cmd
-      if ((tlm_list_[i].out_type == "once") ||
-          (tlm_list_[i].out_type == "onnext")) {
+      if ((tlm_list_[i].out_type == "once") || (tlm_list_[i].out_type == "onnext")) {
         tlm_list_.erase(tlm_list_.begin() + i);
       }
     }
@@ -169,22 +154,17 @@ OEM7600_CMD OEM7600::DecodeCommand() {
   // decode recieved command if suffient number of args are found
   if (space_pos_count > 0) {
     // store cmd name
-    rcvd_cmd.cmd_name =
-        std::string(rx_buffer_.begin(), rx_buffer_.begin() + space_pos[0]);
+    rcvd_cmd.cmd_name = std::string(rx_buffer_.begin(), rx_buffer_.begin() + space_pos[0]);
 
     // store cmd args
     if (space_pos_count > 1) {
       for (int i = 1; i < space_pos_count; i++) {
-        rcvd_cmd.cmd_args[i - 1] =
-            std::string(rx_buffer_.begin() + space_pos[i - 1] + 1,
-                        rx_buffer_.begin() + space_pos[i]);
+        rcvd_cmd.cmd_args[i - 1] = std::string(rx_buffer_.begin() + space_pos[i - 1] + 1, rx_buffer_.begin() + space_pos[i]);
       }
     }
     // last cmd arg begins from last space pos + 1 and lasts for the end of the
     // cmd
-    rcvd_cmd.cmd_args[space_pos_count - 1] =
-        std::string(rx_buffer_.begin() + space_pos[space_pos_count - 1] + 1,
-                    rx_buffer_.end());
+    rcvd_cmd.cmd_args[space_pos_count - 1] = std::string(rx_buffer_.begin() + space_pos[space_pos_count - 1] + 1, rx_buffer_.end());
 
     rcvd_cmd.is_valid = true;
   }
@@ -198,8 +178,7 @@ OEM7600_CMD OEM7600::DecodeCommand() {
 }
 
 // function correspond to "log" command action
-int OEM7600::Cmd_LOG(const std::string comport_ID, const std::string tlm_name,
-                     const std::string type, const std::string freq) {
+int OEM7600::Cmd_LOG(const std::string comport_ID, const std::string tlm_name, const std::string type, const std::string freq) {
   // convert string "COMX" to int X
   int rcvd_comport = 0;
   char rcvd_comport_name = (char)(comport_ID[comport_ID.length() - 1]);
@@ -257,7 +236,7 @@ std::string OEM7600::Gen_TLM_Packet(const std::string tlm_name) {
   // ASII,Binary formats
   if (tlm_name == "gpgga") {
     str_tmp += Gen_GPGGATlm();
-    str_tmp += "\r\n"; // footer for ASCII format;
+    str_tmp += "\r\n";  // footer for ASCII format;
     return str_tmp;
   }
 
@@ -273,7 +252,7 @@ std::string OEM7600::Gen_TLM_Packet(const std::string tlm_name) {
       str_tmp += Gen_HWMonitorTlm_Ascii();
     } else {
       str_tmp = "";
-      return str_tmp; // returns empty string
+      return str_tmp;  // returns empty string
     }
 
     // calculate CRC32 in ASCII format
@@ -281,10 +260,10 @@ std::string OEM7600::Gen_TLM_Packet(const std::string tlm_name) {
     if (tlm_length > 0) {
       const char *tlm_data_char = str_tmp.c_str();
       unsigned int crc32 = OEM7600_calculate_crc32(tlm_data_char, tlm_length);
-      str_tmp += "*";                // separator before CRC for ASCII format;
-      str_tmp += WriteScalar(crc32); // CRC in string format
-      str_tmp.pop_back();            // erase unnecessary conma
-      str_tmp += "\r\n";             // footer for ASCII format;
+      str_tmp += "*";                 // separator before CRC for ASCII format;
+      str_tmp += WriteScalar(crc32);  // CRC in string format
+      str_tmp.pop_back();             // erase unnecessary conma
+      str_tmp += "\r\n";              // footer for ASCII format;
     }
 
     return str_tmp;
@@ -300,7 +279,7 @@ std::string OEM7600::Gen_TLM_Packet(const std::string tlm_name) {
       str_tmp += Gen_HWMonitorTlm_Binary();
     } else {
       str_tmp = "";
-      return str_tmp; // returns empty string
+      return str_tmp;  // returns empty string
     }
 
     // calculate CRC32 in Binary format
@@ -328,15 +307,13 @@ std::string OEM7600::Gen_TLM_Header_Ascii(const std::string tlm_name) {
 
   // Sync + Message
   std::string str_tmp = "#" + tlm_name;
-  std::transform(tlm_name.begin(), tlm_name.end(), (str_tmp.begin() + 1),
-                 ::toupper);
+  std::transform(tlm_name.begin(), tlm_name.end(), (str_tmp.begin() + 1), ::toupper);
 
-  std::string port = "COM" + WriteScalar((int)(oem_tlm_ch_), 1); // Port
-  str_tmp +=
-      "," + port; // after port, "," is already added (WriteScalar did it)
+  std::string port = "COM" + WriteScalar((int)(oem_tlm_ch_), 1);  // Port
+  str_tmp += "," + port;                                          // after port, "," is already added (WriteScalar did it)
 
-  str_tmp += "0";     // Sequence number
-  str_tmp += ",90.5"; // CPU idle time (currently dummy data is padded)
+  str_tmp += "0";                                                 // Sequence number
+  str_tmp += ",90.5";                                             // CPU idle time (currently dummy data is padded)
 
   // Time status
   if (is_gnss_visible_) {
@@ -347,17 +324,15 @@ std::string OEM7600::Gen_TLM_Header_Ascii(const std::string tlm_name) {
 
   str_tmp += WriteScalar(gps_time_week_);
   str_tmp += WriteScalar(gps_time_s_);
-  str_tmp +=
-      "02000000"; // Receiver status summary (currently dummy data is padded)
-  str_tmp += str_reserved; // footer
+  str_tmp += "02000000";    // Receiver status summary (currently dummy data is padded)
+  str_tmp += str_reserved;  // footer
 
   return str_tmp;
 }
 
 // generate tlm header
 std::string OEM7600::Gen_TLM_Header_Binary(const std::string tlm_name) {
-  const unsigned char kOEM7600RxHeader[] = {0xAA, 0x44,
-                                            0x12}; // Binary Tlm Header
+  const unsigned char kOEM7600RxHeader[] = {0xAA, 0x44, 0x12};  // Binary Tlm Header
   const unsigned char reserved_val_before_farmware_rev[] = {0xDB, 0x52};
   const unsigned char farmware_rev[] = {0xCF, 0x3D};
 
@@ -376,8 +351,7 @@ std::string OEM7600::Gen_TLM_Header_Binary(const std::string tlm_name) {
 
   // tlm id
   unsigned short tlm_id = (unsigned short)(GetTlmIdOfBinaryTlm(tlm_name));
-  if (tlm_id == OEM7600_TLM_ID_ERROR)
-    return str_tmp; // return null string
+  if (tlm_id == OEM7600_TLM_ID_ERROR) return str_tmp;  // return null string
   tlm[tlm_parse_pointer++] = (unsigned char)((tlm_id & 0x00ff));
   tlm[tlm_parse_pointer++] = (unsigned char)((tlm_id & 0xff00) >> 8);
 
@@ -387,8 +361,7 @@ std::string OEM7600::Gen_TLM_Header_Binary(const std::string tlm_name) {
 
   // tlm length of variable part
   unsigned short tlm_length = GetTlmLengthOfBinaryTlm(tlm_name);
-  if (tlm_length == 0)
-    return str_tmp; // return null string
+  if (tlm_length == 0) return str_tmp;  // return null string
   tlm[tlm_parse_pointer++] = (unsigned char)((tlm_length & 0x00ff));
   tlm[tlm_parse_pointer++] = (unsigned char)((tlm_length & 0xff00) >> 8);
 
@@ -400,24 +373,20 @@ std::string OEM7600::Gen_TLM_Header_Binary(const std::string tlm_name) {
   tlm[tlm_parse_pointer++] = 0xB2;
 
   if (is_gnss_visible_) {
-    tlm[tlm_parse_pointer++] = 0xB4; // Fine Steering
+    tlm[tlm_parse_pointer++] = 0xB4;  // Fine Steering
   } else {
-    tlm[tlm_parse_pointer++] = 0x14; // Unknown
+    tlm[tlm_parse_pointer++] = 0x14;  // Unknown
   }
 
   // week(uint16),msec(uint32)
-  tlm[tlm_parse_pointer++] =
-      (unsigned char)(((unsigned short)(gps_time_week_)&0x00ff));
-  tlm[tlm_parse_pointer++] =
-      (unsigned char)(((unsigned short)(gps_time_week_)&0xff00) >> 8);
+  tlm[tlm_parse_pointer++] = (unsigned char)(((unsigned short)(gps_time_week_)&0x00ff));
+  tlm[tlm_parse_pointer++] = (unsigned char)(((unsigned short)(gps_time_week_)&0xff00) >> 8);
 
   unsigned int gps_time_msec = (unsigned int)(gps_time_s_ * 1000.0);
   tlm[tlm_parse_pointer++] = (unsigned char)((gps_time_msec & 0x000000ff));
   tlm[tlm_parse_pointer++] = (unsigned char)((gps_time_msec & 0x0000ff00) >> 8);
-  tlm[tlm_parse_pointer++] =
-      (unsigned char)((gps_time_msec & 0x00ff0000) >> 16);
-  tlm[tlm_parse_pointer++] =
-      (unsigned char)((gps_time_msec & 0xff000000) >> 24);
+  tlm[tlm_parse_pointer++] = (unsigned char)((gps_time_msec & 0x00ff0000) >> 16);
+  tlm[tlm_parse_pointer++] = (unsigned char)((gps_time_msec & 0xff000000) >> 24);
 
   // dummy data of receiver status(uint32)
   tlm[tlm_parse_pointer++] = 0x00;
@@ -450,50 +419,43 @@ std::string OEM7600::Gen_BestXYZTlm_Ascii(void) {
     sol_staus = "INSUFFICIENT_OBS";
   }
 
-  str_tmp += sol_staus + ",SINGLE,";            // position solution status
-  str_tmp += WriteVector(position_ecef_m_, 11); // postion computed
-  str_tmp +=
-      "72.5816,61.3924,159.6638,"; // std 1-sigma of computed position(currently
-                                   // dummy data is padded)
+  str_tmp += sol_staus + ",SINGLE,";              // position solution status
+  str_tmp += WriteVector(position_ecef_m_, 11);   // postion computed
+  str_tmp += "72.5816,61.3924,159.6638,";         // std 1-sigma of computed position(currently
+                                                  // dummy data is padded)
 
-  str_tmp += sol_staus + ",DOPPLER_VELOCITY,";   // velocity solution sutatus
-  str_tmp += WriteVector(velocity_ecef_m_s_, 8); // velocity computed
-  str_tmp +=
-      "0.5747,0.4413,1.4830,"; // std 1-sigma of computed velocity(currently
-                               // dummy data is padded)
+  str_tmp += sol_staus + ",DOPPLER_VELOCITY,";    // velocity solution sutatus
+  str_tmp += WriteVector(velocity_ecef_m_s_, 8);  // velocity computed
+  str_tmp += "0.5747,0.4413,1.4830,";             // std 1-sigma of computed velocity(currently
+                                                  // dummy data is padded)
 
-  str_tmp += " ,"; // base station ID of differenctial positioning (ignored in
-                   // this model)
-  str_tmp += "0.000,"; // V-latency (velocity measurement time delay, currently
-                       // dummy data is padded)
-  str_tmp += "0.000,"; // diff_age (differential age in seconds, basically the
-                       // ouput value is fixed to zero)
+  str_tmp += " ,";                                // base station ID of differenctial positioning (ignored in
+                                                  // this model)
+  str_tmp += "0.000,";                            // V-latency (velocity measurement time delay, currently
+                                                  // dummy data is padded)
+  str_tmp += "0.000,";                            // diff_age (differential age in seconds, basically the
+                                                  // ouput value is fixed to zero)
 
   // sol_age (solution age in seconds)
-  double sol_age =
-      simulation_time_->GetElapsedTime_s() - last_position_fix_time_local_;
+  double sol_age = simulation_time_->GetElapsedTime_s() - last_position_fix_time_local_;
   str_tmp += WriteScalar(sol_age);
 
-  str_tmp +=
-      WriteScalar(visible_satellite_number_); // number of satellites tracked
-  str_tmp += WriteScalar(
-      visible_satellite_number_); // number of satellites used in solution
-                                  // (currently dummy data is padded)
-  str_tmp += WriteScalar(
-      visible_satellite_number_); // number of satellites with L1/E1/B1 signals
-                                  // used in solution (currently dummy data is
-                                  // padded)
-  str_tmp += "0,"; // number of satellites with multi-frequency signals used in
-                   // solution (currently dummy data is padded)
+  str_tmp += WriteScalar(visible_satellite_number_);  // number of satellites tracked
+  str_tmp += WriteScalar(visible_satellite_number_);  // number of satellites used in solution
+                                                      // (currently dummy data is padded)
+  str_tmp += WriteScalar(visible_satellite_number_);  // number of satellites with L1/E1/B1 signals
+                                                      // used in solution (currently dummy data is
+                                                      // padded)
+  str_tmp += "0,";                                    // number of satellites with multi-frequency signals used in
+                                                      // solution (currently dummy data is padded)
 
-  str_tmp += "0,"; // reserved
-  str_tmp +=
-      "02,"; // Extended solution status (currently fixed to default value, i.e,
-             // pseudorange lono correction is based on Klobuchar model)
-  str_tmp += "00,"; // Galileo and BeiDou sig mask (currently fixed to default
-                    // value, i.e, they are not used in solution)
-  str_tmp += "01";  // GPS and GLONASS sig mask (currently fixed to default
-                    // value, i.e, only GPS is used in solution)
+  str_tmp += "0,";                                    // reserved
+  str_tmp += "02,";                                   // Extended solution status (currently fixed to default value, i.e,
+                                                      // pseudorange lono correction is based on Klobuchar model)
+  str_tmp += "00,";                                   // Galileo and BeiDou sig mask (currently fixed to default
+                                                      // value, i.e, they are not used in solution)
+  str_tmp += "01";                                    // GPS and GLONASS sig mask (currently fixed to default
+                                                      // value, i.e, only GPS is used in solution)
 
   return str_tmp;
 }
@@ -515,36 +477,28 @@ std::string OEM7600::Gen_BestXYZTlm_Binary(void) {
   unsigned int velocity_solution_type;
 
   if (is_gnss_visible_) {
-    position_solution_status = 0; // Solution computed
-    position_solution_type = 16;  // Single (Sololy based on GNSSR Signal)
-    valocity_solution_status = 0; // Solution computed
-    velocity_solution_type = 8;   // Doppler Velocity
+    position_solution_status = 0;  // Solution computed
+    position_solution_type = 16;   // Single (Sololy based on GNSSR Signal)
+    valocity_solution_status = 0;  // Solution computed
+    velocity_solution_type = 8;    // Doppler Velocity
   } else {
-    position_solution_status = 1; // Insufficient observation
-    position_solution_type = 0;   // No solution
-    valocity_solution_status = 1; // Insufficient observation
-    velocity_solution_type = 0;   // No solution
+    position_solution_status = 1;  // Insufficient observation
+    position_solution_type = 0;    // No solution
+    valocity_solution_status = 1;  // Insufficient observation
+    velocity_solution_type = 0;    // No solution
   }
 
   // position_solution_status
-  tlm[tlm_parse_pointer++] =
-      (unsigned char)((position_solution_status & 0x000000ff));
-  tlm[tlm_parse_pointer++] =
-      (unsigned char)((position_solution_status & 0x0000ff00) >> 8);
-  tlm[tlm_parse_pointer++] =
-      (unsigned char)((position_solution_status & 0x00ff0000) >> 16);
-  tlm[tlm_parse_pointer++] =
-      (unsigned char)((position_solution_status & 0xff000000) >> 24);
+  tlm[tlm_parse_pointer++] = (unsigned char)((position_solution_status & 0x000000ff));
+  tlm[tlm_parse_pointer++] = (unsigned char)((position_solution_status & 0x0000ff00) >> 8);
+  tlm[tlm_parse_pointer++] = (unsigned char)((position_solution_status & 0x00ff0000) >> 16);
+  tlm[tlm_parse_pointer++] = (unsigned char)((position_solution_status & 0xff000000) >> 24);
 
   // position_solution_type
-  tlm[tlm_parse_pointer++] =
-      (unsigned char)((position_solution_type & 0x000000ff));
-  tlm[tlm_parse_pointer++] =
-      (unsigned char)((position_solution_type & 0x0000ff00) >> 8);
-  tlm[tlm_parse_pointer++] =
-      (unsigned char)((position_solution_type & 0x00ff0000) >> 16);
-  tlm[tlm_parse_pointer++] =
-      (unsigned char)((position_solution_type & 0xff000000) >> 24);
+  tlm[tlm_parse_pointer++] = (unsigned char)((position_solution_type & 0x000000ff));
+  tlm[tlm_parse_pointer++] = (unsigned char)((position_solution_type & 0x0000ff00) >> 8);
+  tlm[tlm_parse_pointer++] = (unsigned char)((position_solution_type & 0x00ff0000) >> 16);
+  tlm[tlm_parse_pointer++] = (unsigned char)((position_solution_type & 0xff000000) >> 24);
 
   // position in ECEF[m]
   for (int axis = 0; axis < 3; axis++) {
@@ -564,24 +518,16 @@ std::string OEM7600::Gen_BestXYZTlm_Binary(void) {
   }
 
   // valocity_solution_status
-  tlm[tlm_parse_pointer++] =
-      (unsigned char)((valocity_solution_status & 0x000000ff));
-  tlm[tlm_parse_pointer++] =
-      (unsigned char)((valocity_solution_status & 0x0000ff00) >> 8);
-  tlm[tlm_parse_pointer++] =
-      (unsigned char)((valocity_solution_status & 0x00ff0000) >> 16);
-  tlm[tlm_parse_pointer++] =
-      (unsigned char)((valocity_solution_status & 0xff000000) >> 24);
+  tlm[tlm_parse_pointer++] = (unsigned char)((valocity_solution_status & 0x000000ff));
+  tlm[tlm_parse_pointer++] = (unsigned char)((valocity_solution_status & 0x0000ff00) >> 8);
+  tlm[tlm_parse_pointer++] = (unsigned char)((valocity_solution_status & 0x00ff0000) >> 16);
+  tlm[tlm_parse_pointer++] = (unsigned char)((valocity_solution_status & 0xff000000) >> 24);
 
   // velocity_solution_type
-  tlm[tlm_parse_pointer++] =
-      (unsigned char)((velocity_solution_type & 0x000000ff));
-  tlm[tlm_parse_pointer++] =
-      (unsigned char)((velocity_solution_type & 0x0000ff00) >> 8);
-  tlm[tlm_parse_pointer++] =
-      (unsigned char)((velocity_solution_type & 0x00ff0000) >> 16);
-  tlm[tlm_parse_pointer++] =
-      (unsigned char)((velocity_solution_type & 0xff000000) >> 24);
+  tlm[tlm_parse_pointer++] = (unsigned char)((velocity_solution_type & 0x000000ff));
+  tlm[tlm_parse_pointer++] = (unsigned char)((velocity_solution_type & 0x0000ff00) >> 8);
+  tlm[tlm_parse_pointer++] = (unsigned char)((velocity_solution_type & 0x00ff0000) >> 16);
+  tlm[tlm_parse_pointer++] = (unsigned char)((velocity_solution_type & 0xff000000) >> 24);
 
   // velocity in ECEF[m]
   for (int axis = 0; axis < 3; axis++) {
@@ -603,12 +549,9 @@ std::string OEM7600::Gen_BestXYZTlm_Binary(void) {
   // Base station ID (usually fixed to zero)
   unsigned int station_id_dummy = 0;
   tlm[tlm_parse_pointer++] = (unsigned char)((station_id_dummy & 0x000000ff));
-  tlm[tlm_parse_pointer++] =
-      (unsigned char)((station_id_dummy & 0x0000ff00) >> 8);
-  tlm[tlm_parse_pointer++] =
-      (unsigned char)((station_id_dummy & 0x00ff0000) >> 16);
-  tlm[tlm_parse_pointer++] =
-      (unsigned char)((station_id_dummy & 0xff000000) >> 24);
+  tlm[tlm_parse_pointer++] = (unsigned char)((station_id_dummy & 0x0000ff00) >> 8);
+  tlm[tlm_parse_pointer++] = (unsigned char)((station_id_dummy & 0x00ff0000) >> 16);
+  tlm[tlm_parse_pointer++] = (unsigned char)((station_id_dummy & 0xff000000) >> 24);
 
   // V-latency (velocity measurement time delay, currently dummy data is padded)
   float vlatency_dummy_sec = 0.0f;
@@ -626,8 +569,7 @@ std::string OEM7600::Gen_BestXYZTlm_Binary(void) {
   }
 
   // solution age (elapsed time since last position fixed time [sec])
-  float sol_age_sec = (float)(simulation_time_->GetElapsedTime_s() -
-                              last_position_fix_time_local_);
+  float sol_age_sec = (float)(simulation_time_->GetElapsedTime_s() - last_position_fix_time_local_);
   byte_buffer_float = ConvertFloatToByte(sol_age_sec);
   for (int i = 0; i < kByteSizeIntFloat; i++) {
     tlm[tlm_parse_pointer++] = byte_buffer_float[i];
@@ -667,15 +609,14 @@ std::string OEM7600::Gen_TimeTlm_Ascii(void) {
     clock_status += "INVALID";
   }
 
-  str_tmp += clock_status + ","; // clock sutatus
-  str_tmp +=
-      "-3.004848645e-08,"; // receiver clock offset in seconds from GPST (clock
-                           // = GPST + offset), currently dummya data is padded
-  str_tmp += "2.736064744e-09,"; // std 1-sigma of clock offset (currently
-                                 // dummya data is padded)
-  str_tmp += "-17.99999999852,"; // GPST offset in seconds from UTC (UTC = GPST
-                                 // + offset), currently fixed number at
-                                 // A.C.2020 (=-18sec)is padded
+  str_tmp += clock_status + ",";   // clock sutatus
+  str_tmp += "-3.004848645e-08,";  // receiver clock offset in seconds from GPST (clock
+                                   // = GPST + offset), currently dummya data is padded
+  str_tmp += "2.736064744e-09,";   // std 1-sigma of clock offset (currently
+                                   // dummya data is padded)
+  str_tmp += "-17.99999999852,";   // GPST offset in seconds from UTC (UTC = GPST
+                                   // + offset), currently fixed number at
+                                   // A.C.2020 (=-18sec)is padded
 
   // UTC
   str_tmp += WriteScalar(utc_.year);
@@ -683,11 +624,9 @@ std::string OEM7600::Gen_TimeTlm_Ascii(void) {
   str_tmp += WriteScalar(utc_.day);
   str_tmp += WriteScalar(utc_.hour);
   str_tmp += WriteScalar(utc_.minute);
-  str_tmp +=
-      WriteScalar((unsigned int)(utc_.second * 1000)); // sec in [msec] format
-  str_tmp +=
-      clock_status; // UTC status (in real HW, UTC status is not always equal to
-                    // clock status, but is deal to be equal in this model )
+  str_tmp += WriteScalar((unsigned int)(utc_.second * 1000));  // sec in [msec] format
+  str_tmp += clock_status;                                     // UTC status (in real HW, UTC status is not always equal to
+                                                               // clock status, but is deal to be equal in this model )
 
   return str_tmp;
 }
@@ -712,14 +651,10 @@ std::string OEM7600::Gen_HWMonitorTlm_Binary(void) {
 
   // number of output
   unsigned int num_of_output_contenst = 6;
-  tlm[tlm_parse_pointer++] =
-      (unsigned char)((num_of_output_contenst & 0x000000ff));
-  tlm[tlm_parse_pointer++] =
-      (unsigned char)((num_of_output_contenst & 0x0000ff00) >> 8);
-  tlm[tlm_parse_pointer++] =
-      (unsigned char)((num_of_output_contenst & 0x00ff0000) >> 16);
-  tlm[tlm_parse_pointer++] =
-      (unsigned char)((num_of_output_contenst & 0xff000000) >> 24);
+  tlm[tlm_parse_pointer++] = (unsigned char)((num_of_output_contenst & 0x000000ff));
+  tlm[tlm_parse_pointer++] = (unsigned char)((num_of_output_contenst & 0x0000ff00) >> 8);
+  tlm[tlm_parse_pointer++] = (unsigned char)((num_of_output_contenst & 0x00ff0000) >> 16);
+  tlm[tlm_parse_pointer++] = (unsigned char)((num_of_output_contenst & 0xff000000) >> 24);
 
   // temperature [degC] (currently dummy data is padded)
   float temperature_degC = 27.899879f;
@@ -731,12 +666,9 @@ std::string OEM7600::Gen_HWMonitorTlm_Binary(void) {
   // temperature staus (currently dummy data is padded)
   unsigned int temperature_status = 0x00000100;
   tlm[tlm_parse_pointer++] = (unsigned char)((temperature_status & 0x000000ff));
-  tlm[tlm_parse_pointer++] =
-      (unsigned char)((temperature_status & 0x0000ff00) >> 8);
-  tlm[tlm_parse_pointer++] =
-      (unsigned char)((temperature_status & 0x00ff0000) >> 16);
-  tlm[tlm_parse_pointer++] =
-      (unsigned char)((temperature_status & 0xff000000) >> 24);
+  tlm[tlm_parse_pointer++] = (unsigned char)((temperature_status & 0x0000ff00) >> 8);
+  tlm[tlm_parse_pointer++] = (unsigned char)((temperature_status & 0x00ff0000) >> 16);
+  tlm[tlm_parse_pointer++] = (unsigned char)((temperature_status & 0xff000000) >> 24);
 
   // 3V3 Voltage [V] (currently dummy data is padded)
   float internally_regulated_3V3_voltage_V = 3.101343f;
@@ -747,17 +679,10 @@ std::string OEM7600::Gen_HWMonitorTlm_Binary(void) {
 
   // 3V3 Voltage staus (currently dummy data is padded)
   unsigned int internally_regulated_3V3_voltage_status = 0x00000601;
-  tlm[tlm_parse_pointer++] =
-      (unsigned char)((internally_regulated_3V3_voltage_status & 0x000000ff));
-  tlm[tlm_parse_pointer++] =
-      (unsigned char)((internally_regulated_3V3_voltage_status & 0x0000ff00) >>
-                      8);
-  tlm[tlm_parse_pointer++] =
-      (unsigned char)((internally_regulated_3V3_voltage_status & 0x00ff0000) >>
-                      16);
-  tlm[tlm_parse_pointer++] =
-      (unsigned char)((internally_regulated_3V3_voltage_status & 0xff000000) >>
-                      24);
+  tlm[tlm_parse_pointer++] = (unsigned char)((internally_regulated_3V3_voltage_status & 0x000000ff));
+  tlm[tlm_parse_pointer++] = (unsigned char)((internally_regulated_3V3_voltage_status & 0x0000ff00) >> 8);
+  tlm[tlm_parse_pointer++] = (unsigned char)((internally_regulated_3V3_voltage_status & 0x00ff0000) >> 16);
+  tlm[tlm_parse_pointer++] = (unsigned char)((internally_regulated_3V3_voltage_status & 0xff000000) >> 24);
 
   // Antenna Voltage [V] (currently dummy data is padded)
   float antenna_voltage_V = 3.110134f;
@@ -768,14 +693,10 @@ std::string OEM7600::Gen_HWMonitorTlm_Binary(void) {
 
   // Antenna Voltage staus  (currently dummy data is padded)
   unsigned int antenna_voltage_status = 0x00000701;
-  tlm[tlm_parse_pointer++] =
-      (unsigned char)((antenna_voltage_status & 0x000000ff));
-  tlm[tlm_parse_pointer++] =
-      (unsigned char)((antenna_voltage_status & 0x0000ff00) >> 8);
-  tlm[tlm_parse_pointer++] =
-      (unsigned char)((antenna_voltage_status & 0x00ff0000) >> 16);
-  tlm[tlm_parse_pointer++] =
-      (unsigned char)((antenna_voltage_status & 0xff000000) >> 24);
+  tlm[tlm_parse_pointer++] = (unsigned char)((antenna_voltage_status & 0x000000ff));
+  tlm[tlm_parse_pointer++] = (unsigned char)((antenna_voltage_status & 0x0000ff00) >> 8);
+  tlm[tlm_parse_pointer++] = (unsigned char)((antenna_voltage_status & 0x00ff0000) >> 16);
+  tlm[tlm_parse_pointer++] = (unsigned char)((antenna_voltage_status & 0xff000000) >> 24);
 
   // 1V2 Voltage [V] (currently dummy data is padded)
   float internally_regulated_1V2_voltage_V = 1.190476f;
@@ -786,17 +707,10 @@ std::string OEM7600::Gen_HWMonitorTlm_Binary(void) {
 
   // 1V2 Voltage staus (currently dummy data is padded)
   unsigned int internally_regulated_1V2_voltage_status = 0x00000800;
-  tlm[tlm_parse_pointer++] =
-      (unsigned char)((internally_regulated_1V2_voltage_status & 0x000000ff));
-  tlm[tlm_parse_pointer++] =
-      (unsigned char)((internally_regulated_1V2_voltage_status & 0x0000ff00) >>
-                      8);
-  tlm[tlm_parse_pointer++] =
-      (unsigned char)((internally_regulated_1V2_voltage_status & 0x00ff0000) >>
-                      16);
-  tlm[tlm_parse_pointer++] =
-      (unsigned char)((internally_regulated_1V2_voltage_status & 0xff000000) >>
-                      24);
+  tlm[tlm_parse_pointer++] = (unsigned char)((internally_regulated_1V2_voltage_status & 0x000000ff));
+  tlm[tlm_parse_pointer++] = (unsigned char)((internally_regulated_1V2_voltage_status & 0x0000ff00) >> 8);
+  tlm[tlm_parse_pointer++] = (unsigned char)((internally_regulated_1V2_voltage_status & 0x00ff0000) >> 16);
+  tlm[tlm_parse_pointer++] = (unsigned char)((internally_regulated_1V2_voltage_status & 0xff000000) >> 24);
 
   // supply Voltage [V] (currently dummy data is padded)
   float supply_voltage_V = 3.091575f;
@@ -807,14 +721,10 @@ std::string OEM7600::Gen_HWMonitorTlm_Binary(void) {
 
   // supply Voltage staus (currently dummy data is padded)
   unsigned int supply_voltage_status = 0x00000f01;
-  tlm[tlm_parse_pointer++] =
-      (unsigned char)((supply_voltage_status & 0x000000ff));
-  tlm[tlm_parse_pointer++] =
-      (unsigned char)((supply_voltage_status & 0x0000ff00) >> 8);
-  tlm[tlm_parse_pointer++] =
-      (unsigned char)((supply_voltage_status & 0x00ff0000) >> 16);
-  tlm[tlm_parse_pointer++] =
-      (unsigned char)((supply_voltage_status & 0xff000000) >> 24);
+  tlm[tlm_parse_pointer++] = (unsigned char)((supply_voltage_status & 0x000000ff));
+  tlm[tlm_parse_pointer++] = (unsigned char)((supply_voltage_status & 0x0000ff00) >> 8);
+  tlm[tlm_parse_pointer++] = (unsigned char)((supply_voltage_status & 0x00ff0000) >> 16);
+  tlm[tlm_parse_pointer++] = (unsigned char)((supply_voltage_status & 0xff000000) >> 24);
 
   // 1V8 Voltage [V] (currently dummy data is padded)
   float internally_regulated_1V8_voltage_V = 1.821734f;
@@ -825,17 +735,10 @@ std::string OEM7600::Gen_HWMonitorTlm_Binary(void) {
 
   // 1V8 Voltage staus (currently dummy data is padded)
   unsigned int internally_regulated_1V8_voltage_status = 0x00001100;
-  tlm[tlm_parse_pointer++] =
-      (unsigned char)((internally_regulated_1V8_voltage_status & 0x000000ff));
-  tlm[tlm_parse_pointer++] =
-      (unsigned char)((internally_regulated_1V8_voltage_status & 0x0000ff00) >>
-                      8);
-  tlm[tlm_parse_pointer++] =
-      (unsigned char)((internally_regulated_1V8_voltage_status & 0x00ff0000) >>
-                      16);
-  tlm[tlm_parse_pointer++] =
-      (unsigned char)((internally_regulated_1V8_voltage_status & 0xff000000) >>
-                      24);
+  tlm[tlm_parse_pointer++] = (unsigned char)((internally_regulated_1V8_voltage_status & 0x000000ff));
+  tlm[tlm_parse_pointer++] = (unsigned char)((internally_regulated_1V8_voltage_status & 0x0000ff00) >> 8);
+  tlm[tlm_parse_pointer++] = (unsigned char)((internally_regulated_1V8_voltage_status & 0x00ff0000) >> 16);
+  tlm[tlm_parse_pointer++] = (unsigned char)((internally_regulated_1V8_voltage_status & 0xff000000) >> 24);
 
   str_tmp.assign(std::begin(tlm), std::end(tlm));
 
@@ -848,8 +751,7 @@ std::string OEM7600::Gen_GPGGATlm(void) {
 
   // if 100 sec passed from last position fix timing, all the succeeding outputs
   // reset to blank
-  double elapsed_sec =
-      simulation_time_->GetElapsedTime_s() - last_position_fix_time_local_;
+  double elapsed_sec = simulation_time_->GetElapsedTime_s() - last_position_fix_time_local_;
   if (elapsed_sec > 100.0) {
     str_tmp += ",,,,,0,,,,,,,,*66";
   }
@@ -857,15 +759,13 @@ std::string OEM7600::Gen_GPGGATlm(void) {
   else {
     // UTC
     std::string str_utc_tmp = WriteScalar(utc_.hour, 2);
-    str_utc_tmp.erase(str_utc_tmp.end() -
-                      1); // since "," added in "WriteScalar" is unnecessary in
-                          // this case, erase it here
+    str_utc_tmp.erase(str_utc_tmp.end() - 1);  // since "," added in "WriteScalar" is unnecessary in
+                                               // this case, erase it here
     str_tmp += string_zeropad_local(str_utc_tmp, 2);
 
     str_utc_tmp = WriteScalar(utc_.minute, 2);
-    str_utc_tmp.erase(str_utc_tmp.end() -
-                      1); // since "," added in "WriteScalar" is unnecessary in
-                          // this case, erase it here
+    str_utc_tmp.erase(str_utc_tmp.end() - 1);  // since "," added in "WriteScalar" is unnecessary in
+                                               // this case, erase it here
     str_tmp += string_zeropad_local(str_utc_tmp, 2);
 
     str_utc_tmp = WriteScalar(utc_.second, 4);
@@ -904,8 +804,8 @@ std::string OEM7600::Gen_GPGGATlm(void) {
 
     // age of correction data in [sec]
     str_tmp += WriteScalar((unsigned int)(elapsed_sec), 2);
-    str_tmp.erase(str_tmp.end() - 1); // since "," added in "WriteScalar" is
-                                      // unnecessary in this case, erase it here
+    str_tmp.erase(str_tmp.end() - 1);  // since "," added in "WriteScalar" is
+                                       // unnecessary in this case, erase it here
 
     // check sum (currently dummy data is padded)
     str_tmp += "*60";
@@ -948,8 +848,7 @@ unsigned short OEM7600::GetTlmLengthOfBinaryTlm(const std::string tlm_name) {
 }
 
 // convert lat/lon in [rad] to NMEA format
-std::string OEM7600::convLatLontoNMEA(const double rad,
-                                      const std::string type) {
+std::string OEM7600::convLatLontoNMEA(const double rad, const std::string type) {
   const double rad2deg = 180.0 / libra::pi;
   const double deg2arcmin = 60.0;
 
@@ -960,8 +859,8 @@ std::string OEM7600::convLatLontoNMEA(const double rad,
   double angle_rem_amin = (angle_deg - (double)(angle_dd)) * deg2arcmin;
 
   std::string str_deg = WriteScalar(angle_dd);
-  str_deg.erase(str_deg.end() - 1); // since "," added in "WriteScalar" is
-                                    // unnecessary in this case, erase it here
+  str_deg.erase(str_deg.end() - 1);  // since "," added in "WriteScalar" is
+                                     // unnecessary in this case, erase it here
   if (type == "lat") {
     str_tmp += string_zeropad_local(str_deg, 2);
   } else {
@@ -988,8 +887,7 @@ std::string OEM7600::convLatLontoNMEA(const double rad,
 }
 
 // zero padding(to be removed and improved after core_oss modification)
-std::string OEM7600::string_zeropad_local(const std::string str_org,
-                                          const unsigned int len) {
+std::string OEM7600::string_zeropad_local(const std::string str_org, const unsigned int len) {
   std::string str_tmp = str_org;
   if (str_org.length() < len) {
     int pad_n = len - str_org.length();
@@ -1005,8 +903,7 @@ std::string OEM7600::string_zeropad_local(const std::string str_org,
 }
 
 // convert position,velocity data in double format into byte format
-std::vector<unsigned char>
-OEM7600::ConvertDoubleToByte(const double double_data) {
+std::vector<unsigned char> OEM7600::ConvertDoubleToByte(const double double_data) {
   union {
     double buffer_double_format;
     uint64_t buffer_byte_format;
@@ -1020,10 +917,7 @@ OEM7600::ConvertDoubleToByte(const double double_data) {
   uint64_t byte_extruct_mask = 0x00000000000000ff;
   unsigned char bit_shifter_for_byte_extruct = 0;
   for (int i = 0; i < kByteSizeDouble; i++) {
-    unsigned char byte_buffer =
-        (unsigned char)((convertbuffer_double_byte.buffer_byte_format &
-                         byte_extruct_mask) >>
-                        bit_shifter_for_byte_extruct);
+    unsigned char byte_buffer = (unsigned char)((convertbuffer_double_byte.buffer_byte_format & byte_extruct_mask) >> bit_shifter_for_byte_extruct);
     byte_vector.push_back(byte_buffer);
     byte_extruct_mask = byte_extruct_mask << 8;
     bit_shifter_for_byte_extruct += 8;
@@ -1047,10 +941,7 @@ std::vector<unsigned char> OEM7600::ConvertFloatToByte(const float float_data) {
   unsigned int byte_extruct_mask = 0x000000ff;
   unsigned char bit_shifter_for_byte_extruct = 0;
   for (int i = 0; i < kByteSizeFloat; i++) {
-    unsigned char byte_buffer =
-        (unsigned char)((convertbuffer_float_byte.buffer_byte_format &
-                         byte_extruct_mask) >>
-                        bit_shifter_for_byte_extruct);
+    unsigned char byte_buffer = (unsigned char)((convertbuffer_float_byte.buffer_byte_format & byte_extruct_mask) >> bit_shifter_for_byte_extruct);
     byte_vector.push_back(byte_buffer);
     byte_extruct_mask = byte_extruct_mask << 8;
     bit_shifter_for_byte_extruct += 8;
@@ -1060,8 +951,7 @@ std::vector<unsigned char> OEM7600::ConvertFloatToByte(const float float_data) {
 }
 
 // 32bit CRC Calculation
-unsigned int OEM7600::OEM7600_calculate_crc32(const char *tlm_data_for_crc,
-                                              const size_t data_length) {
+unsigned int OEM7600::OEM7600_calculate_crc32(const char *tlm_data_for_crc, const size_t data_length) {
   unsigned int temporary_value1_for_crc_calcx;
   unsigned int temporary_value2_for_crc_calcx;
   unsigned int calculated_crc32x = 0;
@@ -1069,18 +959,15 @@ unsigned int OEM7600::OEM7600_calculate_crc32(const char *tlm_data_for_crc,
 
   while (data_length_for_crc_calc-- != 0) {
     temporary_value1_for_crc_calcx = (calculated_crc32x >> 8) & 0x00FFFFFF;
-    temporary_value2_for_crc_calcx = OEM7600_calculate_crc32_subroutine(
-        ((unsigned int)calculated_crc32x ^ *tlm_data_for_crc++) & 0xFF);
-    calculated_crc32x =
-        temporary_value1_for_crc_calcx ^ temporary_value2_for_crc_calcx;
+    temporary_value2_for_crc_calcx = OEM7600_calculate_crc32_subroutine(((unsigned int)calculated_crc32x ^ *tlm_data_for_crc++) & 0xFF);
+    calculated_crc32x = temporary_value1_for_crc_calcx ^ temporary_value2_for_crc_calcx;
   }
 
   return calculated_crc32x;
 }
 
 // 32bit CRC Calculation subroutine
-unsigned int
-OEM7600::OEM7600_calculate_crc32_subroutine(const unsigned int initial_value) {
+unsigned int OEM7600::OEM7600_calculate_crc32_subroutine(const unsigned int initial_value) {
   const unsigned int kCrc32Polynominal = 0xEDB88320;
 
   unsigned int uint32_crcx = initial_value;

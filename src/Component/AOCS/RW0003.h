@@ -10,16 +10,15 @@ Note: Functions not used in the project are not implemented
 */
 
 class RW0003 : public ReactionWheel, public I2cTargetCommunicationWithObc {
-public:
-  RW0003(ReactionWheel rw, const int sils_port_id,
-         const unsigned int hils_port_id, const unsigned char i2c_addr,
-         OnBoardComputer *obc, HilsPortManager *hils_port_manager);
+ public:
+  RW0003(ReactionWheel rw, const int sils_port_id, const unsigned int hils_port_id, const unsigned char i2c_addr, OnBoardComputer *obc,
+         HilsPortManager *hils_port_manager);
 
   // Override: RWModel functions
   void MainRoutine(int count) override;
   std::string GetLogHeader() const override;
 
-private:
+ private:
   bool is_rw_initialized_ = false;
   // Dummy data
   double temperture_degC_ = 30.0;

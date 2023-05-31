@@ -1,33 +1,26 @@
 #include "NanoSSOCD60.h"
 #define _USE_MATH_DEFINES
-#include <string.h> // for memcpy
+#include <string.h>  // for memcpy
 
 #include <algorithm>
 #include <library/math/constants.hpp>
 #include <library/utilities/macros.hpp>
 
-NanoSSOCD60::NanoSSOCD60(SunSensor sun_sensor, const int sils_port_id,
-                         const unsigned int hils_port_id,
-                         const unsigned char i2c_addr, OnBoardComputer *obc,
-                         HilsPortManager *hils_port_manager)
-    : SunSensor(sun_sensor),
-      I2cTargetCommunicationWithObc(sils_port_id, hils_port_id, i2c_addr, obc,
-                                    hils_port_manager),
-      i2c_addr_(i2c_addr) {}
+NanoSSOCD60::NanoSSOCD60(SunSensor sun_sensor, const int sils_port_id, const unsigned int hils_port_id, const unsigned char i2c_addr,
+                         OnBoardComputer *obc, HilsPortManager *hils_port_manager)
+    : SunSensor(sun_sensor), I2cTargetCommunicationWithObc(sils_port_id, hils_port_id, i2c_addr, obc, hils_port_manager), i2c_addr_(i2c_addr) {}
 
 NanoSSOCD60::~NanoSSOCD60() {}
 
 void NanoSSOCD60::MainRoutine(int count) {
   UNUSED(count);
   Measure();
-  sun_intensity_percent_ = solar_illuminance_W_m2_ /
-                           srp_environment_->GetSolarConstant_W_m2() * 100.0;
+  sun_intensity_percent_ = solar_illuminance_W_m2_ / srp_environment_->GetSolarConstant_W_m2() * 100.0;
 
   GenerateTelemetry();
 
   int cmd_size = ReceiveCommand();
-  if (cmd_size != 1)
-    return; // length == 1 means setting of read register address
+  if (cmd_size != 1) return;  // length == 1 means setting of read register address
   // これ以降はHILS用に事前にテレメトリを溜めておく
   const int kTlmSize = 15;
   StoreTelemetry(kStoredFrameSize, kTlmSize);
@@ -49,8 +42,7 @@ int NanoSSOCD60::GenerateTelemetry() {
   for (int i = 0; i < 4; i++) {
     tlm[5 + i] = (beta_tlm >> kByte2Bit * i) & 0xFF;
   }
-  int32_t sun_detection_rate_tlm =
-      ConvertFloat2FloatingPoint(float(sun_intensity_percent_));
+  int32_t sun_detection_rate_tlm = ConvertFloat2FloatingPoint(float(sun_intensity_percent_));
   for (int i = 0; i < 4; i++) {
     tlm[9 + i] = (sun_detection_rate_tlm >> kByte2Bit * i) & 0xFF;
   }
@@ -68,9 +60,8 @@ int NanoSSOCD60::GenerateTelemetry() {
 
 // Function to convert a float value to its internal 32-bit representation
 int32_t NanoSSOCD60::ConvertFloat2FloatingPoint(float data) {
-  int32_t internal_representation =
-      *((int32_t *)&data); // The internal representation of "data" in decimal
-                           // notation.
+  int32_t internal_representation = *((int32_t *)&data);  // The internal representation of "data" in decimal
+                                                          // notation.
   return internal_representation;
 }
 
@@ -107,8 +98,7 @@ unsigned char NanoSSOCD60::GenerateErrorCode() {
 
 std::string NanoSSOCD60::GetLogHeader() const {
   std::string str_tmp = "";
-  const std::string st_id =
-      std::to_string(static_cast<long long>(component_id_));
+  const std::string st_id = std::to_string(static_cast<long long>(component_id_));
 
   str_tmp += WriteVector("NanoSSOC D60" + st_id, "c", "-", 3);
   str_tmp += WriteScalar("sun_detected_flag" + st_id, "-");

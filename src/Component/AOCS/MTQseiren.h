@@ -8,16 +8,15 @@ HowToUse: NA
 */
 
 class MTQseiren : public Magnetorquer, public GpioConnectionWithObc {
-public:
-  MTQseiren(Magnetorquer mag_torquer, std::vector<int> gpio_ports,
-            OnBoardComputer *obc);
+ public:
+  MTQseiren(Magnetorquer mag_torquer, std::vector<int> gpio_ports, OnBoardComputer *obc);
   ~MTQseiren();
 
   // Override: MagTorquer functions
   void MainRoutine(int count) override;
   std::string GetLogHeader() const override;
 
-private:
+ private:
   typedef enum {
     GPIO_X_POSITIVE = 0,
     GPIO_X_NEGATIVE,
@@ -34,8 +33,7 @@ private:
   // +1: positive
   // -1: negative
   //  0: zero (no output)
-  int ConvertGPIOState2Polarity(int positive_gpio_pin_idx,
-                                int negative_gpio_pin_idx);
+  int ConvertGPIOState2Polarity(int positive_gpio_pin_idx, int negative_gpio_pin_idx);
 
   void ConvertPolarity2OutputMag();
 };

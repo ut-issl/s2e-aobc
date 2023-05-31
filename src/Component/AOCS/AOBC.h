@@ -4,12 +4,12 @@
 class ISSL6UComponents;
 
 class AOBC : public Component {
-public:
+ public:
   AOBC(ClockGenerator *clock_gen, ISSL6UComponents *components);
   ~AOBC();
   void Initialize();
 
-protected:
+ protected:
   ISSL6UComponents *components_;
   void MainRoutine(int count);
 };

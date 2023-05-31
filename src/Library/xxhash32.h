@@ -25,7 +25,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 **/
 
 #pragma once
-#include <stdint.h> // for uint32_t and uint64_t
+#include <stdint.h>  // for uint32_t and uint64_t
 
 /// XXHash (32 bit), based on Yann Collet's descriptions, see
 /// http://cyan4973.github.io/xxHash/
@@ -42,7 +42,7 @@ often as you like to ...
     Note: my code is NOT endian-aware !
 **/
 class XXHash32 {
-public:
+ public:
   /// create new XXHash (32 bit)
   /** @param seed your seed value, even zero is a valid seed and e.g. used by
    * LZ4 **/
@@ -61,8 +61,7 @@ public:
       @return false if parameters are invalid / zero **/
   bool add(const void *input, uint64_t length) {
     // no data ?
-    if (!input || length == 0)
-      return false;
+    if (!input || length == 0) return false;
 
     totalLength += length;
     // byte-wise access
@@ -71,8 +70,7 @@ public:
     // unprocessed old data plus new data still fit in temporary buffer ?
     if (bufferSize + length < MaxBufferSize) {
       // just add new data
-      while (length-- > 0)
-        buffer[bufferSize++] = *data++;
+      while (length-- > 0) buffer[bufferSize++] = *data++;
       return true;
     }
 
@@ -83,8 +81,7 @@ public:
     // some data left from previous update ?
     if (bufferSize > 0) {
       // make sure temporary buffer is full (16 bytes)
-      while (bufferSize < MaxBufferSize)
-        buffer[bufferSize++] = *data++;
+      while (bufferSize < MaxBufferSize) buffer[bufferSize++] = *data++;
 
       // process these 16 bytes (4x4)
       process(buffer, state[0], state[1], state[2], state[3]);
@@ -106,8 +103,7 @@ public:
 
     // copy remainder to temporary buffer
     bufferSize = stop - data;
-    for (unsigned int i = 0; i < bufferSize; i++)
-      buffer[i] = data[i];
+    for (unsigned int i = 0; i < bufferSize; i++) buffer[i] = data[i];
 
     // done
     return true;
@@ -120,8 +116,7 @@ public:
 
     // fold 128 bit state into one single 32 bit value
     if (totalLength >= MaxBufferSize)
-      result += rotateLeft(state[0], 1) + rotateLeft(state[1], 7) +
-                rotateLeft(state[2], 12) + rotateLeft(state[3], 18);
+      result += rotateLeft(state[0], 1) + rotateLeft(state[1], 7) + rotateLeft(state[2], 12) + rotateLeft(state[3], 18);
     else
       // internal state wasn't set in add(), therefore original seed is still
       // stored in state2
@@ -133,12 +128,10 @@ public:
     const unsigned char *stop = data + bufferSize;
 
     // at least 4 bytes left ? => eat 4 bytes per step
-    for (; data + 4 <= stop; data += 4)
-      result = rotateLeft(result + *(uint32_t *)data * Prime3, 17) * Prime4;
+    for (; data + 4 <= stop; data += 4) result = rotateLeft(result + *(uint32_t *)data * Prime3, 17) * Prime4;
 
     // take care of remaining 0..3 bytes, eat 1 byte per step
-    while (data != stop)
-      result = rotateLeft(result + (*data++) * Prime5, 11) * Prime1;
+    while (data != stop) result = rotateLeft(result + (*data++) * Prime5, 11) * Prime1;
 
     // mix bits
     result ^= result >> 15;
@@ -160,7 +153,7 @@ public:
     return hasher.hash();
   }
 
-private:
+ private:
   /// magic constants :-)
   static const uint32_t Prime1 = 2654435761U;
   static const uint32_t Prime2 = 2246822519U;
@@ -172,21 +165,17 @@ private:
   static const uint32_t MaxBufferSize = 15 + 1;
 
   // internal state and temporary buffer
-  uint32_t state[4]; // state[2] == seed if totalLength < MaxBufferSize
+  uint32_t state[4];  // state[2] == seed if totalLength < MaxBufferSize
   unsigned char buffer[MaxBufferSize];
   unsigned int bufferSize;
   uint64_t totalLength;
 
   /// rotate bits, should compile to a single CPU instruction (ROL)
-  static inline uint32_t rotateLeft(uint32_t x, unsigned char bits) {
-    return (x << bits) | (x >> (32 - bits));
-  }
+  static inline uint32_t rotateLeft(uint32_t x, unsigned char bits) { return (x << bits) | (x >> (32 - bits)); }
 
   /// process a block of 4x4 bytes, this is the main part of the XXHash32
   /// algorithm
-  static inline void process(const void *data, uint32_t &state0,
-                             uint32_t &state1, uint32_t &state2,
-                             uint32_t &state3) {
+  static inline void process(const void *data, uint32_t &state0, uint32_t &state1, uint32_t &state2, uint32_t &state3) {
     const uint32_t *block = (const uint32_t *)data;
     state0 = rotateLeft(state0 + block[0] * Prime2, 13) * Prime1;
     state1 = rotateLeft(state1 + block[1] * Prime2, 13) * Prime1;

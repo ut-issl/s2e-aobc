@@ -4,7 +4,7 @@
  */
 
 #ifdef WIN32
-#define _WINSOCKAPI_ // stops windows.h including winsock.h
+#define _WINSOCKAPI_  // stops windows.h including winsock.h
 #include <tchar.h>
 #include <windows.h>
 #endif
@@ -39,10 +39,8 @@ int main(int argc, char *argv[]) {
   UNUSED(argv);
 
   std::string ini_file = "../../data/initialize_files/simulation_base.ini";
-  MonteCarloSimulationExecutor *mc_simulator =
-      InitMonteCarloSimulation(ini_file);
-  Logger *log_mc_simulator =
-      InitMonteCarloLog(ini_file, mc_simulator->IsEnabled());
+  MonteCarloSimulationExecutor *mc_simulator = InitMonteCarloSimulation(ini_file);
+  Logger *log_mc_simulator = InitMonteCarloLog(ini_file, mc_simulator->IsEnabled());
 
   std::cout << "Starting simulation..." << std::endl;
   std::cout << "\tIni file: ";
@@ -52,8 +50,7 @@ int main(int argc, char *argv[]) {
     std::chrono::system_clock::time_point start, end;
     start = std::chrono::system_clock::now();
 
-    auto simcase =
-        ISSL6UCase(ini_file, *mc_simulator, log_mc_simulator->GetLogPath());
+    auto simcase = ISSL6UCase(ini_file, *mc_simulator, log_mc_simulator->GetLogPath());
     // Initialize
     log_mc_simulator->AddLogList(&simcase);
     if (mc_simulator->GetNumberOfExecutionsDone() == 0) {
@@ -62,20 +59,15 @@ int main(int argc, char *argv[]) {
     simcase.Initialize();
 
     // Main
-    log_mc_simulator->WriteValues(); // log initial value
+    log_mc_simulator->WriteValues();  // log initial value
     simcase.Main();
     mc_simulator->AtTheEndOfEachCase();
-    log_mc_simulator->WriteValues(); // log final value
+    log_mc_simulator->WriteValues();  // log final value
     log_mc_simulator->ClearLogList();
 
     end = std::chrono::system_clock::now();
-    double time = static_cast<double>(
-        std::chrono::duration_cast<std::chrono::microseconds>(end - start)
-            .count() /
-        1000000.0);
-    std::cout << std::endl
-              << "Simulation execution time: " << time << "sec" << std::endl
-              << std::endl;
+    double time = static_cast<double>(std::chrono::duration_cast<std::chrono::microseconds>(end - start).count() / 1000000.0);
+    std::cout << std::endl << "Simulation execution time: " << time << "sec" << std::endl << std::endl;
   }
   return EXIT_SUCCESS;
 }

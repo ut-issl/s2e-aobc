@@ -29,12 +29,9 @@
 using libra::Vector;
 
 class ISSL6UComponents : public InstalledComponents {
-public:
-  ISSL6UComponents(const Dynamics *dynamics, Structure *structure,
-                   const LocalEnvironment *local_environment,
-                   const GlobalEnvironment *global_environment,
-                   const SimulationConfiguration *configuration,
-                   ClockGenerator *clock_generator,
+ public:
+  ISSL6UComponents(const Dynamics *dynamics, Structure *structure, const LocalEnvironment *local_environment,
+                   const GlobalEnvironment *global_environment, const SimulationConfiguration *configuration, ClockGenerator *clock_generator,
                    const unsigned int spacecraft_id);
   ~ISSL6UComponents();
   libra::Vector<3> GenerateForce_b_N();
@@ -49,7 +46,7 @@ public:
   inline const LocalEnvironment &GetLocalEnv() { return *local_environment_; }
   inline GnssReceiver &GetGNSSR() { return *oem7600_; }
 
-private:
+ private:
   // CDH
   ObcWithC2a *aobc_;
   // Power
@@ -66,7 +63,7 @@ private:
   NanoSSOCD60 *nanoSSOC_D60_my_;
   MTQseiren *mtq_seiren_;
 
-  OEM7600 *oem7600_; // GNSS Receiver
+  OEM7600 *oem7600_;  // GNSS Receiver
   Sagitta *sagitta_;
   STIM210 *stim210_;
 
@@ -82,11 +79,10 @@ private:
   HilsIfDriver *hils_if_driver_;
 
   // States
-  const SimulationConfiguration *configuration_; //!< Simulation settings
-  const Dynamics *dynamics_; //!< Dynamics information of the spacecraft
-  Structure *structure_;     //!< Structure information of the spacecraft
-  const LocalEnvironment *local_environment_; //!< Local environment information
-                                              //!< around the spacecraft
-  const GlobalEnvironment
-      *global_environment_; //!< Global environment information
+  const SimulationConfiguration *configuration_;  //!< Simulation settings
+  const Dynamics *dynamics_;                      //!< Dynamics information of the spacecraft
+  Structure *structure_;                          //!< Structure information of the spacecraft
+  const LocalEnvironment *local_environment_;     //!< Local environment information
+                                                  //!< around the spacecraft
+  const GlobalEnvironment *global_environment_;   //!< Global environment information
 };
