@@ -23,6 +23,11 @@ jobs:
         with:
           fetch-depth: 2
 
+      - name: checkout the submodules
+        uses: actions/checkout@v3
+        with:
+          submodules: recursive
+
       - name: install clang-format
         run: |
           sudo apt-get update
