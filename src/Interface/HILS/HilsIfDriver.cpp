@@ -1,13 +1,8 @@
 #include "HilsIfDriver.h"
 
-HilsIfDriver::HilsIfDriver(const int prescaler, ClockGenerator *clock_gen,
-                           const unsigned int hils_port_id,
-                           const unsigned int baud_rate,
-                           HilsPortManager *hils_port_manager,
-                           std::vector<int> gpio_ports, OnBoardComputer *obc)
-    : Component(prescaler, clock_gen),
-      UartCommunicationWithObc(hils_port_id, baud_rate, hils_port_manager),
-      GpioConnectionWithObc(gpio_ports, obc) {}
+HilsIfDriver::HilsIfDriver(const int prescaler, ClockGenerator *clock_gen, const unsigned int hils_port_id, const unsigned int baud_rate,
+                           HilsPortManager *hils_port_manager, std::vector<int> gpio_ports, OnBoardComputer *obc)
+    : Component(prescaler, clock_gen), UartCommunicationWithObc(hils_port_id, baud_rate, hils_port_manager), GpioConnectionWithObc(gpio_ports, obc) {}
 
 HilsIfDriver::~HilsIfDriver() {}
 
@@ -35,8 +30,7 @@ int HilsIfDriver::ParseCommand(const int cmd_size) {
     idx++;
   }
 
-  if (cmd[0] != 0x49 || cmd[1] != 0x46)
-    return -1;
+  if (cmd[0] != 0x49 || cmd[1] != 0x46) return -1;
 
   for (int i = 0; i < kNumOfMtqGpio_; i++) {
     is_high_mtq_[i] = (cmd[2] >> i) & 1;

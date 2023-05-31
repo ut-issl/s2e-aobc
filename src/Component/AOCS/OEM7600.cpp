@@ -79,15 +79,13 @@ int OEM7600::ParseCommand(const int cmd_size) {
   if (rcvd_cmd.is_valid == false) {
     return -1;
   }
-  // if the decoded cmd seems to be valid, details of the cmd is investigated by
-  // comparing its format to the expected one from its name
+  // if the decoded cmd seems to be valid, details of the cmd is investigated by comparing its format to the expected one from its name
   else {
     if (rcvd_cmd.cmd_name == "log") {
       return Cmd_LOG(rcvd_cmd.cmd_args[0], rcvd_cmd.cmd_args[1], rcvd_cmd.cmd_args[2], rcvd_cmd.cmd_args[3]);
     }
 
-    // command actions for the other types of command will be implimented in the
-    // future...
+    // command actions for the other types of command will be implimented in the future...
   }
 
   return 0;
@@ -99,8 +97,7 @@ int OEM7600::GenerateTelemetry() {
 
   // find all tlm must be padded from tlm list
   for (size_t i = 0; i < tlm_list_.size(); i++) {
-    tlm_list_[i].count_up();  // tlm output timing is adjusted to previously
-                              // commanded one
+    tlm_list_[i].count_up();  // tlm output timing is adjusted to previously commanded one
 
     if ((tlm_list_[i].count_to_out == 0) || ((tlm_list_[i].out_type == "once") || (tlm_list_[i].out_type == "onnext"))) {
       tlm_all += Gen_TLM_Packet(tlm_list_[i].tlm_name);
@@ -113,8 +110,7 @@ int OEM7600::GenerateTelemetry() {
     }
   }
 
-  // To avoid unhandled error in the parent function, add dummy char if the
-  // result of the above process is empty
+  // To avoid unhandled error in the parent function, add dummy char if the result of the above process is empty
   if ((int)(tlm_all.length()) == 0) {
     tlm_all = " ";
   }
@@ -135,8 +131,7 @@ OEM7600_CMD OEM7600::DecodeCommand() {
   // examples of cmd format are...
   // CMD_NAME Arg1
   // CMD_NAME Arg1 Arg2 ...
-  // type and length of Args vary according to commands and also according to
-  // the context of the each Args
+  // type and length of Args vary according to commands and also according to the context of the each Args
 
   // find empty space character(separator)
   for (size_t i = 0; i < rx_buffer_.size(); i++) {
@@ -162,8 +157,7 @@ OEM7600_CMD OEM7600::DecodeCommand() {
         rcvd_cmd.cmd_args[i - 1] = std::string(rx_buffer_.begin() + space_pos[i - 1] + 1, rx_buffer_.begin() + space_pos[i]);
       }
     }
-    // last cmd arg begins from last space pos + 1 and lasts for the end of the
-    // cmd
+    // last cmd arg begins from last space pos + 1 and lasts for the end of the cmd
     rcvd_cmd.cmd_args[space_pos_count - 1] = std::string(rx_buffer_.begin() + space_pos[space_pos_count - 1] + 1, rx_buffer_.end());
 
     rcvd_cmd.is_valid = true;
@@ -232,8 +226,7 @@ int OEM7600::Cmd_LOG(const std::string comport_ID, const std::string tlm_name, c
 std::string OEM7600::Gen_TLM_Packet(const std::string tlm_name) {
   std::string str_tmp = "";
 
-  // In Case of NMEA tlm, header and footer are different from both of
-  // ASII,Binary formats
+  // In Case of NMEA tlm, header and footer are different from both of ASII,Binary formats
   if (tlm_name == "gpgga") {
     str_tmp += Gen_GPGGATlm();
     str_tmp += "\r\n";  // footer for ASCII format;
@@ -311,7 +304,6 @@ std::string OEM7600::Gen_TLM_Header_Ascii(const std::string tlm_name) {
 
   std::string port = "COM" + WriteScalar((int)(oem_tlm_ch_), 1);  // Port
   str_tmp += "," + port;                                          // after port, "," is already added (WriteScalar did it)
-
   str_tmp += "0";                                                 // Sequence number
   str_tmp += ",90.5";                                             // CPU idle time (currently dummy data is padded)
 
@@ -421,41 +413,27 @@ std::string OEM7600::Gen_BestXYZTlm_Ascii(void) {
 
   str_tmp += sol_staus + ",SINGLE,";              // position solution status
   str_tmp += WriteVector(position_ecef_m_, 11);   // postion computed
-  str_tmp += "72.5816,61.3924,159.6638,";         // std 1-sigma of computed position(currently
-                                                  // dummy data is padded)
-
+  str_tmp += "72.5816,61.3924,159.6638,";         // std 1-sigma of computed position(currently dummy data is padded)
   str_tmp += sol_staus + ",DOPPLER_VELOCITY,";    // velocity solution sutatus
   str_tmp += WriteVector(velocity_ecef_m_s_, 8);  // velocity computed
-  str_tmp += "0.5747,0.4413,1.4830,";             // std 1-sigma of computed velocity(currently
-                                                  // dummy data is padded)
-
-  str_tmp += " ,";                                // base station ID of differenctial positioning (ignored in
-                                                  // this model)
-  str_tmp += "0.000,";                            // V-latency (velocity measurement time delay, currently
-                                                  // dummy data is padded)
-  str_tmp += "0.000,";                            // diff_age (differential age in seconds, basically the
-                                                  // ouput value is fixed to zero)
+  str_tmp += "0.5747,0.4413,1.4830,";             // std 1-sigma of computed velocity(currently dummy data is padded)
+  str_tmp += " ,";                                // base station ID of differenctial positioning (ignored in this model)
+  str_tmp += "0.000,";                            // V-latency (velocity measurement time delay, currently dummy data is padded)
+  str_tmp += "0.000,";                            // diff_age (differential age in seconds, basically the ouput value is fixed to zero)
 
   // sol_age (solution age in seconds)
   double sol_age = simulation_time_->GetElapsedTime_s() - last_position_fix_time_local_;
   str_tmp += WriteScalar(sol_age);
 
   str_tmp += WriteScalar(visible_satellite_number_);  // number of satellites tracked
-  str_tmp += WriteScalar(visible_satellite_number_);  // number of satellites used in solution
-                                                      // (currently dummy data is padded)
-  str_tmp += WriteScalar(visible_satellite_number_);  // number of satellites with L1/E1/B1 signals
-                                                      // used in solution (currently dummy data is
-                                                      // padded)
-  str_tmp += "0,";                                    // number of satellites with multi-frequency signals used in
-                                                      // solution (currently dummy data is padded)
+  str_tmp += WriteScalar(visible_satellite_number_);  // number of satellites used in solution (currently dummy data is padded)
+  str_tmp += WriteScalar(visible_satellite_number_);  // number of satellites with L1/E1/B1 signals used in solution (currently dummy data is padded)
 
-  str_tmp += "0,";                                    // reserved
-  str_tmp += "02,";                                   // Extended solution status (currently fixed to default value, i.e,
-                                                      // pseudorange lono correction is based on Klobuchar model)
-  str_tmp += "00,";                                   // Galileo and BeiDou sig mask (currently fixed to default
-                                                      // value, i.e, they are not used in solution)
-  str_tmp += "01";                                    // GPS and GLONASS sig mask (currently fixed to default
-                                                      // value, i.e, only GPS is used in solution)
+  str_tmp += "0,";   // number of satellites with multi-frequency signals used in solution (currently dummy data is padded)
+  str_tmp += "0,";   // reserved
+  str_tmp += "02,";  // Extended solution status (currently fixed to default value, i.e, pseudorange lono correction is based on Klobuchar model)
+  str_tmp += "00,";  // Galileo and BeiDou sig mask (currently fixed to default value, i.e, they are not used in solution)
+  str_tmp += "01";   // GPS and GLONASS sig mask (currently fixed to default value, i.e, only GPS is used in solution)
 
   return str_tmp;
 }
@@ -560,8 +538,7 @@ std::string OEM7600::Gen_BestXYZTlm_Binary(void) {
     tlm[tlm_parse_pointer++] = byte_buffer_float[i];
   }
 
-  // diff_age (differential age in seconds, basically the ouput value is fixed
-  // to zero)
+  // diff_age (differential age in seconds, basically the ouput value is fixed to zero)
   float diff_age_dummy_sec = 0.0f;
   byte_buffer_float = ConvertFloatToByte(diff_age_dummy_sec);
   for (int i = 0; i < kByteSizeIntFloat; i++) {
@@ -587,8 +564,7 @@ std::string OEM7600::Gen_BestXYZTlm_Binary(void) {
   tlm[tlm_parse_pointer++] = 0x00;
   tlm[tlm_parse_pointer++] = 0x02;
 
-  // GNSS System mask (currently fix to 0x00 and 0x01, i.e. only GPS is
-  // observed)
+  // GNSS System mask (currently fix to 0x00 and 0x01, i.e. only GPS is observed)
   tlm[tlm_parse_pointer++] = 0x00;
   tlm[tlm_parse_pointer++] = 0x01;
 
@@ -610,13 +586,9 @@ std::string OEM7600::Gen_TimeTlm_Ascii(void) {
   }
 
   str_tmp += clock_status + ",";   // clock sutatus
-  str_tmp += "-3.004848645e-08,";  // receiver clock offset in seconds from GPST (clock
-                                   // = GPST + offset), currently dummya data is padded
-  str_tmp += "2.736064744e-09,";   // std 1-sigma of clock offset (currently
-                                   // dummya data is padded)
-  str_tmp += "-17.99999999852,";   // GPST offset in seconds from UTC (UTC = GPST
-                                   // + offset), currently fixed number at
-                                   // A.C.2020 (=-18sec)is padded
+  str_tmp += "-3.004848645e-08,";  // receiver clock offset in seconds from GPST (clock = GPST + offset), currently dummya data is padded
+  str_tmp += "2.736064744e-09,";   // std 1-sigma of clock offset (currently dummya data is padded)
+  str_tmp += "-17.99999999852,";   // GPST offset in seconds from UTC (UTC = GPST + offset), currently fixed number at A.C.2020 (=-18sec)is padded
 
   // UTC
   str_tmp += WriteScalar(utc_.year);
@@ -625,8 +597,7 @@ std::string OEM7600::Gen_TimeTlm_Ascii(void) {
   str_tmp += WriteScalar(utc_.hour);
   str_tmp += WriteScalar(utc_.minute);
   str_tmp += WriteScalar((unsigned int)(utc_.second * 1000));  // sec in [msec] format
-  str_tmp += clock_status;                                     // UTC status (in real HW, UTC status is not always equal to
-                                                               // clock status, but is deal to be equal in this model )
+  str_tmp += clock_status;  // UTC status (in real HW, UTC status is not always equal to clock status, but is deal to be equal in this model )
 
   return str_tmp;
 }
@@ -640,8 +611,7 @@ std::string OEM7600::Gen_HWMonitorTlm_Ascii(void) {
   return str_tmp;
 }
 
-// function correspond to "hwmonitorb" tlm (currently dummy data is padded =
-// constant voltage, temperature, etc.)
+// function correspond to "hwmonitorb" tlm (currently dummy data is padded = constant voltage, temperature, etc.)
 std::string OEM7600::Gen_HWMonitorTlm_Binary(void) {
   std::string str_tmp;
   unsigned char tlm[OEM7600_HWMONITOR_BINARY_TLM_SIZE] = {};
@@ -749,8 +719,7 @@ std::string OEM7600::Gen_HWMonitorTlm_Binary(void) {
 std::string OEM7600::Gen_GPGGATlm(void) {
   std::string str_tmp = "$GPGGA,";
 
-  // if 100 sec passed from last position fix timing, all the succeeding outputs
-  // reset to blank
+  // if 100 sec passed from last position fix timing, all the succeeding outputs reset to blank
   double elapsed_sec = simulation_time_->GetElapsedTime_s() - last_position_fix_time_local_;
   if (elapsed_sec > 100.0) {
     str_tmp += ",,,,,0,,,,,,,,*66";
@@ -759,13 +728,11 @@ std::string OEM7600::Gen_GPGGATlm(void) {
   else {
     // UTC
     std::string str_utc_tmp = WriteScalar(utc_.hour, 2);
-    str_utc_tmp.erase(str_utc_tmp.end() - 1);  // since "," added in "WriteScalar" is unnecessary in
-                                               // this case, erase it here
+    str_utc_tmp.erase(str_utc_tmp.end() - 1);  // since "," added in "WriteScalar" is unnecessary in this case, erase it here
     str_tmp += string_zeropad_local(str_utc_tmp, 2);
 
     str_utc_tmp = WriteScalar(utc_.minute, 2);
-    str_utc_tmp.erase(str_utc_tmp.end() - 1);  // since "," added in "WriteScalar" is unnecessary in
-                                               // this case, erase it here
+    str_utc_tmp.erase(str_utc_tmp.end() - 1);  // since "," added in "WriteScalar" is unnecessary in this case, erase it here
     str_tmp += string_zeropad_local(str_utc_tmp, 2);
 
     str_utc_tmp = WriteScalar(utc_.second, 4);
@@ -804,8 +771,7 @@ std::string OEM7600::Gen_GPGGATlm(void) {
 
     // age of correction data in [sec]
     str_tmp += WriteScalar((unsigned int)(elapsed_sec), 2);
-    str_tmp.erase(str_tmp.end() - 1);  // since "," added in "WriteScalar" is
-                                       // unnecessary in this case, erase it here
+    str_tmp.erase(str_tmp.end() - 1);  // since "," added in "WriteScalar" is unnecessary in this case, erase it here
 
     // check sum (currently dummy data is padded)
     str_tmp += "*60";
@@ -859,8 +825,7 @@ std::string OEM7600::convLatLontoNMEA(const double rad, const std::string type) 
   double angle_rem_amin = (angle_deg - (double)(angle_dd)) * deg2arcmin;
 
   std::string str_deg = WriteScalar(angle_dd);
-  str_deg.erase(str_deg.end() - 1);  // since "," added in "WriteScalar" is
-                                     // unnecessary in this case, erase it here
+  str_deg.erase(str_deg.end() - 1);  // since "," added in "WriteScalar" is unnecessary in this case, erase it here
   if (type == "lat") {
     str_tmp += string_zeropad_local(str_deg, 2);
   } else {

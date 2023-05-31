@@ -61,8 +61,7 @@ class OEM7600 : public GnssReceiver, public UartCommunicationWithObc {
   int GenerateTelemetry() override;
 
   // General function
-  void Update_local();  // update positioning infromation(to be removed after
-                        // core_oss modification)
+  void Update_local();  // update positioning infromation(to be removed after core_oss modification)
 
   // TLM Packet Generator
   std::string Gen_TLM_Packet(const std::string tlm_name);  // generate tlm body
@@ -89,11 +88,9 @@ class OEM7600 : public GnssReceiver, public UartCommunicationWithObc {
   unsigned int OEM7600_calculate_crc32_subroutine(const unsigned int initial_value);
 
   // Other utility functions for tlm/cmd string manipuration
-  bool TLM_NameSearch(const std::string tlm_name);                        // check wether the designated tlm name in
-                                                                          // "log" cmd is valid or not
-  OEM7600_BINARY_TLM_ID GetTlmIdOfBinaryTlm(const std::string tlm_name);  // get tlm id for binary format tlm packet
-  unsigned short GetTlmLengthOfBinaryTlm(const std::string tlm_name);     // get tlm length of variable part for binary format tlm
-
+  bool TLM_NameSearch(const std::string tlm_name);                           // check wether the designated tlm name in "log" cmd is valid or not
+  OEM7600_BINARY_TLM_ID GetTlmIdOfBinaryTlm(const std::string tlm_name);     // get tlm id for binary format tlm packet
+  unsigned short GetTlmLengthOfBinaryTlm(const std::string tlm_name);        // get tlm length of variable part for binary format tlm
   std::string convLatLontoNMEA(const double rad,
                                const std::string type);                      // convert lat/lon in [rad] to NMEA format
   std::string string_zeropad_local(const std::string str_org,

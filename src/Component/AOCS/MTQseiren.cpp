@@ -1,8 +1,8 @@
 #include "MTQseiren.h"
+
 #include <library/utilities/macros.hpp>
 
-MTQseiren::MTQseiren(Magnetorquer mag_torquer, std::vector<int> gpio_ports,
-                     OnBoardComputer *obc)
+MTQseiren::MTQseiren(Magnetorquer mag_torquer, std::vector<int> gpio_ports, OnBoardComputer *obc)
     : Magnetorquer(mag_torquer), GpioConnectionWithObc(gpio_ports, obc) {}
 
 MTQseiren::~MTQseiren() {}
@@ -21,20 +21,18 @@ void MTQseiren::MainRoutine(int count) {
   CalcOutputTorque();
 }
 
-int MTQseiren::ConvertGPIOState2Polarity(int positive_gpio_pin_idx,
-                                         int negative_gpio_pin_idx) {
+int MTQseiren::ConvertGPIOState2Polarity(int positive_gpio_pin_idx, int negative_gpio_pin_idx) {
   int polarity;
 
-  bool positive_gpio_pin_state; // true = HIGH, false = LOW
-  bool negative_gpio_pin_state; // true = HIGH, false = LOW
+  bool positive_gpio_pin_state;  // true = HIGH, false = LOW
+  bool negative_gpio_pin_state;  // true = HIGH, false = LOW
 
   positive_gpio_pin_state = Read(positive_gpio_pin_idx);
   negative_gpio_pin_state = Read(negative_gpio_pin_idx);
 
   if (positive_gpio_pin_state == true && negative_gpio_pin_state == false) {
     polarity = 1;
-  } else if (positive_gpio_pin_state == false &&
-             negative_gpio_pin_state == true) {
+  } else if (positive_gpio_pin_state == false && negative_gpio_pin_state == true) {
     polarity = -1;
   } else {
     // (positive_gpio_pin_state == false && negative_gpio_pin_state == false :
@@ -60,8 +58,7 @@ void MTQseiren::ConvertPolarity2OutputMag() {
 
 std::string MTQseiren::GetLogHeader() const {
   std::string str_tmp = "";
-  const std::string st_sensor_id =
-      std::to_string(static_cast<long long>(component_id_));
+  const std::string st_sensor_id = std::to_string(static_cast<long long>(component_id_));
   const char *cs = st_sensor_id.data();
   std::string MSSection = "MTQ_seiren";
 
