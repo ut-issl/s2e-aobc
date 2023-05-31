@@ -53,3 +53,7 @@
 - name: "WINGS"
   description: ""
   color: "1503bb"
+
+- name: "automation::force-check-format"
+  description: ""
+  color: "9A9379"
