@@ -20,11 +20,6 @@ jobs:
         with:
           fetch-depth: 2
 
-      - name: checkout the submodules
-        uses: actions/checkout@v3
-        with:
-          submodules: recursive
-
       - name: install clang-format
         run: |
           sudo apt-get update
@@ -46,7 +41,7 @@ jobs:
         if: github.event_name == 'pull_request'
         run: |
           git-clang-format --commit ${{ github.event.pull_request.base.sha }} --diff | tee format.patch
-           
+
       - name: check
         run: |
           git apply --allow-empty format.patch
