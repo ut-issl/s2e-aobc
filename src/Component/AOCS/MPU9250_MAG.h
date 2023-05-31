@@ -19,9 +19,9 @@ class MPU9250_MAG : public Magnetometer, public I2cTargetCommunicationWithObc {
 
  private:
   // Status
-  const bool *is_mag_on_;     // mag_onはMPU9250_GYROが管理している
-  unsigned char config_ = 0x00;
-  unsigned char status_ = 0;  // TODO: ちゃんと実装する？今の所この情報は使っていないみたい
+  const bool *is_mag_on_;        // mag_onはMPU9250_GYROが管理している
+  unsigned char config_ = 0x00;  // config
+  unsigned char status_ = 0;     // TODO: ちゃんと実装する？今の所この情報は使っていないみたい
 
   // TlmCmd parameters
   const unsigned char kTlmSize_ = 2;
