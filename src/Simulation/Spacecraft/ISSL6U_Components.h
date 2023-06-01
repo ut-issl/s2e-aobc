@@ -7,18 +7,18 @@
 // CDH
 #include <components/real/cdh/on_board_computer_with_c2a.hpp>
 // Power
-#include "../../Component/Power/PowerController.h"
 #include "../../Component/Power/INA260.h"
+#include "../../Component/Power/PowerController.h"
 // AOCS
-#include "../../Component/AOCS/Sagitta.h"
-#include "../../Component/AOCS/STIM210.h"
 #include "../../Component/AOCS/MPU9250_GYRO.h"
 #include "../../Component/AOCS/MPU9250_MAG.h"
-#include "../../Component/AOCS/RM3100.h"
-#include "../../Component/AOCS/NanoSSOCD60.h"
 #include "../../Component/AOCS/MTQseiren.h"
+#include "../../Component/AOCS/NanoSSOCD60.h"
 #include "../../Component/AOCS/OEM7600.h"
+#include "../../Component/AOCS/RM3100.h"
 #include "../../Component/AOCS/RW0003.h"
+#include "../../Component/AOCS/STIM210.h"
+#include "../../Component/AOCS/Sagitta.h"
 // Propulsion
 #include <components/real/propulsion/initialize_simple_thruster.hpp>
 // Mission
@@ -28,9 +28,8 @@
 
 using libra::Vector;
 
-class ISSL6UComponents : public InstalledComponents
-{
-public:
+class ISSL6UComponents : public InstalledComponents {
+ public:
   ISSL6UComponents(const Dynamics *dynamics, Structure *structure, const LocalEnvironment *local_environment,
                    const GlobalEnvironment *global_environment, const SimulationConfiguration *configuration, ClockGenerator *clock_generator,
                    const unsigned int spacecraft_id);
@@ -47,7 +46,7 @@ public:
   inline const LocalEnvironment &GetLocalEnv() { return *local_environment_; }
   inline GnssReceiver &GetGNSSR() { return *oem7600_; }
 
-private:
+ private:
   // CDH
   ObcWithC2a *aobc_;
   // Power
@@ -64,7 +63,7 @@ private:
   NanoSSOCD60 *nanoSSOC_D60_my_;
   MTQseiren *mtq_seiren_;
 
-  OEM7600 *oem7600_; // GNSS Receiver
+  OEM7600 *oem7600_;  // GNSS Receiver
   Sagitta *sagitta_;
   STIM210 *stim210_;
 
@@ -80,9 +79,10 @@ private:
   HilsIfDriver *hils_if_driver_;
 
   // States
-  const SimulationConfiguration *configuration_; //!< Simulation settings
-  const Dynamics *dynamics_;                     //!< Dynamics information of the spacecraft
-  Structure *structure_;                         //!< Structure information of the spacecraft
-  const LocalEnvironment *local_environment_;    //!< Local environment information around the spacecraft
-  const GlobalEnvironment *global_environment_;  //!< Global environment information
+  const SimulationConfiguration *configuration_;  //!< Simulation settings
+  const Dynamics *dynamics_;                      //!< Dynamics information of the spacecraft
+  Structure *structure_;                          //!< Structure information of the spacecraft
+  const LocalEnvironment *local_environment_;     //!< Local environment information
+                                                  //!< around the spacecraft
+  const GlobalEnvironment *global_environment_;   //!< Global environment information
 };

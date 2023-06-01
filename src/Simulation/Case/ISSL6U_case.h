@@ -2,11 +2,11 @@
 
 #include <simulation/case/simulation_case.hpp>
 #include <simulation/monte_carlo_simulation/monte_carlo_simulation_executor.hpp>
+
 #include "../Spacecraft/ISSL6Usat.h"
 
-class ISSL6UCase : public SimulationCase
-{
-public:
+class ISSL6UCase : public SimulationCase {
+ public:
   ISSL6UCase(const std::string initialize_base_file, MonteCarloSimulationExecutor &monte_carlo_simulator, const std::string log_path);
   virtual ~ISSL6UCase();
 
@@ -14,7 +14,7 @@ public:
   virtual std::string GetLogHeader() const;
   virtual std::string GetLogValue() const;
 
-private:
+ private:
   ISSL6USat *spacecraft_;
   MonteCarloSimulationExecutor &monte_carlo_simulator_;
 

@@ -6,11 +6,11 @@ on:
       - main
       - develop
   pull_request:
+    types: [opened, synchronize, reopened, labeled]
     paths:
       - '.github/workflows/check-format.yml'
       - '.clang-format'
-      - 's2e-aobc/src/**'
-
+      - 'src/**'
 jobs:
   clang-format:
     runs-on: ubuntu-latest
