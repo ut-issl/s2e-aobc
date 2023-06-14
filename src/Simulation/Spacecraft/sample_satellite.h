@@ -6,5 +6,6 @@
 
 class SampleSatellite : public Spacecraft {
  public:
-  SampleSatellite(const SimulationConfiguration *simulation_configuration, const GlobalEnvironment *global_environment, const unsigned int spacecraft_id);
+  SampleSatellite(const SimulationConfiguration *simulation_configuration, const GlobalEnvironment *global_environment,
+                  const unsigned int spacecraft_id);
 };

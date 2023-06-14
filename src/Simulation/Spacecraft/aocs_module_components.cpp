@@ -15,8 +15,8 @@
 #include "aocs_module_port_config.h"
 
 AocsModuleComponents::AocsModuleComponents(const Dynamics *dynamics, Structure *structure, const LocalEnvironment *local_environment,
-                                   const GlobalEnvironment *global_environment, const SimulationConfiguration *configuration,
-                                   ClockGenerator *clock_generator, const unsigned int spacecraft_id)
+                                           const GlobalEnvironment *global_environment, const SimulationConfiguration *configuration,
+                                           ClockGenerator *clock_generator, const unsigned int spacecraft_id)
     : dynamics_(dynamics),
       structure_(structure),
       local_environment_(local_environment),

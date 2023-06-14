@@ -31,8 +31,8 @@ using libra::Vector;
 class AocsModuleComponents : public InstalledComponents {
  public:
   AocsModuleComponents(const Dynamics *dynamics, Structure *structure, const LocalEnvironment *local_environment,
-                   const GlobalEnvironment *global_environment, const SimulationConfiguration *configuration, ClockGenerator *clock_generator,
-                   const unsigned int spacecraft_id);
+                       const GlobalEnvironment *global_environment, const SimulationConfiguration *configuration, ClockGenerator *clock_generator,
+                       const unsigned int spacecraft_id);
   ~AocsModuleComponents();
   libra::Vector<3> GenerateForce_b_N();
   libra::Vector<3> GenerateTorque_b_Nm();
