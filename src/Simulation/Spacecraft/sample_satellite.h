@@ -2,7 +2,7 @@
 
 #include <simulation/spacecraft/spacecraft.hpp>
 
-#include "ISSL6U_Components.h"
+#include "aocs_module_components.h"
 
 class SampleSatellite : public Spacecraft {
  public:

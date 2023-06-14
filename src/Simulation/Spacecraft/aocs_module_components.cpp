@@ -1,4 +1,4 @@
-#include "ISSL6U_Components.h"
+#include "aocs_module_components.h"
 
 #include <components/real/aocs/initialize_gnss_receiver.hpp>
 #include <components/real/aocs/initialize_gyro_sensor.hpp>
@@ -12,7 +12,7 @@
 #include <vector>
 
 #include "../../Component/AOCS/AOBC.h"
-#include "ISSL6U_PortConfig.h"
+#include "aocs_module_port_config.h"
 
 AocsModuleComponents::AocsModuleComponents(const Dynamics *dynamics, Structure *structure, const LocalEnvironment *local_environment,
                                    const GlobalEnvironment *global_environment, const SimulationConfiguration *configuration,

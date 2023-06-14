@@ -1,8 +1,8 @@
-#include "ISSL6U_case.h"
+#include "sample_case.h"
 
 #include <./simulation/monte_carlo_simulation/simulation_object.hpp>
 
-#include "../Spacecraft/ISSL6Usat.h"
+#include "../Spacecraft/sample_satellite.h"
 
 SampleCase::SampleCase(const std::string initialize_base_file, MonteCarloSimulationExecutor &monte_carlo_simulator, const std::string log_path)
     : SimulationCase(initialize_base_file, monte_carlo_simulator, log_path), monte_carlo_simulator_(monte_carlo_simulator) {}

@@ -3,7 +3,7 @@
 #include <simulation/case/simulation_case.hpp>
 #include <simulation/monte_carlo_simulation/monte_carlo_simulation_executor.hpp>
 
-#include "../Spacecraft/ISSL6Usat.h"
+#include "../Spacecraft/sample_satellite.h"
 
 class SampleCase : public SimulationCase {
  public:

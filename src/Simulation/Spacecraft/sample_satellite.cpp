@@ -1,6 +1,6 @@
-#include "ISSL6Usat.h"
+#include "sample_satellite.h"
 
-#include "ISSL6U_Components.h"
+#include "aocs_module_components.h"
 
 SampleSatellite::SampleSatellite(const SimulationConfiguration *simulation_configuration, const GlobalEnvironment *global_environment,
                      const unsigned int spacecraft_id)

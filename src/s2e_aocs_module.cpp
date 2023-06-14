@@ -20,7 +20,7 @@
 #include <simulation/monte_carlo_simulation/initialize_monte_carlo_simulation.hpp>
 
 // Add custom include files
-#include "./Simulation/Case/ISSL6U_case.h"
+#include "./Simulation/Case/sample_case.h"
 
 void print_path(std::string path) {
 #ifdef WIN32
