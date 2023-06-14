@@ -14,7 +14,7 @@
 #include "../../Component/AOCS/AOBC.h"
 #include "ISSL6U_PortConfig.h"
 
-ISSL6UComponents::ISSL6UComponents(const Dynamics *dynamics, Structure *structure, const LocalEnvironment *local_environment,
+AocsModuleComponents::AocsModuleComponents(const Dynamics *dynamics, Structure *structure, const LocalEnvironment *local_environment,
                                    const GlobalEnvironment *global_environment, const SimulationConfiguration *configuration,
                                    ClockGenerator *clock_generator, const unsigned int spacecraft_id)
     : dynamics_(dynamics),
@@ -160,7 +160,7 @@ ISSL6UComponents::ISSL6UComponents(const Dynamics *dynamics, Structure *structur
 #endif
 }
 
-ISSL6UComponents::~ISSL6UComponents() {
+AocsModuleComponents::~AocsModuleComponents() {
   delete telescope_;
   delete sagitta_;
   delete stim210_;
@@ -187,13 +187,13 @@ ISSL6UComponents::~ISSL6UComponents() {
   delete hils_port_manager_;
 }
 
-Vector<3> ISSL6UComponents::GenerateForce_b_N() {
+Vector<3> AocsModuleComponents::GenerateForce_b_N() {
   // There is no orbit control component, so it remains 0
   Vector<3> force_b_N_(0.0);
   return force_b_N_;
 }
 
-Vector<3> ISSL6UComponents::GenerateTorque_b_Nm() {
+Vector<3> AocsModuleComponents::GenerateTorque_b_Nm() {
   Vector<3> torque_b_Nm_(0.0);
   torque_b_Nm_ += mtq_seiren_->GetOutputTorque_b_Nm();
   torque_b_Nm_ += rw0003_x_->GetOutputTorque_b_Nm();
@@ -203,7 +203,7 @@ Vector<3> ISSL6UComponents::GenerateTorque_b_Nm() {
   return torque_b_Nm_;
 }
 
-void ISSL6UComponents::LogSetup(Logger &logger) {
+void AocsModuleComponents::LogSetup(Logger &logger) {
   logger.AddLogList(telescope_);
   logger.AddLogList(sagitta_);
   logger.AddLogList(stim210_);

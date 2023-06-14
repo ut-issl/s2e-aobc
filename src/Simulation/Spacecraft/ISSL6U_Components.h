@@ -28,12 +28,12 @@
 
 using libra::Vector;
 
-class ISSL6UComponents : public InstalledComponents {
+class AocsModuleComponents : public InstalledComponents {
  public:
-  ISSL6UComponents(const Dynamics *dynamics, Structure *structure, const LocalEnvironment *local_environment,
+  AocsModuleComponents(const Dynamics *dynamics, Structure *structure, const LocalEnvironment *local_environment,
                    const GlobalEnvironment *global_environment, const SimulationConfiguration *configuration, ClockGenerator *clock_generator,
                    const unsigned int spacecraft_id);
-  ~ISSL6UComponents();
+  ~AocsModuleComponents();
   libra::Vector<3> GenerateForce_b_N();
   libra::Vector<3> GenerateTorque_b_Nm();
   void LogSetup(Logger &logger);

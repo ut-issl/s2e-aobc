@@ -4,7 +4,7 @@
 
 #include "../../Simulation/Spacecraft/ISSL6U_Components.h"
 
-AOBC::AOBC(ClockGenerator *clock_gen, ISSL6UComponents *components) : Component(100, clock_gen), components_(components) { Initialize(); }
+AOBC::AOBC(ClockGenerator *clock_gen, AocsModuleComponents *components) : Component(100, clock_gen), components_(components) { Initialize(); }
 
 AOBC::~AOBC() { delete components_; }
 
