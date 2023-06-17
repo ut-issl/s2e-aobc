@@ -1,5 +1,5 @@
 /**
- * @file S2E_ISSL6U.cpp
+ * @file s2e_aocs_module.cpp
  * @brief The main file of S2E-USER
  */
 
@@ -20,7 +20,7 @@
 #include <simulation/monte_carlo_simulation/initialize_monte_carlo_simulation.hpp>
 
 // Add custom include files
-#include "./Simulation/Case/ISSL6U_case.h"
+#include "./Simulation/Case/sample_case.h"
 
 void print_path(std::string path) {
 #ifdef WIN32
@@ -50,7 +50,7 @@ int main(int argc, char *argv[]) {
     std::chrono::system_clock::time_point start, end;
     start = std::chrono::system_clock::now();
 
-    auto simcase = ISSL6UCase(ini_file, *mc_simulator, log_mc_simulator->GetLogPath());
+    auto simcase = SampleCase(ini_file, *mc_simulator, log_mc_simulator->GetLogPath());
     // Initialize
     log_mc_simulator->AddLogList(&simcase);
     if (mc_simulator->GetNumberOfExecutionsDone() == 0) {

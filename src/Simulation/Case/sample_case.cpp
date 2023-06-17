@@ -1,20 +1,20 @@
-#include "ISSL6U_case.h"
+#include "sample_case.h"
 
 #include <./simulation/monte_carlo_simulation/simulation_object.hpp>
 
-#include "../Spacecraft/ISSL6Usat.h"
+#include "../Spacecraft/sample_satellite.h"
 
-ISSL6UCase::ISSL6UCase(const std::string initialize_base_file, MonteCarloSimulationExecutor &monte_carlo_simulator, const std::string log_path)
+SampleCase::SampleCase(const std::string initialize_base_file, MonteCarloSimulationExecutor &monte_carlo_simulator, const std::string log_path)
     : SimulationCase(initialize_base_file, monte_carlo_simulator, log_path), monte_carlo_simulator_(monte_carlo_simulator) {}
 
-ISSL6UCase::~ISSL6UCase() { delete spacecraft_; }
+SampleCase::~SampleCase() { delete spacecraft_; }
 
-void ISSL6UCase::InitializeTargetObjects() {
+void SampleCase::InitializeTargetObjects() {
   // Instantiate the target of the simulation
   // `spacecraft_id` corresponds to the index of `spacecraft_file` in
   // simulation_base.ini
   const int spacecraft_id = 0;
-  spacecraft_ = new ISSL6USat(&simulation_configuration_, global_environment_, spacecraft_id);
+  spacecraft_ = new SampleSatellite(&simulation_configuration_, global_environment_, spacecraft_id);
 
   // Register the log output
   spacecraft_->LogSetup(*(simulation_configuration_.main_logger_));
@@ -26,13 +26,13 @@ void ISSL6UCase::InitializeTargetObjects() {
   monte_carlo_simulator_.AtTheBeginningOfEachCase();
 }
 
-void ISSL6UCase::UpdateTargetObjects() {
+void SampleCase::UpdateTargetObjects() {
   // Spacecraft Update
   spacecraft_->Update(&(global_environment_->GetSimulationTime()));
 }
 
 // Log for Monte Carlo Simulation
-std::string ISSL6UCase::GetLogHeader() const {
+std::string SampleCase::GetLogHeader() const {
   std::string str_tmp = "";
   str_tmp += WriteScalar("time", "s");
   str_tmp += WriteVector("Omega", "b", "rad/s", 3);
@@ -40,7 +40,7 @@ std::string ISSL6UCase::GetLogHeader() const {
   return str_tmp;
 }
 
-std::string ISSL6UCase::GetLogValue() const {
+std::string SampleCase::GetLogValue() const {
   std::string str_tmp = "";
   str_tmp += WriteScalar(global_environment_->GetSimulationTime().GetElapsedTime_s());
   str_tmp += WriteVector(spacecraft_->GetDynamics().GetAttitude().GetAngularVelocity_b_rad_s(), 3);

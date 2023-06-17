@@ -2,7 +2,7 @@
 
 #include <library/utilities/macros.hpp>
 
-#include "../../Simulation/Spacecraft/ISSL6U_PortConfig.h"
+#include "../../Simulation/Spacecraft/aocs_module_port_config.h"
 
 PowerController::PowerController(PowerControlUnit pcu,
                                  const std::vector<int> gpio_ports,              // GPIOのポート番号リスト
