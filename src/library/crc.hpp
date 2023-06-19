@@ -1,4 +1,5 @@
-#pragma once
+#ifndef S2E_AOBC_LIBRARY_CRC_HPP_
+#define S2E_AOBC_LIBRARY_CRC_HPP_
 
 #include <stddef.h>
 #include <stdint.h>
@@ -32,3 +33,5 @@ uint8_t crc_8_atm_left(uint8_t crc, const unsigned char *data, const size_t size
  * @return uint16_t: 計算結果
  */
 uint16_t crc_16_ccitt_right(uint16_t crc, const unsigned char *data, const size_t size, const bool rev_flag);
+
+#endif  // S2E_AOBC_LIBRARY_CRC_HPP_

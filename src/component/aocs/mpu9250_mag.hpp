@@ -1,4 +1,6 @@
-#pragma once
+#ifndef S2E_AOBC_COMPONENT_AOCS_MPU9250_MAG_HPP_
+#define S2E_AOBC_COMPONENT_AOCS_MPU9250_MAG_HPP_
+
 #include <components/base/i2c_target_communication_with_obc.hpp>
 #include <components/real/aocs/magnetometer.hpp>
 
@@ -50,3 +52,4 @@ class MPU9250_MAG : public Magnetometer, public I2cTargetCommunicationWithObc {
   void SetConvertCoefficients();
   void Convert2Tlm(unsigned char tlm[2], const double value);
 };
+#endif  // S2E_AOBC_COMPONENT_AOCS_MPU9250_MAG_HPP_

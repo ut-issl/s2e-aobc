@@ -24,7 +24,9 @@ IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
 CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 **/
 
-#pragma once
+#ifndef S2E_AOBC_LIBRARY_XXHASH32_HPP_
+#define S2E_AOBC_LIBRARY_XXHASH32_HPP_
+
 #include <stdint.h>  // for uint32_t and uint64_t
 
 /// XXHash (32 bit), based on Yann Collet's descriptions, see
@@ -183,3 +185,4 @@ class XXHash32 {
     state3 = rotateLeft(state3 + block[3] * Prime2, 13) * Prime1;
   }
 };
+#endif  // S2E_AOBC_LIBRARY_XXHASH32_HPP_

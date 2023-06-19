@@ -1,4 +1,6 @@
-#pragma once
+#ifndef S2E_AOBC_COMPONENT_AOCS_STIM210_HPP_
+#define S2E_AOBC_COMPONENT_AOCS_STIM210_HPP_
+
 #include <components/base/uart_communication_with_obc.hpp>
 #include <components/real/aocs/gyro_sensor.hpp>
 
@@ -142,3 +144,4 @@ class STIM210 : public GyroSensor, public UartCommunicationWithObc {
   int AnalyzeCmdSetOmegaMode(std::vector<unsigned char> cmd);
   int AnalyzeCmdSetLPFFrequency(std::vector<unsigned char> cmd);
 };
+#endif  // S2E_AOBC_COMPONENT_AOCS_STIM210_HPP_

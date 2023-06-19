@@ -1,4 +1,6 @@
-﻿#pragma once
+﻿#ifndef S2E_AOBC_COMPONENT_AOCS_OEM7600_HPP_
+#define S2E_AOBC_COMPONENT_AOCS_OEM7600_HPP_
+
 #include <components/base/uart_communication_with_obc.hpp>
 #include <components/real/aocs/gnss_receiver.hpp>
 
@@ -107,3 +109,4 @@ class OEM7600 : public GnssReceiver, public UartCommunicationWithObc {
   // TLM name list (additinoal tlm names will be added in the future as needed)
   const std::string tlm_name_dictionary_[OEM7600_MAX_TLM_LIST] = {"bestxyza", "timea", "gpgga", "hwmonitora", "bestxyzb", "hwmonitorb"};
 };
+#endif  // S2E_AOBC_COMPONENT_AOCS_OEM7600_HPP_

@@ -1,4 +1,6 @@
-#pragma once
+#ifndef S2E_AOBC_COMPONENT_AOCS_NANOSSOC_D60_HPP_
+#define S2E_AOBC_COMPONENT_AOCS_NANOSSOC_D60_HPP_
+
 #include <components/base/i2c_target_communication_with_obc.hpp>
 #include <components/real/aocs/sun_sensor.hpp>
 
@@ -31,3 +33,4 @@ class NanoSSOCD60 : public SunSensor, public I2cTargetCommunicationWithObc {
   int32_t ConvertAngle2Tlm(double angle);
   unsigned char GenerateErrorCode();
 };
+#endif  // S2E_AOBC_COMPONENT_AOCS_NANOSSOC_D60_HPP_

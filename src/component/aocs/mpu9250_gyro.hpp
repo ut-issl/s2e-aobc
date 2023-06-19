@@ -1,4 +1,6 @@
-#pragma once
+#ifndef S2E_AOBC_COMPONENT_AOCS_MPU9250_GYRO_HPP_
+#define S2E_AOBC_COMPONENT_AOCS_MPU9250_GYRO_HPP_
+
 #include <components/base/i2c_target_communication_with_obc.hpp>
 #include <components/real/aocs/gyro_sensor.hpp>
 
@@ -69,3 +71,4 @@ class MPU9250_GYRO : public GyroSensor, public I2cTargetCommunicationWithObc {
   void SetConvertCoefficients();
   void Convert2Tlm(unsigned char tlm[kMpuTlmSize_], const double value);
 };
+#endif  // S2E_AOBC_COMPONENT_AOCS_MPU9250_GYRO_HPP_

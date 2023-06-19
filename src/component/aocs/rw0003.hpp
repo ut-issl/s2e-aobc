@@ -1,4 +1,6 @@
-#pragma once
+#ifndef S2E_AOBC_COMPONENT_AOCS_RW0003_HPP_
+#define S2E_AOBC_COMPONENT_AOCS_RW0003_HPP_
+
 #include <components/base/i2c_target_communication_with_obc.hpp>
 #include <components/real/aocs/reaction_wheel.hpp>
 
@@ -67,3 +69,4 @@ class RW0003 : public ReactionWheel, public I2cTargetCommunicationWithObc {
   // Tlm
   void WriteFloatTlm(uint8_t address, float value);
 };
+#endif  // S2E_AOBC_COMPONENT_AOCS_RW0003_HPP_

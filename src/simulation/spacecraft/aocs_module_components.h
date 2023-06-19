@@ -1,4 +1,5 @@
-#pragma once
+#ifndef S2E_AOBC_SIMULATION_SPACECRAFT_AOCS_MODULE_COMPONENTS_HPP_
+#define S2E_AOBC_SIMULATION_SPACECRAFT_AOCS_MODULE_COMPONENTS_HPP_
 
 #include <dynamics/dynamics.hpp>
 #include <library/math/vector.hpp>
@@ -86,3 +87,4 @@ class AocsModuleComponents : public InstalledComponents {
                                                   //!< around the spacecraft
   const GlobalEnvironment *global_environment_;   //!< Global environment information
 };
+#endif  // S2E_AOBC_SIMULATION_SPACECRAFT_AOCS_MODULE_COMPONENTS_HPP_

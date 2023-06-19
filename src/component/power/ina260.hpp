@@ -1,4 +1,6 @@
-#pragma once
+#ifndef S2E_AOBC_COMPONENT_POWER_INA260_HPP_
+#define S2E_AOBC_COMPONENT_POWER_INA260_HPP_
+
 #include <components/base/component.hpp>
 #include <components/base/i2c_target_communication_with_obc.hpp>
 #include <components/ports/power_port.hpp>
@@ -48,3 +50,4 @@ class INA260 : public Component, public I2cTargetCommunicationWithObc {
   void ReadLimitMaskCmd();
   void ReadLimitValueCmd();
 };
+#endif  // S2E_AOBC_COMPONENT_POWER_INA260_HPP_

@@ -1,4 +1,6 @@
-#pragma once
+#ifndef S2E_AOBC_COMPONENT_AOCS_RM3100_HPP_
+#define S2E_AOBC_COMPONENT_AOCS_RM3100_HPP_
+
 #include <components/base/i2c_target_communication_with_obc.hpp>
 #include <components/real/aocs/magnetometer.hpp>
 
@@ -31,3 +33,4 @@ class RM3100 : public Magnetometer, public I2cTargetCommunicationWithObc {
   int32_t ConvertMag2Tlm(double mag);
   int GenerateTelemetry();
 };
+#endif  // S2E_AOBC_COMPONENT_AOCS_RM3100_HPP_

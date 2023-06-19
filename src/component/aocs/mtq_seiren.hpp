@@ -1,4 +1,6 @@
-#pragma once
+#ifndef S2E_AOBC_COMPONENT_AOCS_MTQ_SEIREN_HPP_
+#define S2E_AOBC_COMPONENT_AOCS_MTQ_SEIREN_HPP_
+
 #include <components/base/gpio_connection_with_obc.hpp>
 #include <components/real/aocs/magnetorquer.hpp>
 
@@ -37,3 +39,4 @@ class MTQseiren : public Magnetorquer, public GpioConnectionWithObc {
 
   void ConvertPolarity2OutputMag();
 };
+#endif  // S2E_AOBC_COMPONENT_AOCS_MTQ_SEIREN_HPP_

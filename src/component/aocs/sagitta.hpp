@@ -1,4 +1,6 @@
-#pragma once
+#ifndef S2E_AOBC_COMPONENT_AOCS_SAGITTA_HPP_
+#define S2E_AOBC_COMPONENT_AOCS_SAGITTA_HPP_
+
 #include <components/base/uart_communication_with_obc.hpp>
 #include <components/real/aocs/star_sensor.hpp>
 
@@ -89,3 +91,4 @@ class Sagitta : public StarSensor, public UartCommunicationWithObc {
 
   int EncodeSLIP(unsigned char *tlm, const int cmd_data_len);
 };
+#endif  // S2E_AOBC_COMPONENT_AOCS_SAGITTA_HPP_

@@ -1,4 +1,5 @@
-#pragma once
+#ifndef S2E_AOBC_SIMULATION_CASE_SAMPLE_CASE_HPP_
+#define S2E_AOBC_SIMULATION_CASE_SAMPLE_CASE_HPP_
 
 #include <simulation/case/simulation_case.hpp>
 #include <simulation/monte_carlo_simulation/monte_carlo_simulation_executor.hpp>
@@ -30,3 +31,4 @@ class SampleCase : public SimulationCase {
    */
   void UpdateTargetObjects();
 };
+#endif  // S2E_AOBC_SIMULATION_CASE_SAMPLE_CASE_HPP_
