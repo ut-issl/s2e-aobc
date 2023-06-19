@@ -18,8 +18,8 @@
 #include "../../component/aocs/oem7600.hpp"
 #include "../../component/aocs/rm3100.hpp"
 #include "../../component/aocs/rw0003.hpp"
-#include "../../component/aocs/stim210.hpp"
 #include "../../component/aocs/sagitta.hpp"
+#include "../../component/aocs/stim210.hpp"
 // Propulsion
 #include <components/real/propulsion/initialize_simple_thruster.hpp>
 // Mission
