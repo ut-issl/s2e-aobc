@@ -1,4 +1,4 @@
-#include "NanoSSOCD60.h"
+#include "nanossoc_d60.hpp"
 #define _USE_MATH_DEFINES
 #include <string.h>  // for memcpy
 

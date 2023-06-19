@@ -1,4 +1,4 @@
-#include "MPU9250_GYRO.h"
+#include "mpu9250_gyro.hpp"
 
 #include <library/math/constants.hpp>
 #include <library/utilities/macros.hpp>

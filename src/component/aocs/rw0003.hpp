@@ -2,7 +2,7 @@
 #include <components/base/i2c_target_communication_with_obc.hpp>
 #include <components/real/aocs/reaction_wheel.hpp>
 
-#include "../../Library/crc.h"
+#include "../../library/crc.hpp"
 
 /* References
 Manual: NA

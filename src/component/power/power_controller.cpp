@@ -1,8 +1,8 @@
-#include "PowerController.h"
+#include "power_controller.hpp"
 
 #include <library/utilities/macros.hpp>
 
-#include "../../Simulation/Spacecraft/aocs_module_port_config.h"
+#include "../../simulation/spacecraft/aocs_module_port_config.h"
 
 PowerController::PowerController(PowerControlUnit pcu,
                                  const std::vector<int> gpio_ports,              // GPIOのポート番号リスト

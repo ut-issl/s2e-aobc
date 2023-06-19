@@ -2,7 +2,7 @@
 #include <components/base/component.hpp>
 #include <components/base/uart_communication_with_obc.hpp>
 
-#include "../../Component/AOCS/MTQseiren.h"
+#include "../../component/aocs/mtq_seiren.hpp"
 
 class HilsIfDriver : public Component, public UartCommunicationWithObc, public GpioConnectionWithObc {
  public:

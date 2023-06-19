@@ -1,8 +1,8 @@
-#include "AOBC.h"
+#include "aobc.hpp"
 
 #include <library/utilities/macros.hpp>
 
-#include "../../Simulation/Spacecraft/aocs_module_components.h"
+#include "../../simulation/spacecraft/aocs_module_components.h"
 
 AOBC::AOBC(ClockGenerator *clock_gen, AocsModuleComponents *components) : Component(100, clock_gen), components_(components) { Initialize(); }
 

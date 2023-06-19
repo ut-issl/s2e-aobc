@@ -2,7 +2,7 @@
 #include <components/base/uart_communication_with_obc.hpp>
 #include <components/real/aocs/gyro_sensor.hpp>
 
-#include "../../Library/crc.h"
+#include "../../library/crc.hpp"
 
 /* References
 Documents: https://www.sensonor.com/products/gyro-modules/stim210/

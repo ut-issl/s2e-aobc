@@ -7,24 +7,24 @@
 // CDH
 #include <components/real/cdh/on_board_computer_with_c2a.hpp>
 // Power
-#include "../../Component/Power/INA260.h"
-#include "../../Component/Power/PowerController.h"
+#include "../../component/power/ina260.hpp"
+#include "../../component/power/power_controller.hpp"
 // AOCS
-#include "../../Component/AOCS/MPU9250_GYRO.h"
-#include "../../Component/AOCS/MPU9250_MAG.h"
-#include "../../Component/AOCS/MTQseiren.h"
-#include "../../Component/AOCS/NanoSSOCD60.h"
-#include "../../Component/AOCS/OEM7600.h"
-#include "../../Component/AOCS/RM3100.h"
-#include "../../Component/AOCS/RW0003.h"
-#include "../../Component/AOCS/STIM210.h"
-#include "../../Component/AOCS/Sagitta.h"
+#include "../../component/aocs/mpu9250_gyro.hpp"
+#include "../../component/aocs/mpu9250_mag.hpp"
+#include "../../component/aocs/mtq_seiren.hpp"
+#include "../../component/aocs/nanossoc_d60.hpp"
+#include "../../component/aocs/oem7600.hpp"
+#include "../../component/aocs/rm3100.hpp"
+#include "../../component/aocs/rw0003.hpp"
+#include "../../component/aocs/stim210.hpp"
+#include "../../component/aocs/sagitta.hpp"
 // Propulsion
 #include <components/real/propulsion/initialize_simple_thruster.hpp>
 // Mission
 #include <components/real/mission/initialize_telescope.hpp>
 // HILS IF
-#include "../../Interface/HILS/HilsIfDriver.h"
+#include "../../interface/hils/hils_if_driver.hpp"
 
 using libra::Vector;
 

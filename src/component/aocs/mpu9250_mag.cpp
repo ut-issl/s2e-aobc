@@ -1,4 +1,4 @@
-#include "MPU9250_MAG.h"
+#include "mpu9250_mag.hpp"
 
 #include <library/utilities/macros.hpp>
 

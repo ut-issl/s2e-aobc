@@ -2,7 +2,7 @@
 #include <components/base/uart_communication_with_obc.hpp>
 #include <components/real/aocs/star_sensor.hpp>
 
-#include "../../Library/xxhash32.h"
+#include "../../library/xxhash32.hpp"
 
 /* References
 ICD: NA

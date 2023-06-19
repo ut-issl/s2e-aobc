@@ -1,4 +1,4 @@
-#include "HilsIfDriver.h"
+#include "hils_if_driver.hpp"
 
 HilsIfDriver::HilsIfDriver(const int prescaler, ClockGenerator *clock_gen, const unsigned int hils_port_id, const unsigned int baud_rate,
                            HilsPortManager *hils_port_manager, std::vector<int> gpio_ports, OnBoardComputer *obc)

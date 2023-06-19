@@ -1,4 +1,4 @@
-#include "RM3100.h"
+#include "rm3100.hpp"
 
 #include <library/utilities/macros.hpp>
 

@@ -11,7 +11,7 @@
 #include <library/initialize/initialize_file_access.hpp>
 #include <vector>
 
-#include "../../Component/AOCS/AOBC.h"
+#include "../../component/aocs/aobc.hpp"
 #include "aocs_module_port_config.h"
 
 AocsModuleComponents::AocsModuleComponents(const Dynamics *dynamics, Structure *structure, const LocalEnvironment *local_environment,

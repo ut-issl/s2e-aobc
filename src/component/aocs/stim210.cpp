@@ -1,4 +1,4 @@
-#include "STIM210.h"
+#include "stim210.hpp"
 
 #include <library/utilities/macros.hpp>
 

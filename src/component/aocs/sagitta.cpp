@@ -1,4 +1,4 @@
-#include "Sagitta.h"
+#include "sagitta.hpp"
 
 #include <library/utilities/slip.hpp>
 
