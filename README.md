@@ -1,21 +1,46 @@
 # S2E-AOBC
 ## Overview
 
-- S2E-AOBC is the S2E's user side repository for AOCS sub-system.
-- This repository manages source codes and initialize files for simulation scenario definition since this is just a user repository.
+- S2E-AOBC is the S2E's user side repository for the AOCS module developed by ISSL/UT, Seiren, and JAXA.
+- Support platform checked in GitHub Actions
+  - Windows Visual Studio 2022 C++ compiler with 32bit build 
+  - Linux g++ compiler version 11 with 32bit build
+  - Please see [s2e-document](https://github.com/ut-issl/s2e-documents) for more detailed information.
+- How to use
+  - `Main developers` of the AOCS module directly use this repository to improve the module.
+  - `General users` of the AOCS module use this repository are not expected to directly edit this repository. They need to create a project-specific repository and define spacecraft-specific parameters within the repository.
 
-## Development style
-
-- Basically, S2E-AOBC developers should follow rules in [Gitlab_settings](https://gitlab.com/ut_issl/documents/gitlab_settings). When we have our own rule of development, it will be written here.
 
 ## Documents
 
 - [s2e-document](https://github.com/ut-issl/s2e-documents)
 
-## How to compile
+
+## Release style
+
+- We use [Semantic Versioning 2.0.0](https://semver.org/) as versioning style
+  - Basic version format is `<major>.<minor>.<patch>`(like `4.0.0`)
+  - Public API is declared in the code itself(currently, there is no definitive list)
+- All release should be tagged as `v<semver>`(like `v4.0.0`)
+
+
+## For general users
+### How to make a project-specific repository
+
+- TBW
+
+
+### How to join development of this repository
+
+- When general users add new features or remove bugs of this repository, please feel free to make upstream PRs from a forked repository.
+- Before make PRs, please carefully read the following `Development style`.
+
+
+## For main developers
+### How to construct the repository
 
 - `git submodule`
-  - This repository include [s2e-core](https://github.com/ut-issl/s2e-core) with `gitsubmodule`. Please use the following commands to construct the directory.
+  - This repository includes [s2e-core](https://github.com/ut-issl/s2e-core) with `git submodule`. Please use the following commands to construct the directory.
     ```
     $ git clone git@github.com:ut-issl/s2e-aobc.git
     $ cd s2e-aobc/
@@ -28,23 +53,67 @@
     ```
 - External Libraries
   - Please execute `src-core/ExtLibraries/CMakeLists.txt` to download the external libraries.
-    - Please see [s2e-document](https://github.com/ut-issl/s2e-documents) for more detailed information.
+  - Please see [s2e-document](https://github.com/ut-issl/s2e-documents) for more detailed information.
 
-## C2A Integration
+### Clone Flight S/W repository and build
 
-- Make `FlightSW` directory at same directory with `S2E-AOBC`
-- Clone a [C2A-AOBC](https://github.com/ut-issl/c2a-aobc) repository into `FlightSW`
-- Edit `S2E-AOBC/CMakeLists.txt` as follows
-  - `set(USE_C2A OFF)` -> `set(USE_C2A ON)`
-- Build `S2E-AOBC`
-- **Note:** When you add new c source file in C2A, you have to modify `C2A/CMakeLists.txt` directory
+- Make `FlightSW` directory at the same directory with `s2e-aobc`
+- Clone the [C2A-AOBC](https://github.com/ut-issl/c2a-aobc) repository into `FlightSW`
+  - Current support version: [v6.0.0](https://github.com/ut-issl/c2a-aobc/release/tag/v6.0.0)
+- Directory construction
+  ```
+  - s2e-aobc
+  - FlightSW
+    - c2a-aobc
+  ```
+- You can build `s2e-aobc` using `CMake` together with `c2a-aobc`.
+
+### Development style
+
+- Repository settings
+  - Branch structure
+    ```
+    - main        # The latest operation guaranteed codes for general users
+    - develop     # The latest buildable codes for S2E primary developers
+    - feature/*   # Developing codes
+    - hotfix/*    # Bug Fix codes
+    ```
+  - Push to `main` and `develop` is prohibited. All developers have to develop with `feature/*` or `hotfix/*` branch and make a pull request.
+
+- Flow of development
+  1. Make a `feature/*` branch from the `develop` branch.
+     - To fix the small bugs in the latest release codes, please make `hotfix/*` branch from the `main` branch.
+  2. Edit, commit, and push in the branch.
+     - Please check the [coding convention](https://github.com/ut-issl/s2e-documents/blob/develop/General/CodingConvention.md) and the `code format` in next section.
+  3. Create a new pull request to the `develop` branch.
+     - The target branch becomes the `main` branch for the `hotfix/*` branches.
+  4. A maintainer reviews the pull request. If some problems are found, the maintainer proposes modifications.
+  5. According to the maintainer's proposal, the developer modifies the codes and goes back to 3.
+  6. The maintainer merges the `feature/*` branch to the `develop` branch.
+  7. The code owners decide to merge the `develop` branch to the `main` branch and release a new version.
+
+- Binary files
+  - Binary file commit is prohibited.
+  - Please write the link to such files, or make a script file to get the files.
+  - **Exception**
+    - Images for markdown document files are allowable when the file size is smaller than 200K Bytes.
+
+- Code format
+  - We use [clang-format](https://clang.llvm.org/docs/ClangFormat.html) for format source code.
+  - We recommend install clang-format and format code before commit. It also will be checked on CI.
+  - Some modern editor has plugin/extension for code format. It will be very useful.
+    - VSCode: [C/C++](https://marketplace.visualstudio.com/items?itemName=ms-vscode.cpptools)
+    - Vim: [vim-clang-format](https://github.com/rhysd/vim-clang-format)
+
 
 ## Brief history of development
+### History
 - 21st Apr. 2020: Development start in a private repository at GitLab.
 - 26th Sep. 2022: Initial development was finished.
-- 03rd Mar. 2023: Move to a private repository at GotHub to prepare publish as OSS
+- 03rd Mar. 2023: Move to a private repository at GitHub to prepare publish as OSS.
+- xx Jun. 2023: Convert to a public repository.
 
-## Contributors in the GitLab repository
+### Contributors in the GitLab repository
 - ISSL, UT
   - Satoshi Ikari: 158 commits
   - Hirotaka Sekine: 47 commits
