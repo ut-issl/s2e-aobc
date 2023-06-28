@@ -1,4 +1,5 @@
 #include "hils_if_driver.hpp"
+
 #include <library/utilities/macros.hpp>
 
 HilsIfDriver::HilsIfDriver(const int prescaler, ClockGenerator *clock_gen, const unsigned int hils_port_id, const unsigned int baud_rate,
