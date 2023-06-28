@@ -1,4 +1,5 @@
 #include "hils_if_driver.hpp"
+#include <library/utilities/macros.hpp>
 
 HilsIfDriver::HilsIfDriver(const int prescaler, ClockGenerator *clock_gen, const unsigned int hils_port_id, const unsigned int baud_rate,
                            HilsPortManager *hils_port_manager, std::vector<int> gpio_ports, OnBoardComputer *obc)
@@ -7,6 +8,7 @@ HilsIfDriver::HilsIfDriver(const int prescaler, ClockGenerator *clock_gen, const
 HilsIfDriver::~HilsIfDriver() {}
 
 void HilsIfDriver::MainRoutine(int count) {
+  UNUSED(count);
   // IFボードからデータ取得
   int ret = ReceiveCommand(0, kRxMaxBytes_);
   if (ret != 0) {
