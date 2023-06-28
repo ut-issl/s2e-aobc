@@ -1,4 +1,7 @@
 # S2E-AOBC
+ [![check format](https://github.com/ut-issl/s2e-aobc/actions/workflows/check-format.yml/badge.svg)](https://github.com/ut-issl/s2e-aobc/actions/workflows/check-format.yml)
+[![Build](https://github.com/ut-issl/s2e-aobc/actions/workflows/build.yml/badge.svg)](https://github.com/ut-issl/s2e-aobc/actions/workflows/build.yml)
+
 ## Overview
 
 - S2E-AOBC is the S2E's user side repository for the AOCS module developed by ISSL/UT, Seiren, and JAXA.
