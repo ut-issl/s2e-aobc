@@ -78,7 +78,7 @@ add_subdirectory(${S2E_CORE_DIR}/src/environment/local s2e_core/environment/loca
 add_subdirectory(${S2E_CORE_DIR}/src/library s2e_core/library)
 add_subdirectory(${S2E_CORE_DIR}/src/simulation s2e_core/simulation)
 
-
+## Set build source files
 file(GLOB_RECURSE SOURCE_FILES ${S2E_AOBC_DIR}/src/*.cpp)
 # Uncomment the following line to exclude any files that match the REGEX from SOURCE_FILES
 # list(FILTER SOURCE_FILES EXCLUDE REGEX ${CMAKE_CURRENT_LIST_DIR}/src/Example/example.cpp)
