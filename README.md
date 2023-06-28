@@ -30,8 +30,18 @@
 ## For general users
 ### How to make a project-specific repository
 
-- TBW
-
+- We recommend to make a project-specific repository named `s2e-aobc-hoge-satellite`.
+- Users can refer the `s2e-aobc/example` directory to make directory construction of `s2e-aobc-hoge-satellite`.
+  ```
+  - s2e-aobc (git submodule)
+  - data (copy `data` directory of s2e-aobc and modify as you need)
+  - CMakeLists.txt
+  - CMakeSettings.json
+  - others
+    - README, git related files, and etc.
+  ```
+- `CMakeLists.txt`
+  - Please change the word `example` to suit with your project name.
 
 ### How to join development of this repository
 
