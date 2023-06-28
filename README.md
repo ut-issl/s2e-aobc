@@ -34,6 +34,7 @@
 - Users can refer the `s2e-aobc/example` directory to make directory construction of `s2e-aobc-hoge-satellite`.
   ```
   - s2e-aobc (git submodule)
+    - We recommend to use a released version of s2e-aobc.
   - data (copy `s2e-aobc/data` directory and modify the simulation settings as you need)
   - CMakeLists.txt
   - CMakeSettings.json
