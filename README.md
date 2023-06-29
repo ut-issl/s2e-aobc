@@ -42,11 +42,11 @@
   - README.md
   ```
 - `CMakeLists.txt`
-  - Please change the word `example` to suit your project name.
+  - Please change the words `example` in the file to suit your project name.
 
 ### How to build and execute the project-specific repository
 
-- Please check the `README.md` in the example directly.
+- Please see the [README.md](./example/README.md) in the `example` directly.
 
 ### How to join the development of this repository
 
