@@ -10,14 +10,7 @@
 ## How to construct the repository
 
 - `git submodule`
-  - This repository includes the [s2e-aobc](https://github.com/ut-issl/s2e-aobc) with the `git submodule`. Please use the following commands to construct the directory.
-    ```
-    $ git clone git@github.com:ut-issl/s2e-aobc-example.git
-    $ cd s2e-aobc-example/
-    $ git submodule init
-    $ git submodule update
-    ```
-  - Or use the following command to recursively clone the repository.
+  - This repository includes the [s2e-aobc](https://github.com/ut-issl/s2e-aobc) with the `git submodule`. And the `s2e-aobc` also includes [s2e-core](https://github.com/ut-issl/s2e-core) as a submodule. Please use the following command to clone the repository recursively.
     ```
     $ git clone --recursive git@github.com:ut-issl/s2e-aobc-example.git
     ```

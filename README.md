@@ -41,6 +41,7 @@
   - CMakeSettings.json
   - README.md
   ```
+- To use `git submodule` features, please see the reference [Git Tools Submodule](https://git-scm.com/book/en/v2/Git-Tools-Submodules).
 - `CMakeLists.txt`
   - Please change the words `example` in the file to suit your project name.
 
