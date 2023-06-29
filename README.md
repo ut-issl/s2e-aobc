@@ -5,13 +5,14 @@
 ## Overview
 
 - S2E-AOBC is the S2E's user side repository for the AOCS module developed by ISSL/UT, Seiren, and JAXA.
-- Support platform checked in GitHub Actions
+- Support platforms
   - Windows Visual Studio 2022 C++ compiler with 32bit build 
   - Linux g++ compiler version 11 with 32bit build
   - Please see [s2e-document](https://github.com/ut-issl/s2e-documents) for more detailed information.
+  - We use [GitHub Actions](https://github.com/ut-issl/s2e-aobc/actions) to continuously check the build error in these compilers.
 - How to use
   - `Main developers` of the AOCS module directly use this repository to improve the module.
-  - `General users` of the AOCS module use this repository are not expected to directly edit this repository. They need to create a project-specific repository and define spacecraft-specific parameters within the repository.
+  - `General users` of the AOCS module are not expected to directly use and edit this repository. They need to create a project-specific repository and define spacecraft-specific parameters within the repository.
 
 
 ## Documents
@@ -35,14 +36,18 @@
   ```
   - s2e-aobc (git submodule)
     - We recommend to use a released version of s2e-aobc.
-  - data (copy `s2e-aobc/data` directory and modify the simulation settings as you need)
+  - data
+    - Please copy `s2e-aobc/data` directory and modify the simulation settings as you need.
   - CMakeLists.txt
   - CMakeSettings.json
-  - others
-    - README, git related files, and etc.
+  - README.md
   ```
 - `CMakeLists.txt`
   - Please change the word `example` to suit with your project name.
+
+### How to build and execute the project-specific repository
+
+- Please check the `README.md` in the example directly.
 
 ### How to join development of this repository
 
@@ -66,8 +71,10 @@
     $ git clone --recursive git@github.com:ut-issl/s2e-aobc.git
     ```
 - External Libraries
-  - Please execute `src-core/ExtLibraries/CMakeLists.txt` to download the external libraries.
-  - Please see [s2e-document](https://github.com/ut-issl/s2e-documents) for more detailed information.
+  - Users can use `s2e-aobc/s2e-core/ExtLibraries/CMakeLists.txt` to download the external libraries.
+  - Please find how to download the `ExtLibraries` in the [s2e-document](https://github.com/ut-issl/s2e-documents).
+    - [How to build and execute with Visual Studio](https://github.com/ut-issl/s2e-documents/blob/develop/General/HowToCompileWithVisualStudio.md)
+    - [How to compile with Ubuntu in Docker](https://github.com/ut-issl/s2e-documents/blob/develop/General/HowToCompileWithUbuntuInDocker.md)
 
 ### Clone Flight S/W repository and build
 
