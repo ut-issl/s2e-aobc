@@ -33,11 +33,11 @@
 
 - We recommend to make a project-specific repository named `s2e-aobc-hoge-satellite`.
 - Users can refer the `s2e-aobc/example` directory to make directory construction of `s2e-aobc-hoge-satellite`.
+  - **NOTE** Please rewrite `example` to your project name.
   ```
   - s2e-aobc (git submodule)
     - We recommend to use a released version of s2e-aobc.
   - data
-    - Please copy `s2e-aobc/data` directory and modify the simulation settings as you need.
   - CMakeLists.txt
   - CMakeSettings.json
   - README.md
