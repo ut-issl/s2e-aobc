@@ -1,6 +1,6 @@
 /**
- * @file s2e_aocs_module.cpp
- * @brief The main file of S2E-USER
+ * @file s2e_aobc.cpp
+ * @brief The main file of S2E-AOBC
  */
 
 #ifdef WIN32

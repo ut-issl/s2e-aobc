@@ -64,18 +64,18 @@ AocsModuleComponents::AocsModuleComponents(const Dynamics *dynamics, Structure *
       0, mpu9250_gyro_hils_port_id, 0x68, aobc_, hils_port_manager_);
   const std::string mpu9250_mag_ini_path = iniAccess.ReadString("COMPONENTS_FILE", "magsensor_l_file");
   const unsigned int mpu9250_mag_hils_port_id = iniAccess.ReadInt("COM_PORT", "mpu9250_mag_hils_port_id");
-  mpu9250_mag_ = new MPU9250_MAG(InitMagetometer(clock_generator, power_controller_->GetPowerPort((int)PowerPortIdx::MPU), 2, mpu9250_mag_ini_path,
+  mpu9250_mag_ = new MPU9250_MAG(InitMagnetometer(clock_generator, power_controller_->GetPowerPort((int)PowerPortIdx::MPU), 2, mpu9250_mag_ini_path,
                                                  compo_step_sec, &(local_environment_->GetGeomagneticField())),
                                  0, mpu9250_mag_hils_port_id, 0x0c, aobc_, hils_port_manager_, mpu9250_gyro_->GetIsMagOn());
 
   const std::string rm3100_aobc_ini_path = iniAccess.ReadString("COMPONENTS_FILE", "magsensor_h_aobc_file");
   const unsigned int rm3100_aobc_hils_port_id = iniAccess.ReadInt("COM_PORT", "rm3100_aobc_hils_port_id");
-  rm3100_aobc_ = new RM3100(Magnetometer(InitMagetometer(clock_generator, power_controller_->GetPowerPort((int)PowerPortIdx::RM), 1,
+  rm3100_aobc_ = new RM3100(Magnetometer(InitMagnetometer(clock_generator, power_controller_->GetPowerPort((int)PowerPortIdx::RM), 1,
                                                          rm3100_aobc_ini_path, compo_step_sec, &local_environment_->GetGeomagneticField())),
                             0, rm3100_aobc_hils_port_id, 0x20, aobc_, hils_port_manager_);
   const std::string rm3100_ext_ini_path = iniAccess.ReadString("COMPONENTS_FILE", "magsensor_h_ext_file");
   const unsigned int rm3100_ext_hils_port_id = iniAccess.ReadInt("COM_PORT", "rm3100_ext_hils_port_id");
-  rm3100_ext_ = new RM3100(Magnetometer(InitMagetometer(clock_generator, power_controller_->GetPowerPort((int)PowerPortIdx::RM), 2,
+  rm3100_ext_ = new RM3100(Magnetometer(InitMagnetometer(clock_generator, power_controller_->GetPowerPort((int)PowerPortIdx::RM), 2,
                                                         rm3100_ext_ini_path, compo_step_sec, &local_environment_->GetGeomagneticField())),
                            0, rm3100_ext_hils_port_id, 0x23, aobc_, hils_port_manager_);
 

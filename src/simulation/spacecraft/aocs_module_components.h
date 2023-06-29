@@ -80,11 +80,11 @@ class AocsModuleComponents : public InstalledComponents {
   HilsIfDriver *hils_if_driver_;
 
   // States
-  const SimulationConfiguration *configuration_;  //!< Simulation settings
   const Dynamics *dynamics_;                      //!< Dynamics information of the spacecraft
   Structure *structure_;                          //!< Structure information of the spacecraft
-  const LocalEnvironment *local_environment_;     //!< Local environment information
-                                                  //!< around the spacecraft
+  const LocalEnvironment *local_environment_;     //!< Local environment information around the spacecraft
   const GlobalEnvironment *global_environment_;   //!< Global environment information
+  const SimulationConfiguration *configuration_;  //!< Simulation settings
 };
+
 #endif  // S2E_AOBC_SIMULATION_SPACECRAFT_AOCS_MODULE_COMPONENTS_HPP_
