@@ -2,15 +2,15 @@
 
 ## Overview
 
-- `S2E-AOBC-EXAMPLE` is a example of project-specific repository of `S2E-AOBC`.
+- `S2E-AOBC-EXAMPLE` is an example of a project-specific repository of `S2E-AOBC`.
 - Users can copy this directory to make their own simulation environment.
-  - **NOTE**: Please rewrite `example` to suit with your project in this document after you copy the directory.
+  - **NOTE**: Please rewrite `example` to suit your project in this document after you copy the directory.
 - For other detailed descriptions, please also see README of [s2e-aobc](https://github.com/ut-issl/s2e-aobc)
 
 ## How to construct the repository
 
 - `git submodule`
-  - This repository includes [s2e-aobc](https://github.com/ut-issl/s2e-aobc) with `git submodule`. Please use the following commands to construct the directory.
+  - This repository includes the [s2e-aobc](https://github.com/ut-issl/s2e-aobc) with the `git submodule`. Please use the following commands to construct the directory.
     ```
     $ git clone git@github.com:ut-issl/s2e-aobc-example.git
     $ cd s2e-aobc-example/
@@ -29,16 +29,16 @@
 
 ## Clone Flight S/W repository and build
 
-- Make `FlightSW` directory at the same directory with `s2e-aobc-example`
+- Make the `FlightSW` directory at the same directory with `s2e-aobc-example`
 - Clone the project-specific `C2A-AOBC` named like `C2A-AOBC-EXAMPLE` repository into `FlightSW`
   - To make `C2A-AOBC-EXAMPLE`, please check the descriptions in the [c2a-aobc](https://github.com/ut-issl/c2a-aobc).
-- Directory construction
+- Directory Construction
   ```
   - s2e-aobc-example
   - FlightSW
     - c2a-aobc-example
   ```
-- You can build `s2e-aobc-example` using `CMake` together with `c2a-aobc-example`, and execute the `SILS (Software In the Loop Simulation)` test.
+- You can build the `s2e-aobc-example` using `CMake` together with the `c2a-aobc-example`, and execute the `SILS (Software In the Loop Simulation)` test.
 
 
 ## How to change the simulation settings and the project-specific parameters
