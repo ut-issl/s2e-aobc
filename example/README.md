@@ -27,7 +27,6 @@
     - [How to build and execute with Visual Studio](https://github.com/ut-issl/s2e-documents/blob/develop/General/HowToCompileWithVisualStudio.md)
     - [How to compile with Ubuntu in Docker](https://github.com/ut-issl/s2e-documents/blob/develop/General/HowToCompileWithUbuntuInDocker.md)
 
-
 ## Clone Flight S/W repository and build
 
 - Make `FlightSW` directory at the same directory with `s2e-aobc-example`
