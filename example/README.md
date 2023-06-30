@@ -4,7 +4,7 @@
 
 - `S2E-AOBC-EXAMPLE` is an example of a project-specific repository of `S2E-AOBC`.
 - Users can copy this directory to make their own simulation environment.
-  - **NOTE**: Please rewrite `example` to suit your project in this document after you copy the directory.
+  - **NOTE**: Please rewrite `example` to suit your project and remove unnecessary descriptions in this document after you copy the directory.
 - For other detailed descriptions, please also see README of [s2e-aobc](https://github.com/ut-issl/s2e-aobc)
 
 ## How to construct the repository
@@ -28,6 +28,9 @@
 - Directory Construction
   ```
   - s2e-aobc-example
+    - s2e-aobc
+      - s2e-core
+      - ExtLibraries
   - FlightSW
     - c2a-aobc-example
   ```
