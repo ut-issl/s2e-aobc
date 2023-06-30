@@ -41,7 +41,8 @@
   - CMakeSettings.json
   - README.md
   ```
-- To use `git submodule` features, please see the reference [Git Tools Submodule](https://git-scm.com/book/en/v2/Git-Tools-Submodules).
+- To construct the `s2e-aobc` directory, we recommend to use `git submodule` to take in the `s2e-aobc` repository.
+  - Reference: [Git Tools Submodule](https://git-scm.com/book/en/v2/Git-Tools-Submodules).
 - `CMakeLists.txt`
   - Please change all words `example, EXAMPLE, or Example` in the file to suit your project name.
 
