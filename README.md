@@ -133,7 +133,7 @@
 - 21st Apr. 2020: Development started in a private repository at GitLab.
 - 26th Sep. 2022: Initial development was finished.
 - 03rd Mar. 2023: Move to a private repository at GitHub to prepare to publish as OSS.
-- xx Jun. 2023: Convert to a public repository.
+- 14th Jul. 2023: Convert to a public repository.
 
 ### Contributors in the GitLab repository
 - ISSL, UT
