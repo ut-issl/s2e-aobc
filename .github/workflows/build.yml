@@ -14,7 +14,7 @@ on:
       - 'src/**'
 
 env:
-  C2A_AOBC_VERSION: v5.0.1
+  C2A_AOBC_VERSION: v6.0.1
 
 jobs:
   build_s2e_win:
@@ -41,7 +41,6 @@ jobs:
           repository: ut-issl/c2a-aobc
           ref: '${{ env.C2A_AOBC_VERSION }}'
           submodules: recursive
-          ssh-key: ${{ secrets.C2A_AOBC_SSH_KEY }}
           fetch-depth: 1
 
       - name: Configure build for x86
@@ -125,7 +124,6 @@ jobs:
           repository: ut-issl/c2a-aobc
           ref: '${{ env.C2A_AOBC_VERSION }}'
           submodules: recursive
-          ssh-key: ${{ secrets.C2A_AOBC_SSH_KEY }}
           fetch-depth: 1
 
       - name: set compiler
