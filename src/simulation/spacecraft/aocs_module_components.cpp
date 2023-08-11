@@ -84,7 +84,9 @@ AocsModuleComponents::AocsModuleComponents(const Dynamics *dynamics, Structure *
   IniAccess ss_ini_file = IniAccess(nanoSSOC_D60_ini_path);
   const size_t number_of_mounted_ss = ss_ini_file.ReadInt("GENERAL", "number_of_mounted_sensors");
   for (size_t ss_idx = 0; ss_idx < number_of_mounted_ss; ss_idx++) {
-    const unsigned int nanoSSOC_D60_hils_port_id = iniAccess.ReadInt("COM_PORT", "nanoSSOC_D60_pz_hils_port_id");
+    const std::string hils_port = "nanoSSOC_d60_idx_" + std::to_string(static_cast<long long>(ss_idx)) + "_hils_port_id";
+    const unsigned int nanoSSOC_D60_hils_port_id = iniAccess.ReadInt("COM_PORT", hils_port.c_str());
+
     const std::string ss_section_name = "I2C_PORT_" + std::to_string(static_cast<long long>(ss_idx));
     const uint8_t i2c_address = ss_ini_file.ReadInt(ss_section_name.c_str(), "i2c_address");
     NanoSSOCD60 *ss =
