@@ -65,32 +65,32 @@ AocsModuleComponents::AocsModuleComponents(const Dynamics *dynamics, Structure *
   const std::string mpu9250_mag_ini_path = iniAccess.ReadString("COMPONENTS_FILE", "magsensor_l_file");
   const unsigned int mpu9250_mag_hils_port_id = iniAccess.ReadInt("COM_PORT", "mpu9250_mag_hils_port_id");
   mpu9250_mag_ = new MPU9250_MAG(InitMagnetometer(clock_generator, power_controller_->GetPowerPort((int)PowerPortIdx::MPU), 2, mpu9250_mag_ini_path,
-                                                 compo_step_sec, &(local_environment_->GetGeomagneticField())),
+                                                  compo_step_sec, &(local_environment_->GetGeomagneticField())),
                                  0, mpu9250_mag_hils_port_id, 0x0c, aobc_, hils_port_manager_, mpu9250_gyro_->GetIsMagOn());
 
   const std::string rm3100_aobc_ini_path = iniAccess.ReadString("COMPONENTS_FILE", "magsensor_h_aobc_file");
   const unsigned int rm3100_aobc_hils_port_id = iniAccess.ReadInt("COM_PORT", "rm3100_aobc_hils_port_id");
   rm3100_aobc_ = new RM3100(Magnetometer(InitMagnetometer(clock_generator, power_controller_->GetPowerPort((int)PowerPortIdx::RM), 1,
-                                                         rm3100_aobc_ini_path, compo_step_sec, &local_environment_->GetGeomagneticField())),
+                                                          rm3100_aobc_ini_path, compo_step_sec, &local_environment_->GetGeomagneticField())),
                             0, rm3100_aobc_hils_port_id, 0x20, aobc_, hils_port_manager_);
   const std::string rm3100_ext_ini_path = iniAccess.ReadString("COMPONENTS_FILE", "magsensor_h_ext_file");
   const unsigned int rm3100_ext_hils_port_id = iniAccess.ReadInt("COM_PORT", "rm3100_ext_hils_port_id");
   rm3100_ext_ = new RM3100(Magnetometer(InitMagnetometer(clock_generator, power_controller_->GetPowerPort((int)PowerPortIdx::RM), 2,
-                                                        rm3100_ext_ini_path, compo_step_sec, &local_environment_->GetGeomagneticField())),
+                                                         rm3100_ext_ini_path, compo_step_sec, &local_environment_->GetGeomagneticField())),
                            0, rm3100_ext_hils_port_id, 0x23, aobc_, hils_port_manager_);
 
   // Sun sensors
   const std::string nanoSSOC_D60_ini_path = iniAccess.ReadString("COMPONENTS_FILE", "ss_file");
   IniAccess ss_ini_file = IniAccess(nanoSSOC_D60_ini_path);
   const size_t number_of_mounted_ss = ss_ini_file.ReadInt("GENERAL", "number_of_mounted_sensors");
-  for (size_t ss_idx = 0; ss_idx < number_of_mounted_ss; ss_idx++){
+  for (size_t ss_idx = 0; ss_idx < number_of_mounted_ss; ss_idx++) {
     const unsigned int nanoSSOC_D60_hils_port_id = iniAccess.ReadInt("COM_PORT", "nanoSSOC_D60_pz_hils_port_id");
     const std::string ss_section_name = "I2C_PORT_" + std::to_string(static_cast<long long>(ss_idx));
     const uint8_t i2c_address = ss_ini_file.ReadInt(ss_section_name.c_str(), "i2c_address");
-    NanoSSOCD60* ss =
-      new NanoSSOCD60(InitSunSensor(clock_generator, power_controller_->GetPowerPort((int)PowerPortIdx::SS), ss_idx, nanoSSOC_D60_ini_path,
-                                    &(local_environment_->GetSolarRadiationPressure()), &(local_environment_->GetCelestialInformation())),
-                      0, nanoSSOC_D60_hils_port_id, i2c_address, aobc_, hils_port_manager_);
+    NanoSSOCD60 *ss =
+        new NanoSSOCD60(InitSunSensor(clock_generator, power_controller_->GetPowerPort((int)PowerPortIdx::SS), ss_idx, nanoSSOC_D60_ini_path,
+                                      &(local_environment_->GetSolarRadiationPressure()), &(local_environment_->GetCelestialInformation())),
+                        0, nanoSSOC_D60_hils_port_id, i2c_address, aobc_, hils_port_manager_);
     nano_ssoc_d60_.push_back(ss);
   }
 
