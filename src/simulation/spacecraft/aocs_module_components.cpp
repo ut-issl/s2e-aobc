@@ -130,18 +130,24 @@ AocsModuleComponents::AocsModuleComponents(const Dynamics *dynamics, Structure *
       compo_step_sec, 0x04, aobc_, stim210_hils_port_id, stim210_baud_rate, hils_port_manager_);
 
   const std::string rw_ini_path = iniAccess.ReadString("COMPONENTS_FILE", "rw_file");
+  IniAccess rw_ini_access = IniAccess(rw_ini_path);
   const unsigned int rw0003_x_hils_port_id = iniAccess.ReadInt("COM_PORT", "rw0003_x_hils_port_id");
+  const uint8_t i2c_address_x = (uint8_t)rw_ini_access.ReadInt("I2C_PORT_1", "i2c_address");
   rw0003_x_ = new RW0003(InitReactionWheel(clock_generator, power_controller_->GetPowerPort((int)PowerPortIdx::RWX), 1, rw_ini_path,
                                            dynamics_->GetAttitude().GetPropStep_s(), compo_step_sec),
-                         1, rw0003_x_hils_port_id, 0x11, aobc_, hils_port_manager_);
+                         1, rw0003_x_hils_port_id, i2c_address_x, aobc_, hils_port_manager_);
+
   const unsigned int rw0003_y_hils_port_id = iniAccess.ReadInt("COM_PORT", "rw0003_y_hils_port_id");
+  const uint8_t i2c_address_y = (uint8_t)rw_ini_access.ReadInt("I2C_PORT_2", "i2c_address");
   rw0003_y_ = new RW0003(InitReactionWheel(clock_generator, power_controller_->GetPowerPort((int)PowerPortIdx::RWY), 2, rw_ini_path,
                                            dynamics_->GetAttitude().GetPropStep_s(), compo_step_sec),
-                         1, rw0003_y_hils_port_id, 0x12, aobc_, hils_port_manager_);
+                         1, rw0003_y_hils_port_id, i2c_address_y, aobc_, hils_port_manager_);
+
   const unsigned int rw0003_z_hils_port_id = iniAccess.ReadInt("COM_PORT", "rw0003_z_hils_port_id");
+  const uint8_t i2c_address_z = (uint8_t)rw_ini_access.ReadInt("I2C_PORT_3", "i2c_address");
   rw0003_z_ = new RW0003(InitReactionWheel(clock_generator, power_controller_->GetPowerPort((int)PowerPortIdx::RWZ), 3, rw_ini_path,
                                            dynamics_->GetAttitude().GetPropStep_s(), compo_step_sec),
-                         1, rw0003_z_hils_port_id, 0x13, aobc_, hils_port_manager_);
+                         1, rw0003_z_hils_port_id, i2c_address_z, aobc_, hils_port_manager_);
 
   // Thruster
   const std::string thruster_ini_path = iniAccess.ReadString("COMPONENTS_FILE", "thruster_file");
