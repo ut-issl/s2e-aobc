@@ -58,7 +58,7 @@ class AocsModuleComponents : public InstalledComponents {
   MPU9250_MAG *mpu9250_mag_;
   RM3100 *rm3100_aobc_;
   RM3100 *rm3100_ext_;
-  std::vector<NanoSSOCD60*> nano_ssoc_d60_;
+  std::vector<NanoSSOCD60 *> nano_ssoc_d60_;
   MTQseiren *mtq_seiren_;
 
   OEM7600 *oem7600_;  // GNSS Receiver
