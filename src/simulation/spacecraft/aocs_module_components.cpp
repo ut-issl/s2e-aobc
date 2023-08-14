@@ -79,27 +79,22 @@ AocsModuleComponents::AocsModuleComponents(const Dynamics *dynamics, Structure *
                                                          rm3100_ext_ini_path, compo_step_sec, &local_environment_->GetGeomagneticField())),
                            0, rm3100_ext_hils_port_id, 0x23, aobc_, hils_port_manager_);
 
+  // Sun sensors
   const std::string nanoSSOC_D60_ini_path = iniAccess.ReadString("COMPONENTS_FILE", "ss_file");
-  const unsigned int nanoSSOC_D60_pz_hils_port_id = iniAccess.ReadInt("COM_PORT", "nanoSSOC_D60_pz_hils_port_id");
-  nanoSSOC_D60_pz_ =
-      new NanoSSOCD60(InitSunSensor(clock_generator, power_controller_->GetPowerPort((int)PowerPortIdx::SS), 1, nanoSSOC_D60_ini_path,
-                                    &(local_environment_->GetSolarRadiationPressure()), &(local_environment_->GetCelestialInformation())),
-                      0, nanoSSOC_D60_pz_hils_port_id, 0x62, aobc_, hils_port_manager_);
-  const unsigned int nanoSSOC_D60_py_hils_port_id = iniAccess.ReadInt("COM_PORT", "nanoSSOC_D60_py_hils_port_id");
-  nanoSSOC_D60_py_ =
-      new NanoSSOCD60(InitSunSensor(clock_generator, power_controller_->GetPowerPort((int)PowerPortIdx::SS), 2, nanoSSOC_D60_ini_path,
-                                    &(local_environment_->GetSolarRadiationPressure()), &(local_environment_->GetCelestialInformation())),
-                      0, nanoSSOC_D60_py_hils_port_id, 0x60, aobc_, hils_port_manager_);
-  const unsigned int nanoSSOC_D60_mz_hils_port_id = iniAccess.ReadInt("COM_PORT", "nanoSSOC_D60_mz_hils_port_id");
-  nanoSSOC_D60_mz_ =
-      new NanoSSOCD60(InitSunSensor(clock_generator, power_controller_->GetPowerPort((int)PowerPortIdx::SS), 3, nanoSSOC_D60_ini_path,
-                                    &(local_environment_->GetSolarRadiationPressure()), &(local_environment_->GetCelestialInformation())),
-                      0, nanoSSOC_D60_mz_hils_port_id, 0x63, aobc_, hils_port_manager_);
-  const unsigned int nanoSSOC_D60_my_hils_port_id = iniAccess.ReadInt("COM_PORT", "nanoSSOC_D60_my_hils_port_id");
-  nanoSSOC_D60_my_ =
-      new NanoSSOCD60(InitSunSensor(clock_generator, power_controller_->GetPowerPort((int)PowerPortIdx::SS), 4, nanoSSOC_D60_ini_path,
-                                    &(local_environment_->GetSolarRadiationPressure()), &(local_environment_->GetCelestialInformation())),
-                      0, nanoSSOC_D60_my_hils_port_id, 0x61, aobc_, hils_port_manager_);
+  IniAccess ss_ini_file = IniAccess(nanoSSOC_D60_ini_path);
+  const size_t number_of_mounted_ss = ss_ini_file.ReadInt("GENERAL", "number_of_mounted_sensors");
+  for (size_t ss_idx = 0; ss_idx < number_of_mounted_ss; ss_idx++) {
+    const std::string hils_port = "nanoSSOC_d60_idx_" + std::to_string(static_cast<long long>(ss_idx)) + "_hils_port_id";
+    const unsigned int nanoSSOC_D60_hils_port_id = iniAccess.ReadInt("COM_PORT", hils_port.c_str());
+
+    const std::string ss_section_name = "I2C_PORT_" + std::to_string(static_cast<long long>(ss_idx));
+    const uint8_t i2c_address = ss_ini_file.ReadInt(ss_section_name.c_str(), "i2c_address");
+    NanoSSOCD60 *ss =
+        new NanoSSOCD60(InitSunSensor(clock_generator, power_controller_->GetPowerPort((int)PowerPortIdx::SS), ss_idx, nanoSSOC_D60_ini_path,
+                                      &(local_environment_->GetSolarRadiationPressure()), &(local_environment_->GetCelestialInformation())),
+                        0, nanoSSOC_D60_hils_port_id, i2c_address, aobc_, hils_port_manager_);
+    nano_ssoc_d60_.push_back(ss);
+  }
 
   const std::string mtq_ini_path = iniAccess.ReadString("COMPONENTS_FILE", "mtq_file");
   std::vector<int> mtq_gpio_ports{78, 81, 82, 83, 84, 68};
@@ -174,10 +169,9 @@ AocsModuleComponents::~AocsModuleComponents() {
   delete mpu9250_mag_;
   delete rm3100_aobc_;
   delete rm3100_ext_;
-  delete nanoSSOC_D60_pz_;
-  delete nanoSSOC_D60_py_;
-  delete nanoSSOC_D60_mz_;
-  delete nanoSSOC_D60_my_;
+  for (auto nano_ssoc_d60 : nano_ssoc_d60_) {
+    delete nano_ssoc_d60;
+  }
   delete mtq_seiren_;
   delete rw0003_x_;
   delete rw0003_y_;
@@ -217,10 +211,9 @@ void AocsModuleComponents::LogSetup(Logger &logger) {
   logger.AddLogList(mpu9250_mag_);
   logger.AddLogList(rm3100_aobc_);
   logger.AddLogList(rm3100_ext_);
-  logger.AddLogList(nanoSSOC_D60_pz_);
-  logger.AddLogList(nanoSSOC_D60_py_);
-  logger.AddLogList(nanoSSOC_D60_mz_);
-  logger.AddLogList(nanoSSOC_D60_my_);
+  for (auto nano_ssoc_d60 : nano_ssoc_d60_) {
+    logger.AddLogList(nano_ssoc_d60);
+  }
   logger.AddLogList(mtq_seiren_);
   logger.AddLogList(rw0003_x_);
   logger.AddLogList(rw0003_y_);
