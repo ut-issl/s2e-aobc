@@ -61,50 +61,51 @@ AocsModuleComponents::AocsModuleComponents(const Dynamics *dynamics, Structure *
   const unsigned int mpu9250_gyro_hils_port_id = iniAccess.ReadInt("COM_PORT", "mpu9250_gyro_hils_port_id");
   mpu9250_gyro_ = new MPU9250_GYRO(
       InitGyroSensor(clock_generator, power_controller_->GetPowerPort((int)PowerPortIdx::MPU), 2, mpu9250_gyro_ini_path, compo_step_sec, dynamics_),
-                     0, mpu9250_gyro_hils_port_id, 0x68, aobc_, hils_port_manager_);
+      0, mpu9250_gyro_hils_port_id, 0x68, aobc_, hils_port_manager_);
   const std::string mpu9250_mag_ini_path = iniAccess.ReadString("COMPONENTS_FILE", "magsensor_l_file");
   const unsigned int mpu9250_mag_hils_port_id = iniAccess.ReadInt("COM_PORT", "mpu9250_mag_hils_port_id");
   mpu9250_mag_ = new MPU9250_MAG(InitMagnetometer(clock_generator, power_controller_->GetPowerPort((int)PowerPortIdx::MPU), 2, mpu9250_mag_ini_path,
                                                   compo_step_sec, &(local_environment_->GetGeomagneticField())),
-                                                  0, mpu9250_mag_hils_port_id, 0x0c, aobc_, hils_port_manager_, mpu9250_gyro_->GetIsMagOn());
+                                 0, mpu9250_mag_hils_port_id, 0x0c, aobc_, hils_port_manager_, mpu9250_gyro_->GetIsMagOn());
 
   const std::string rm3100_aobc_ini_path = iniAccess.ReadString("COMPONENTS_FILE", "magsensor_h_aobc_file");
   const unsigned int rm3100_aobc_hils_port_id = iniAccess.ReadInt("COM_PORT", "rm3100_aobc_hils_port_id");
   rm3100_aobc_ = new RM3100(Magnetometer(InitMagnetometer(clock_generator, power_controller_->GetPowerPort((int)PowerPortIdx::RM), 1,
                                                           rm3100_aobc_ini_path, compo_step_sec, &local_environment_->GetGeomagneticField())),
-                                                          0, rm3100_aobc_hils_port_id, 0x20, aobc_, hils_port_manager_);
+                            0, rm3100_aobc_hils_port_id, 0x20, aobc_, hils_port_manager_);
   const std::string rm3100_ext_ini_path = iniAccess.ReadString("COMPONENTS_FILE", "magsensor_h_ext_file");
   const unsigned int rm3100_ext_hils_port_id = iniAccess.ReadInt("COM_PORT", "rm3100_ext_hils_port_id");
   rm3100_ext_ = new RM3100(Magnetometer(InitMagnetometer(clock_generator, power_controller_->GetPowerPort((int)PowerPortIdx::RM), 2,
                                                          rm3100_ext_ini_path, compo_step_sec, &local_environment_->GetGeomagneticField())),
-                                                         0, rm3100_ext_hils_port_id, 0x23, aobc_, hils_port_manager_);
+                           0, rm3100_ext_hils_port_id, 0x23, aobc_, hils_port_manager_);
 
   const std::string nanoSSOC_D60_ini_path = iniAccess.ReadString("COMPONENTS_FILE", "ss_file");
   const unsigned int nanoSSOC_D60_pz_hils_port_id = iniAccess.ReadInt("COM_PORT", "nanoSSOC_D60_pz_hils_port_id");
   nanoSSOC_D60_pz_ =
       new NanoSSOCD60(InitSunSensor(clock_generator, power_controller_->GetPowerPort((int)PowerPortIdx::SS), 1, nanoSSOC_D60_ini_path,
                                     &(local_environment_->GetSolarRadiationPressure()), &(local_environment_->GetCelestialInformation())),
-                                    0, nanoSSOC_D60_pz_hils_port_id, 0x62, aobc_, hils_port_manager_);
+                      0, nanoSSOC_D60_pz_hils_port_id, 0x62, aobc_, hils_port_manager_);
   const unsigned int nanoSSOC_D60_py_hils_port_id = iniAccess.ReadInt("COM_PORT", "nanoSSOC_D60_py_hils_port_id");
   nanoSSOC_D60_py_ =
       new NanoSSOCD60(InitSunSensor(clock_generator, power_controller_->GetPowerPort((int)PowerPortIdx::SS), 2, nanoSSOC_D60_ini_path,
                                     &(local_environment_->GetSolarRadiationPressure()), &(local_environment_->GetCelestialInformation())),
-                                    0, nanoSSOC_D60_py_hils_port_id, 0x60, aobc_, hils_port_manager_);
+                      0, nanoSSOC_D60_py_hils_port_id, 0x60, aobc_, hils_port_manager_);
   const unsigned int nanoSSOC_D60_mz_hils_port_id = iniAccess.ReadInt("COM_PORT", "nanoSSOC_D60_mz_hils_port_id");
   nanoSSOC_D60_mz_ =
       new NanoSSOCD60(InitSunSensor(clock_generator, power_controller_->GetPowerPort((int)PowerPortIdx::SS), 3, nanoSSOC_D60_ini_path,
                                     &(local_environment_->GetSolarRadiationPressure()), &(local_environment_->GetCelestialInformation())),
-                                    0, nanoSSOC_D60_mz_hils_port_id, 0x63, aobc_, hils_port_manager_);
+                      0, nanoSSOC_D60_mz_hils_port_id, 0x63, aobc_, hils_port_manager_);
   const unsigned int nanoSSOC_D60_my_hils_port_id = iniAccess.ReadInt("COM_PORT", "nanoSSOC_D60_my_hils_port_id");
   nanoSSOC_D60_my_ =
       new NanoSSOCD60(InitSunSensor(clock_generator, power_controller_->GetPowerPort((int)PowerPortIdx::SS), 4, nanoSSOC_D60_ini_path,
                                     &(local_environment_->GetSolarRadiationPressure()), &(local_environment_->GetCelestialInformation())),
-                                    0, nanoSSOC_D60_my_hils_port_id, 0x61, aobc_, hils_port_manager_);
+                      0, nanoSSOC_D60_my_hils_port_id, 0x61, aobc_, hils_port_manager_);
 
   const std::string mtq_ini_path = iniAccess.ReadString("COMPONENTS_FILE", "mtq_file");
   std::vector<int> mtq_gpio_ports{78, 81, 82, 83, 84, 68};
   mtq_seiren_ = new MTQseiren(InitMagnetorquer(clock_generator, power_controller_->GetPowerPort((int)PowerPortIdx::MTQ), 1, mtq_ini_path,
-                                               compo_step_sec, &(local_environment_->GetGeomagneticField())), mtq_gpio_ports, aobc_);
+                                               compo_step_sec, &(local_environment_->GetGeomagneticField())),
+                              mtq_gpio_ports, aobc_);
 
   const std::string oem7600_ini_path = iniAccess.ReadString("COMPONENTS_FILE", "gnssr_file");
   const unsigned int oem7600_hils_port_id = iniAccess.ReadInt("COM_PORT", "oem7600_hils_port_id");
@@ -112,14 +113,14 @@ AocsModuleComponents::AocsModuleComponents(const Dynamics *dynamics, Structure *
   oem7600_ =
       new OEM7600(GnssReceiver(InitGnssReceiver(clock_generator, power_controller_->GetPowerPort((int)PowerPortIdx::OEM), 1, oem7600_ini_path,
                                                 dynamics_, &(global_environment_->GetGnssSatellites()), &(global_environment_->GetSimulationTime()))),
-                                                0x02, aobc_, 0x01, oem7600_hils_port_id, oem7600_baud_rate, hils_port_manager_);
+                  0x02, aobc_, 0x01, oem7600_hils_port_id, oem7600_baud_rate, hils_port_manager_);
 
   const std::string sagitta_ini_path = iniAccess.ReadString("COMPONENTS_FILE", "stt_file");
   const unsigned int sagitta_hils_port_id = iniAccess.ReadInt("COM_PORT", "sagitta_hils_port_id");
   const unsigned int sagitta_baud_rate = iniAccess.ReadInt("COM_PORT", "sagitta_baud_rate");
   sagitta_ = new Sagitta(InitStarSensor(clock_generator, power_controller_->GetPowerPort((int)PowerPortIdx::STT), 0, sagitta_ini_path,
                                         global_environment_->GetSimulationTime().GetSimulationStep_s(), dynamics_, local_environment_),
-                                        0x05, aobc_, sagitta_hils_port_id, sagitta_baud_rate, hils_port_manager_);
+                         0x05, aobc_, sagitta_hils_port_id, sagitta_baud_rate, hils_port_manager_);
 
   const std::string stim210_ini_path = iniAccess.ReadString("COMPONENTS_FILE", "gyro_h_file");
   const unsigned int stim210_hils_port_id = iniAccess.ReadInt("COM_PORT", "stim210_hils_port_id");
@@ -132,15 +133,15 @@ AocsModuleComponents::AocsModuleComponents(const Dynamics *dynamics, Structure *
   const unsigned int rw0003_x_hils_port_id = iniAccess.ReadInt("COM_PORT", "rw0003_x_hils_port_id");
   rw0003_x_ = new RW0003(InitReactionWheel(clock_generator, power_controller_->GetPowerPort((int)PowerPortIdx::RWX), 1, rw_ini_path,
                                            dynamics_->GetAttitude().GetPropStep_s(), compo_step_sec),
-                                           1, rw0003_x_hils_port_id, 0x11, aobc_, hils_port_manager_);
+                         1, rw0003_x_hils_port_id, 0x11, aobc_, hils_port_manager_);
   const unsigned int rw0003_y_hils_port_id = iniAccess.ReadInt("COM_PORT", "rw0003_y_hils_port_id");
   rw0003_y_ = new RW0003(InitReactionWheel(clock_generator, power_controller_->GetPowerPort((int)PowerPortIdx::RWY), 2, rw_ini_path,
                                            dynamics_->GetAttitude().GetPropStep_s(), compo_step_sec),
-                                           1, rw0003_y_hils_port_id, 0x12, aobc_, hils_port_manager_);
+                         1, rw0003_y_hils_port_id, 0x12, aobc_, hils_port_manager_);
   const unsigned int rw0003_z_hils_port_id = iniAccess.ReadInt("COM_PORT", "rw0003_z_hils_port_id");
   rw0003_z_ = new RW0003(InitReactionWheel(clock_generator, power_controller_->GetPowerPort((int)PowerPortIdx::RWZ), 3, rw_ini_path,
                                            dynamics_->GetAttitude().GetPropStep_s(), compo_step_sec),
-                                           1, rw0003_z_hils_port_id, 0x13, aobc_, hils_port_manager_);
+                         1, rw0003_z_hils_port_id, 0x13, aobc_, hils_port_manager_);
 
   // Thruster
   const std::string thruster_ini_path = iniAccess.ReadString("COMPONENTS_FILE", "thruster_file");
