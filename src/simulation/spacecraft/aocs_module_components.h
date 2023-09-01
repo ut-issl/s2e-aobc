@@ -26,6 +26,8 @@
 #include <components/real/mission/initialize_telescope.hpp>
 // HILS IF
 #include "../../interface/hils/hils_if_driver.hpp"
+// Communication
+#include <components/real/communication/wings_command_sender_to_c2a.hpp>
 
 using libra::Vector;
 
@@ -75,6 +77,8 @@ class AocsModuleComponents : public InstalledComponents {
   // HILS
   HilsPortManager *hils_port_manager_;
   HilsIfDriver *hils_if_driver_;
+  // Communication
+  WingsCommandSenderToC2a *wings_command_sender_to_c2a_;
 
   // States
   const Dynamics *dynamics_;                      //!< Dynamics information of the spacecraft

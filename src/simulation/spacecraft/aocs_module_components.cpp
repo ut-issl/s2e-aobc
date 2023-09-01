@@ -155,6 +155,10 @@ AocsModuleComponents::AocsModuleComponents(const Dynamics *dynamics, Structure *
   telescope_ = new Telescope(InitTelescope(clock_generator, 1, telescope_ini_path, &(dynamics_->GetAttitude()),
                                            &(global_environment_->GetHipparcosCatalog()), &(local_environment_->GetCelestialInformation())));
 
+  // Communication 
+  const std::string command_sender_ini_path = iniAccess.ReadString("COMPONENTS_FILE", "command_sender_file");
+  wings_command_sender_to_c2a_ = new WingsCommandSenderToC2a(InitWingsCommandSenderToC2a(clock_generator, compo_step_sec, command_sender_ini_path));
+
 // HILS IF Board
 #ifdef USE_HILS
   const unsigned int hils_if_hils_port_id = iniAccess.ReadInt("COM_PORT", "hils_if_hils_port_id");
@@ -164,6 +168,7 @@ AocsModuleComponents::AocsModuleComponents(const Dynamics *dynamics, Structure *
 }
 
 AocsModuleComponents::~AocsModuleComponents() {
+  delete wings_command_sender_to_c2a_;
   delete telescope_;
   delete sagitta_;
   delete stim210_;
