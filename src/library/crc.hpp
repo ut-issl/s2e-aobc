@@ -1,10 +1,13 @@
+/**
+ * @file crc.hpp
+ * @brief CRC calculation functions
+ */
+
 #ifndef S2E_AOBC_LIBRARY_CRC_HPP_
 #define S2E_AOBC_LIBRARY_CRC_HPP_
 
 #include <stddef.h>
 #include <stdint.h>
-
-// CRC
 
 /**
  * @brief CRC-8-ATM
