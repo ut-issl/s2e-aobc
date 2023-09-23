@@ -1,3 +1,8 @@
+/**
+ * @file sample_case.cpp
+ * @brief Example of user defined simulation case
+ */
+
 #include "sample_case.h"
 
 #include <./simulation/monte_carlo_simulation/simulation_object.hpp>
@@ -11,8 +16,7 @@ SampleCase::~SampleCase() { delete spacecraft_; }
 
 void SampleCase::InitializeTargetObjects() {
   // Instantiate the target of the simulation
-  // `spacecraft_id` corresponds to the index of `spacecraft_file` in
-  // simulation_base.ini
+  // `spacecraft_id` corresponds to the index of `spacecraft_file` in simulation_base.ini
   const int spacecraft_id = 0;
   spacecraft_ = new SampleSatellite(&simulation_configuration_, global_environment_, spacecraft_id);
 

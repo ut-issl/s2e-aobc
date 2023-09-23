@@ -1,3 +1,8 @@
+/**
+ * @file sample_case.hpp
+ * @brief Example of user defined simulation case
+ */
+
 #ifndef S2E_AOBC_SIMULATION_CASE_SAMPLE_CASE_HPP_
 #define S2E_AOBC_SIMULATION_CASE_SAMPLE_CASE_HPP_
 
@@ -6,18 +11,38 @@
 
 #include "../spacecraft/sample_satellite.h"
 
+/**
+ * @class SampleCase
+ * @brief An example of user defined simulation class
+ */
 class SampleCase : public SimulationCase {
  public:
+  /**
+   * @fn SampleCase
+   * @brief Constructor
+   */
   SampleCase(const std::string initialize_base_file, MonteCarloSimulationExecutor &monte_carlo_simulator, const std::string log_path);
+
+  /**
+   * @fn ~SampleCase
+   * @brief Destructor
+   */
   virtual ~SampleCase();
 
-  // Log for Monte Carlo Simulation
+  /**
+   * @fn GetLogHeader
+   * @brief Override function of GetLogHeader
+   */
   virtual std::string GetLogHeader() const;
+  /**
+   * @fn GetLogValue
+   * @brief Override function of GetLogValue
+   */
   virtual std::string GetLogValue() const;
 
  private:
-  SampleSatellite *spacecraft_;
-  MonteCarloSimulationExecutor &monte_carlo_simulator_;
+  SampleSatellite *spacecraft_;                          //!< Instance of spacecraft
+  MonteCarloSimulationExecutor &monte_carlo_simulator_;  //!< Instance of ground station
 
   /**
    * @fn InitializeTargetObjects
@@ -31,4 +56,5 @@ class SampleCase : public SimulationCase {
    */
   void UpdateTargetObjects();
 };
+
 #endif  // S2E_AOBC_SIMULATION_CASE_SAMPLE_CASE_HPP_
