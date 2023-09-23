@@ -1,3 +1,10 @@
+/**
+ * @file rw0003.hpp
+ * @brief Class to emulate RW0.003 reaction wheel
+ * @note Manual: NA
+ *       Functions not used in the project are not implemented
+ */
+
 #ifndef S2E_AOBC_COMPONENT_AOCS_RW0003_HPP_
 #define S2E_AOBC_COMPONENT_AOCS_RW0003_HPP_
 
@@ -6,67 +13,121 @@
 
 #include "../../library/crc.hpp"
 
-/* References
-Manual: NA
-Note: Functions not used in the project are not implemented
-*/
-
+/**
+ * @class RW0003
+ * @brief Class to emulate RW0.003 reaction wheel
+ */
 class RW0003 : public ReactionWheel, public I2cTargetCommunicationWithObc {
  public:
+  /**
+   * @fn RW0003
+   * @brief Constructor
+   * @param [in] rw: Reaction wheel settings
+   * @param [in] sils_port_id: Port ID for SILS
+   * @param [in] hils_port_id: Port ID for HILS
+   * @param [in] i2c_addr: I2C address
+   * @param [in] obc: Connected OBC
+   * @param [in] hils_port_manager: HILS port manager
+   */
   RW0003(ReactionWheel rw, const int sils_port_id, const unsigned int hils_port_id, const unsigned char i2c_addr, OnBoardComputer *obc,
          HilsPortManager *hils_port_manager);
 
-  // Override: RWModel functions
+  // Override functions for Component
+  /**
+   * @fn MainRoutine
+   * @brief Main routine for sensor observation
+   */
   void MainRoutine(int count) override;
+  // Override ILoggable
+  /**
+   * @fn GetLogHeader
+   * @brief Override GetLogHeader function of ILoggable
+   */
   std::string GetLogHeader() const override;
 
  private:
-  bool is_rw_initialized_ = false;
-  // Dummy data
-  double temperture_degC_ = 30.0;
+  bool is_rw_initialized_ = false;  //!< Flag to detect initializing operation
+  double temperture_degC_ = 30.0;   //!< RW measured temperature [degC] (dummy data)
 
   // Communication
-  uint16_t crc_;
-  const uint8_t kSrcAddr_ = 0x11;
-  static const uint8_t kHeaderSize_ = 2;
-  static const uint8_t kFooterSize_ = 1;
-  static const uint8_t kCrcSize_ = 2;
-  static const uint8_t kMaxCmdLength_ = 15;
-  static const uint8_t kMaxTlmLength_ = 15;
+  uint16_t crc_;                             //!< Calculated CRC value
+  const uint8_t kSrcAddr_ = 0x11;            //!< Source address
+  static const uint8_t kHeaderSize_ = 2;     //!< Header size
+  static const uint8_t kFooterSize_ = 1;     //!< Footer size
+  static const uint8_t kCrcSize_ = 2;        //!< CRC size
+  static const uint8_t kMaxCmdLength_ = 15;  //!< Command max length
+  static const uint8_t kMaxTlmLength_ = 15;  //!< Telemetry max length
 
   // Command
-  static const uint8_t kCmdIdInit_ = 0x01;
-  static const uint8_t kCmdIdReadFile_ = 0x07;
-  static const uint8_t kCmdIdWriteFile_ = 0x08;
+  static const uint8_t kCmdIdInit_ = 0x01;       //!< Command ID for initialize
+  static const uint8_t kCmdIdReadFile_ = 0x07;   //!< Command ID for read file
+  static const uint8_t kCmdIdWriteFile_ = 0x08;  //!< Command ID for write file
 
   // Write Command
-  static const uint8_t kWriteCmdIdle_ = 0x00;
-  static const uint8_t kWriteCmdSpeed_ = 0x03;
-  static const uint8_t kWriteCmdTorque_ = 0x12;
+  static const uint8_t kWriteCmdIdle_ = 0x00;    //!< Idle command ID
+  static const uint8_t kWriteCmdSpeed_ = 0x03;   //!< Rotation speed setting command ID
+  static const uint8_t kWriteCmdTorque_ = 0x12;  //!< Torque setting command ID
 
   // Register address
-  static const uint8_t kReadAddressTemperature_ = 0x03;
-  static const uint8_t kReadAddressSpeed_ = 0x15;
-  static const uint8_t kReadAddressLimitSpeed1_ = 0x33;
-  static const uint8_t kReadAddressLimitSpeed2_ = 0x34;
+  static const uint8_t kReadAddressTemperature_ = 0x03;  //!< Register address of temperature measurement
+  static const uint8_t kReadAddressSpeed_ = 0x15;        //!< Register address of rotation speed measurement
+  static const uint8_t kReadAddressLimitSpeed1_ = 0x33;  //!< Register address of limit speed 1
+  static const uint8_t kReadAddressLimitSpeed2_ = 0x34;  //!< Register address of limit speed 2
 
-  static const uint8_t kMcfReadEdac_ = 0xa7;
-  static const uint16_t kCrcInitial_ = 0xffff;
-  static const bool kCrcRevFlag_ = false;
+  static const uint8_t kMcfReadEdac_ = 0xa7;    //!< Read EDAC memory MCF value
+  static const uint16_t kCrcInitial_ = 0xffff;  //!< CRC initial value
+  static const bool kCrcRevFlag_ = false;       //!< CRC reverse flag
 
   // HILS
-  bool is_cmd_written_ = false;
-  const unsigned int kStoredFrameSize = 3;
+  bool is_cmd_written_ = false; //!< Command written flag
+  const unsigned int kStoredFrameSize = 3; //!< Stored frame size for HILS
+  /**
+   * @fn Initialize
+   * @brief Store data before execution for HILS
+   */
   void Initialize();
 
-  // Cmd
+  // Command
+  /**
+   * @fn ReadCmd
+   * @brief Read and execute command
+   */
   void ReadCmd();
+  /**
+   * @fn ReadCmdInit
+   * @brief Read and execute initialize command
+   * @param [in] payload: Argument of the command
+   */
   void ReadCmdInit(std::vector<uint8_t> payload);
+  /**
+   * @fn ReadCmdWriteFile
+   * @brief Read and execute write file command
+   * @param [in] payload: Argument of the command
+   */
   void ReadCmdWriteFile(const std::vector<uint8_t> payload);
+  /**
+   * @fn ReadCmdReadFile
+   * @brief Read and execute read file command
+   * @param [in] payload: Argument of the command
+   */
   void ReadCmdReadFile(const std::vector<uint8_t> payload);
+  /**
+   * @fn decode_mcf
+   * @brief Decode MCF to detect reply requirement
+   * @param [in] cmd_id: Command ID
+   * @param [in] mcf: MCF data
+   * @return 1: with reply, 0: without reply
+   */
   uint8_t decode_mcf(uint8_t *cmd_id, const uint8_t mcf);
 
-  // Tlm
+  // Telemetry
+  /**
+   * @fn WriteFloatTlm
+   * @brief Write float data as telemetry format
+   * @param [in] address: Telemetry address
+   * @param [in] value: Input float value
+   */
   void WriteFloatTlm(uint8_t address, float value);
 };
+
 #endif  // S2E_AOBC_COMPONENT_AOCS_RW0003_HPP_
