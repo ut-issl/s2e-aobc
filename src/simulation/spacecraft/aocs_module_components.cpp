@@ -1,3 +1,8 @@
+/**
+ * @file aocs_module_components.cpp
+ * @brief Components installed on a spacecraft
+ */
+
 #include "aocs_module_components.h"
 
 #include <components/real/aocs/initialize_gnss_receiver.hpp>
