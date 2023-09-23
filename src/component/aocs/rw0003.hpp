@@ -79,8 +79,8 @@ class RW0003 : public ReactionWheel, public I2cTargetCommunicationWithObc {
   static const bool kCrcRevFlag_ = false;       //!< CRC reverse flag
 
   // HILS
-  bool is_cmd_written_ = false; //!< Command written flag
-  const unsigned int kStoredFrameSize = 3; //!< Stored frame size for HILS
+  bool is_cmd_written_ = false;             //!< Command written flag
+  const unsigned int kStoredFrameSize = 3;  //!< Stored frame size for HILS
   /**
    * @fn Initialize
    * @brief Store data before execution for HILS
