@@ -1,3 +1,8 @@
+/**
+ * @file mpu9250_mag.cpp
+ * @brief Class to emulate magnetometer in MPU9250 9 axis sensor
+ */
+
 #include "mpu9250_mag.hpp"
 
 #include <library/utilities/macros.hpp>
