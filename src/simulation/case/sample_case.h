@@ -20,6 +20,9 @@ class SampleCase : public SimulationCase {
   /**
    * @fn SampleCase
    * @brief Constructor
+   * @param [in] initialize_base_file: Initialize base file path
+   * @param [in] monte_carlo_simulator: Monte Carlo simulator
+   * @param [in] log_path: Log file path
    */
   SampleCase(const std::string initialize_base_file, MonteCarloSimulationExecutor &monte_carlo_simulator, const std::string log_path);
 
