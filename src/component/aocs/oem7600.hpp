@@ -134,7 +134,7 @@ class OEM7600 : public GnssReceiver, public UartCommunicationWithObc {
    * @fn Gen_BestXYZTlm_Ascii
    * @brief Generate "bestxyza" tlm with ASCII format
    */
-  std::string Gen_TimeTlm_Ascii(void);
+  std::string Gen_BestXYZTlm_Ascii(void);
   /**
    * @fn Gen_BestXYZTlm_Ascii
    * @brief Generate "timea" tlm with ASCII format
