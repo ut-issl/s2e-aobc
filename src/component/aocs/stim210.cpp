@@ -1,3 +1,8 @@
+/**
+ * @file stim210.cpp
+ * @brief Class to emulate STIM210 gyro sensor
+ */
+
 #include "stim210.hpp"
 
 #include <library/utilities/macros.hpp>

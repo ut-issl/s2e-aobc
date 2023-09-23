@@ -1,6 +1,6 @@
 ﻿/**
  * @file oem7600.hpp
- * @brief Class to emulate EM7600 GNSS receiver
+ * @brief Class to emulate OEM7600 GNSS receiver
  * @note Manual: https://docs.novatel.com/OEM7/Content/Commands/CommandsLogs.htm?tocpath=Commands%20%2526%20Logs%7C_____0
  */
 

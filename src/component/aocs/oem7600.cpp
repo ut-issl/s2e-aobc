@@ -1,6 +1,6 @@
 ﻿/**
  * @file oem7600.cpp
- * @brief Class to emulate EM7600 GNSS receiver
+ * @brief Class to emulate OEM7600 GNSS receiver
  */
 
 #include "oem7600.hpp"
