@@ -1,3 +1,8 @@
+/**
+ * @file hils_if_driver.cpp
+ * @brief Interface driver to read GPIO information for HILS test
+ */
+
 #include "hils_if_driver.hpp"
 
 #include <library/utilities/macros.hpp>
