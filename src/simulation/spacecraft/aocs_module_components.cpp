@@ -73,11 +73,15 @@ AocsModuleComponents::AocsModuleComponents(const Dynamics *dynamics, Structure *
                                                   compo_step_sec, &(local_environment_->GetGeomagneticField())),
                                  0, mpu9250_mag_hils_port_id, 0x0c, aobc_, hils_port_manager_, mpu9250_gyro_->GetIsMagOn());
 
+  // RM3100
   const std::string rm3100_aobc_ini_path = iniAccess.ReadString("COMPONENTS_FILE", "magsensor_h_aobc_file");
   const unsigned int rm3100_aobc_hils_port_id = iniAccess.ReadInt("COM_PORT", "rm3100_aobc_hils_port_id");
+  IniAccess rm3100_aobc_ini_access = IniAccess(rm3100_aobc_ini_path);
+  const uint8_t rm3100_aobc_i2c_address = (uint8_t)rm3100_aobc_ini_access.ReadInt("I2C_PORT_2", "i2c_address");
   rm3100_aobc_ = new RM3100(Magnetometer(InitMagnetometer(clock_generator, power_controller_->GetPowerPort((int)PowerPortIdx::RM), 1,
                                                           rm3100_aobc_ini_path, compo_step_sec, &local_environment_->GetGeomagneticField())),
-                            0, rm3100_aobc_hils_port_id, 0x20, aobc_, hils_port_manager_);
+                            0, rm3100_aobc_hils_port_id, rm3100_aobc_i2c_address, aobc_, hils_port_manager_);
+
   const std::string rm3100_ext_ini_path = iniAccess.ReadString("COMPONENTS_FILE", "magsensor_h_ext_file");
   const unsigned int rm3100_ext_hils_port_id = iniAccess.ReadInt("COM_PORT", "rm3100_ext_hils_port_id");
   IniAccess rm3100_ext_ini_access = IniAccess(rm3100_ext_ini_path);
