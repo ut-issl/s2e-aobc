@@ -119,7 +119,9 @@ AocsModuleComponents::AocsModuleComponents(const Dynamics *dynamics, Structure *
 
   // MTQ
   const std::string mtq_ini_path = iniAccess.ReadString("COMPONENTS_FILE", "mtq_file");
-  std::vector<int> mtq_gpio_ports{78, 81, 82, 83, 84, 68};
+  IniAccess mtq_ini_file = IniAccess(mtq_ini_path);
+  int number_of_mtq_ports = mtq_ini_file.ReadInt("MTQ_GPIO_PORT", "number_of_ports");
+  std::vector<int> mtq_gpio_ports = mtq_ini_file.ReadVectorInt("MTQ_GPIO_PORT", "gpio_port", number_of_mtq_ports);
   mtq_seiren_ = new MTQseiren(InitMagnetorquer(clock_generator, power_controller_->GetPowerPort((int)PowerPortIdx::MTQ), 1, mtq_ini_path,
                                                compo_step_sec, &(local_environment_->GetGeomagneticField())),
                               mtq_gpio_ports, aobc_);
