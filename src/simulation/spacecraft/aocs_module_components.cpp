@@ -128,12 +128,15 @@ AocsModuleComponents::AocsModuleComponents(const Dynamics *dynamics, Structure *
 
   // GPS-R
   const std::string oem7600_ini_path = iniAccess.ReadString("COMPONENTS_FILE", "gnssr_file");
+  IniAccess oem7600_ini_file = IniAccess(oem7600_ini_path);
+  const unsigned char oem7600_uart_sils_port = (unsigned char)oem7600_ini_file.ReadInt("UART_PORT", "uart_port_sils");
+  const unsigned char oem7600_com_port = (unsigned char)oem7600_ini_file.ReadInt("UART_PORT", "oem_com_port");
   const unsigned int oem7600_hils_port_id = iniAccess.ReadInt("COM_PORT", "oem7600_hils_port_id");
   const unsigned int oem7600_baud_rate = iniAccess.ReadInt("COM_PORT", "oem7600_baud_rate");
   oem7600_ =
       new OEM7600(GnssReceiver(InitGnssReceiver(clock_generator, power_controller_->GetPowerPort((int)PowerPortIdx::OEM), 1, oem7600_ini_path,
                                                 dynamics_, &(global_environment_->GetGnssSatellites()), &(global_environment_->GetSimulationTime()))),
-                  0x02, aobc_, 0x01, oem7600_hils_port_id, oem7600_baud_rate, hils_port_manager_);
+                  oem7600_uart_sils_port, aobc_, oem7600_com_port, oem7600_hils_port_id, oem7600_baud_rate, hils_port_manager_);
 
   // STT
   const std::string sagitta_ini_path = iniAccess.ReadString("COMPONENTS_FILE", "stt_file");
