@@ -59,7 +59,8 @@ AocsModuleComponents::AocsModuleComponents(const Dynamics *dynamics, Structure *
   ina260s_.push_back(INA260(ina_prescaler, clock_generator, ina_power_port, ina_min_voltage, ina_power_consumption,
                             power_controller_->GetPowerPort((int)PowerPortIdx::PIC), ina_i2c_port, ina_i2c_addr_pic, aobc_));
   // RM, SS, MTQ, STIM, STT, OEM, RWX, RWY, RWZ
-  std::vector<unsigned char> ina_i2c_addr_list = {0x44, 0x45, 0x46, 0x41, 0x42, 0x43, 0x47, 0x48, 0x49};
+  int number_of_sensors = power_controller_access.ReadInt("POWER_SENSOR", "number_of_sensors");
+  std::vector<unsigned char> ina_i2c_addr_list = power_controller_access.ReadVectorUnsignedChar("POWER_SENSOR", "i2c_address", number_of_sensors);
   for (size_t i = 0; i < ina_i2c_addr_list.size(); i++) {
     ina260s_.push_back(INA260(ina_prescaler, clock_generator, ina_power_port, ina_min_voltage, ina_power_consumption,
                               power_controller_->GetPowerPort(i + 2), ina_i2c_port, ina_i2c_addr_list[i], aobc_));  // INAとMPUは観測対象でない
