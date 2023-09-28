@@ -48,15 +48,16 @@ AocsModuleComponents::AocsModuleComponents(const Dynamics *dynamics, Structure *
   power_controller_ = new PowerController(PowerControlUnit(1, clock_generator), power_gpio_ports, power_output_voltage_list, aobc_);
 
   // INA
-  int ina_prescaler = 1;
   PowerPort *ina_power_port = power_controller_->GetPowerPort((int)PowerPortIdx::INA);
-  double ina_min_voltage = 3.3,
-         ina_power_consumption = 0.001;  // TODO 初期化ファイルに移動させる？
-  unsigned char ina_i2c_port = 4;
-  unsigned char ina_i2c_addr = 0x40;
+  double ina_min_voltage = power_controller_access.ReadDouble("POWER_SENSOR", "ina_minimum_voltage_V");
+  double ina_power_consumption = power_controller_access.ReadDouble("POWER_SENSOR", "ina_power_consumption_W");
+  int ina_prescaler = power_controller_access.ReadInt("POWER_SENSOR", "ina_prescaler");
+  unsigned char ina_i2c_port = (unsigned char)power_controller_access.ReadInt("POWER_SENSOR", "i2c_port_id");
+  unsigned char ina_i2c_addr_pic = (unsigned char)power_controller_access.ReadInt("POWER_SENSOR", "i2c_address_pic");
+
   // PICのみ特別
   ina260s_.push_back(INA260(ina_prescaler, clock_generator, ina_power_port, ina_min_voltage, ina_power_consumption,
-                            power_controller_->GetPowerPort((int)PowerPortIdx::PIC), ina_i2c_port, ina_i2c_addr, aobc_));
+                            power_controller_->GetPowerPort((int)PowerPortIdx::PIC), ina_i2c_port, ina_i2c_addr_pic, aobc_));
   // RM, SS, MTQ, STIM, STT, OEM, RWX, RWY, RWZ
   std::vector<unsigned char> ina_i2c_addr_list = {0x44, 0x45, 0x46, 0x41, 0x42, 0x43, 0x47, 0x48, 0x49};
   for (size_t i = 0; i < ina_i2c_addr_list.size(); i++) {
