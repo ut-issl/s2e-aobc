@@ -140,11 +140,13 @@ AocsModuleComponents::AocsModuleComponents(const Dynamics *dynamics, Structure *
 
   // STT
   const std::string sagitta_ini_path = iniAccess.ReadString("COMPONENTS_FILE", "stt_file");
+  IniAccess sagitta_ini_file = IniAccess(sagitta_ini_path);
+  const unsigned char sagitta_uart_sils_port = (unsigned char)sagitta_ini_file.ReadInt("UART_PORT", "uart_port_sils");
   const unsigned int sagitta_hils_port_id = iniAccess.ReadInt("COM_PORT", "sagitta_hils_port_id");
   const unsigned int sagitta_baud_rate = iniAccess.ReadInt("COM_PORT", "sagitta_baud_rate");
   sagitta_ = new Sagitta(InitStarSensor(clock_generator, power_controller_->GetPowerPort((int)PowerPortIdx::STT), 0, sagitta_ini_path,
                                         global_environment_->GetSimulationTime().GetSimulationStep_s(), dynamics_, local_environment_),
-                         0x05, aobc_, sagitta_hils_port_id, sagitta_baud_rate, hils_port_manager_);
+                         sagitta_uart_sils_port, aobc_, sagitta_hils_port_id, sagitta_baud_rate, hils_port_manager_);
 
   // Accurate gyro sensor
   const std::string stim210_ini_path = iniAccess.ReadString("COMPONENTS_FILE", "gyro_h_file");
