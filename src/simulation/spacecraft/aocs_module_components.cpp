@@ -42,8 +42,9 @@ AocsModuleComponents::AocsModuleComponents(const Dynamics *dynamics, Structure *
   // PowerController
   const std::string power_controller_ini_path = iniAccess.ReadString("COMPONENTS_FILE", "power_controller_file");
   IniAccess power_controller_access = IniAccess(power_controller_ini_path);
-  std::vector<int> power_gpio_ports = power_controller_access.ReadVectorInt("POWER_CONTROLLER", "gpio_port", 11);
-  std::vector<double> power_output_voltage_list = power_controller_access.ReadVectorDouble("POWER_CONTROLLER", "output_voltage_V", 11);
+  int number_of_ports = power_controller_access.ReadInt("POWER_CONTROLLER", "number_of_ports");
+  std::vector<int> power_gpio_ports = power_controller_access.ReadVectorInt("POWER_CONTROLLER", "gpio_port", number_of_ports);
+  std::vector<double> power_output_voltage_list = power_controller_access.ReadVectorDouble("POWER_CONTROLLER", "output_voltage_V", number_of_ports);
   power_controller_ = new PowerController(PowerControlUnit(1, clock_generator), power_gpio_ports, power_output_voltage_list, aobc_);
 
   // INA
