@@ -150,11 +150,13 @@ AocsModuleComponents::AocsModuleComponents(const Dynamics *dynamics, Structure *
 
   // Accurate gyro sensor
   const std::string stim210_ini_path = iniAccess.ReadString("COMPONENTS_FILE", "gyro_h_file");
+  IniAccess stim210_ini_file = IniAccess(stim210_ini_path);
+  const unsigned char stim210_uart_sils_port = (unsigned char)stim210_ini_file.ReadInt("UART_PORT", "uart_port_sils");
   const unsigned int stim210_hils_port_id = iniAccess.ReadInt("COM_PORT", "stim210_hils_port_id");
   const unsigned int stim210_baud_rate = iniAccess.ReadInt("COM_PORT", "stim210_baud_rate");
   stim210_ = new STIM210(
       InitGyroSensor(clock_generator, power_controller_->GetPowerPort((int)PowerPortIdx::STIM), 1, stim210_ini_path, compo_step_sec, dynamics_),
-      compo_step_sec, 0x04, aobc_, stim210_hils_port_id, stim210_baud_rate, hils_port_manager_);
+      compo_step_sec, stim210_uart_sils_port, aobc_, stim210_hils_port_id, stim210_baud_rate, hils_port_manager_);
 
   // Reaction Wheel
   const std::string rw_ini_path = iniAccess.ReadString("COMPONENTS_FILE", "rw_file");
