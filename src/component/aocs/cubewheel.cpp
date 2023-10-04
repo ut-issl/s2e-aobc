@@ -142,4 +142,3 @@ int CubeWheel::GenerateTelemetry() {
 
     return 0;
 }
-
