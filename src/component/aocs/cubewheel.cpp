@@ -5,39 +5,33 @@ CubeWheel::CubeWheel(
     const int port_id,
     const unsigned char i2c_addr,
     OBC* obc
-) :RWModel(rw_model), ObcI2cCommunicationBase(port_id, i2c_addr, obc)
-{
+) :RWModel(rw_model), ObcI2cCommunicationBase(port_id, i2c_addr, obc) {
     port_id_ = i2c_addr - 0x67; // port_idは1固定のため。
 
     unsigned char data[] = { 0x08 };
 
-    if (i2c_addr == 0x68)
-    {
+    if (i2c_addr == 0x68) {
         WriteRegister(0x80, data, 1);
         data[0] = 0xd0;
         WriteRegister(0x83, data, 1);
     }
-    else if (i2c_addr == 0x69)
-    {
+    else if (i2c_addr == 0x69) {
         WriteRegister(0x80, data, 1);
         data[0] = 0xd2;
         WriteRegister(0x83, data, 1);
     }
-    else if (i2c_addr == 0x6A)
-    {
+    else if (i2c_addr == 0x6A) {
         WriteRegister(0x80, data, 1);
         data[0] = 0xd4;
         WriteRegister(0x83, data, 1);
     }
 }
 
-void CubeWheel::MainRoutine(int count)
-{
+void CubeWheel::MainRoutine(int count) {
     // Control Modeの取得と処理
     ReadRegister(kWriteCmdControlMode_, &control_mode_, 1);
 
-    if (control_mode_ == 2) // Duty cycle input mode
-    {
+    if (control_mode_ == 2) { // Duty cycle input mode
         SetDriveFlag(true);
 
         // 指令dutyを取得。
@@ -52,8 +46,7 @@ void CubeWheel::MainRoutine(int count)
 
         SetTargetTorqueRw(torque_Nm);
     }
-    else if (control_mode_ == 3) // Speed controller mode
-    {
+    else if (control_mode_ == 3) { // Speed controller mode
         SetDriveFlag(true);
 
         // 指令speedを取得。
@@ -62,16 +55,14 @@ void CubeWheel::MainRoutine(int count)
         ReadRegister(0x05, &speedH, 1);  // 実際はアドレス2に2byte書かれるが、SILS上はC2A側でアドレス5,6に書く。
         ReadRegister(0x06, &speedL, 1);
 
-        if (speedH != 0xff && speedL != 0xff)
-        {
+        if (speedH != 0xff && speedL != 0xff) {
             double speed_raw = (double)((int16_t)((uint16_t)speedH + ((uint16_t)speedL << 8)));
             double commanded_speed_rpm = speed_raw / 2;
             double current_speed_rpm = GetVelocityRpm();
             double to_add_rpm = abs(commanded_speed_rpm - current_speed_rpm) / 2;
             double to_add_rad_s = to_add_rpm * 0.1047;
             double sign = 1;
-            if (commanded_speed_rpm < current_speed_rpm)
-            {
+            if (commanded_speed_rpm < current_speed_rpm) {
                 sign = -1;
             }
             double speed_cmd_cycle_in_sec = 0.5;
@@ -100,8 +91,7 @@ void CubeWheel::MainRoutine(int count)
     return;
 }
 
-std::string CubeWheel::GetLogHeader() const
-{
+std::string CubeWheel::GetLogHeader() const {
     std::string str_tmp = "";
     const std::string st_id = std::to_string(static_cast<long long>(port_id_));
 
@@ -110,8 +100,7 @@ std::string CubeWheel::GetLogHeader() const
     str_tmp += WriteScalar("cubewheel_angular_velocity_upperlimit" + st_id, "rpm");
     str_tmp += WriteScalar("cubewheel_angular_acceleration" + st_id, "rad/s^2");
 
-    if (is_logged_jitter_)
-    {
+    if (is_logged_jitter_) {
         str_tmp += WriteVector("cubewheel_jitter_force" + st_id, "c", "N", 3);
         str_tmp += WriteVector("cubewheel_jitter_torque" + st_id, "c", "Nm", 3);
     }
@@ -119,30 +108,24 @@ std::string CubeWheel::GetLogHeader() const
     return str_tmp;
 }
 
-int CubeWheel::GenerateTelemetry()
-{
+int CubeWheel::GenerateTelemetry() {
     unsigned char data[] = { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, };
 
     // state
     unsigned char state = 0;
-    if (backup_mode_state_)
-    {
+    if (backup_mode_state_) {
         state += (1 << 0);
     }
-    if (motor_state_)
-    {
+    if (motor_state_) {
         state += (1 << 1);
     }
-    if (hall_sensor_state_)
-    {
+    if (hall_sensor_state_) {
         state += (1 << 2);
     }
-    if (encoder_state_)
-    {
+    if (encoder_state_) {
         state += (1 << 3);
     }
-    if (error_flag_)
-    {
+    if (error_flag_) {
         state += (1 << 4);
     }
 

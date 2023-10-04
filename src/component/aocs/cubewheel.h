@@ -41,4 +41,3 @@ class CubeWheel : public RWModel, public ObcI2cCommunicationBase {
   int GenerateTelemetry();
 };
 #endif  // S2E_AOBC_COMPONENT_AOCS_CUBEWHEEL_HPP_
-
