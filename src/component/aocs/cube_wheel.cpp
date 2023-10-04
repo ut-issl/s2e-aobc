@@ -1,4 +1,4 @@
-#include "CubeWheel.h"
+#include "cube_wheel.h"
 
 CubeWheel::CubeWheel(RWModel rw_model, const int port_id, const unsigned char i2c_addr, OBC* obc)
     : RWModel(rw_model), ObcI2cCommunicationBase(port_id, i2c_addr, obc) {

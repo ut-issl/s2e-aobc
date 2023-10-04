@@ -1,5 +1,5 @@
-#ifndef S2E_AOBC_COMPONENT_AOCS_CUBEWHEEL_HPP_
-#define S2E_AOBC_COMPONENT_AOCS_CUBEWHEEL_HPP_
+#ifndef S2E_AOBC_COMPONENT_AOCS_CUBE_WHEEL_HPP_
+#define S2E_AOBC_COMPONENT_AOCS_CUBE_WHEEL_HPP_
 
 #include "../../../s2e_core_oss/src/Component/AOCS/RWModel.h"
 #include "../../../s2e_core_oss/src/Component/Abstract/ObcI2cCommunicationBase.h"
@@ -40,4 +40,4 @@ class CubeWheel : public RWModel, public ObcI2cCommunicationBase {
   int32_t ConvertMag2Tlm(double mag);
   int GenerateTelemetry();
 };
-#endif  // S2E_AOBC_COMPONENT_AOCS_CUBEWHEEL_HPP_
+#endif  // S2E_AOBC_COMPONENT_AOCS_CUBE_WHEEL_HPP_

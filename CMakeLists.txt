@@ -78,7 +78,7 @@ add_subdirectory(${S2E_CORE_DIR}/src/simulation s2e_core/simulation)
 # Add all cpp files as SOURCE_FILES
 file(GLOB_RECURSE SOURCE_FILES ${CMAKE_CURRENT_LIST_DIR}/src/*.cpp)
 # Uncomment the following line to exclude any files that match the REGEX from SOURCE_FILES
-list(FILTER SOURCE_FILES EXCLUDE REGEX ${CMAKE_CURRENT_LIST_DIR}/src/component/aocs/cubewheel.cpp)
+list(FILTER SOURCE_FILES EXCLUDE REGEX ${CMAKE_CURRENT_LIST_DIR}/src/component/aocs/cube_wheel.cpp)
 
 # Create executable file
 add_executable(${PROJECT_NAME} ${SOURCE_FILES})
