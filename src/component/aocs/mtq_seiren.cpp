@@ -1,3 +1,9 @@
+/**
+ * @file mtq_seiren.cpp
+ * @brief Class to emulate MTQ developed by Seiren
+ * @note Manual: NA
+ */
+
 #include "mtq_seiren.hpp"
 
 #include <library/utilities/macros.hpp>

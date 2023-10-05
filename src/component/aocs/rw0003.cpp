@@ -1,3 +1,8 @@
+/**
+ * @file rw0003.cpp
+ * @brief Class to emulate RW0.003 reaction wheel
+ */
+
 #include "rw0003.hpp"
 
 #include <math.h>
@@ -155,8 +160,7 @@ void RW0003::ReadCmdReadFile(const std::vector<uint8_t> payload) {
   if (payload[0] == kReadAddressTemperature_ || payload[0] == kReadAddressSpeed_) {
     // Set register address to kReadAddressSpeed_
     ReadRegister(kReadAddressSpeed_, rx, 1);
-    SendTelemetry(kTlmSize);  // Send only speed telemetry. Temperature Tlm will
-                              // be abnormal value.
+    SendTelemetry(kTlmSize);  // Send only speed telemetry. Temperature Tlm will be abnormal value.
   }
 }
 

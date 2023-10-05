@@ -1,3 +1,8 @@
+/**
+ * @file hils_if_driver.hpp
+ * @brief Interface driver to read GPIO information for HILS test
+ */
+
 #ifndef S2E_AOBC_INTERFACE_HILS_HILS_IF_DRIVER_HPP_
 #define S2E_AOBC_INTERFACE_HILS_HILS_IF_DRIVER_HPP_
 
@@ -6,21 +11,62 @@
 
 #include "../../component/aocs/mtq_seiren.hpp"
 
+/**
+ * @class HilsIfDriver
+ * @brief Interface driver to read GPIO information for HILS test
+ * @note HILS configuration
+ *       AOBC - MTQ communication port --GPIO-- PIC board --UART-- PC COM port - S2E
+ */
 class HilsIfDriver : public Component, public UartCommunicationWithObc, public GpioConnectionWithObc {
  public:
+  /**
+   * @fn HilsIfDriver
+   * @brief Constructor
+   * @param [in] prescaler: Prescaler
+   * @param [in] clock_gen: Clock generator
+   * @param [in] hils_port_id: HILS port ID
+   * @param [in] baud_rate: HILS communication baud rate
+   * @param [in] hils_port_manager: HILS port manager
+   * @param [in] gpio_ports: GPIO port information
+   * @param [in] obc: On Board Computer
+   */
   HilsIfDriver(const int prescaler, ClockGenerator *clock_gen, const unsigned int hils_port_id, const unsigned int baud_rate,
                HilsPortManager *hils_port_manager, std::vector<int> gpio_ports, OnBoardComputer *obc);
+  /**
+   * @fn ~HilsIfDriver
+   * @brief Destructor
+   */
   ~HilsIfDriver();
 
+  // Override functions for Component
+  /**
+   * @fn MainRoutine
+   * @brief Main routine for sensor observation
+   */
   void MainRoutine(int count) override;
 
  protected:
+  /**
+   * @fn ParseCommand
+   * @brief Override function for UART communication
+   * @param [in] cmd_size: Command size
+   */
   int ParseCommand(const int cmd_size) override;
+  /**
+   * @fn GenerateTelemetry
+   * @brief Override function for UART communication
+   */
   int GenerateTelemetry() override;
+
+  /**
+   * @fn ControlGpio
+   * @brief GPIO controller
+   */
   void ControlGpio();
 
-  static const uint8_t kRxMaxBytes_ = 6;
-  static const uint8_t kNumOfMtqGpio_ = 6;
-  bool is_high_mtq_[kNumOfMtqGpio_];
+  static const uint8_t kRxMaxBytes_ = 6;    //!< Receive max data size [byte]
+  static const uint8_t kNumOfMtqGpio_ = 6;  //!< Number of GPIO port for MTQ
+  bool is_high_mtq_[kNumOfMtqGpio_];        //!< MTQ GPIO states
 };
+
 #endif  // S2E_AOBC_INTERFACE_HILS_HILS_IF_DRIVER_HPP_

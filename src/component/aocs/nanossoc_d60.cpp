@@ -1,3 +1,9 @@
+/**
+ * @file nanossoc_d60.cpp
+ * @brief Class to emulate NanoSSOC D60 sun sensor
+ * @note Manual: NA
+ */
+
 #include "nanossoc_d60.hpp"
 #define _USE_MATH_DEFINES
 #include <string.h>  // for memcpy
@@ -58,15 +64,11 @@ int NanoSSOCD60::GenerateTelemetry() {
   return kTlmSize;
 }
 
-// Function to convert a float value to its internal 32-bit representation
 int32_t NanoSSOCD60::ConvertFloat2FloatingPoint(float data) {
-  int32_t internal_representation = *((int32_t *)&data);  // The internal representation of "data" in decimal
-                                                          // notation.
+  int32_t internal_representation = *((int32_t *)&data);  // The internal representation of "data" in decimal notation.
   return internal_representation;
 }
 
-// Convert the angle output by the sun sensor to deg units, and convert it to
-// internal representation.
 int32_t NanoSSOCD60::ConvertAngle2Tlm(double angle) {
   double angle_deg = angle * libra::rad_to_deg;
 

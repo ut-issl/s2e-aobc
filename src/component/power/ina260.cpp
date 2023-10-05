@@ -1,3 +1,8 @@
+/**
+ * @file ina260.cpp
+ * @brief Class to emulate INA260 current sensor
+ */
+
 #include "ina260.hpp"
 
 INA260::INA260(int prescaler, ClockGenerator *clock_gen, PowerPort *ina_power_port, const double ina_minimum_voltage,

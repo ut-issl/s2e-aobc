@@ -1,3 +1,8 @@
+/**
+ * @file rm3100.cpp
+ * @brief Class to emulate RM3100 magnetometer
+ */
+
 #include "rm3100.hpp"
 
 #include <library/utilities/macros.hpp>

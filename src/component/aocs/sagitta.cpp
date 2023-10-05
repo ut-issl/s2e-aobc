@@ -1,3 +1,9 @@
+/**
+ * @file sagitta.cpp
+ * @brief Class to emulate Sagitta star sensor
+ * @note Manual: NA
+ */
+
 #include "sagitta.hpp"
 
 #include <library/utilities/slip.hpp>
