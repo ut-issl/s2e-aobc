@@ -43,7 +43,7 @@ class AOBC : public Component {
    * @fn MainRoutine
    * @brief Main routine for sensor observation
    */
-  void MainRoutine(int count);
+  void MainRoutine(const int time_count);
 };
 
 #endif  // S2E_AOBC_COMPONENT_AOCS_AOBC_HPP_

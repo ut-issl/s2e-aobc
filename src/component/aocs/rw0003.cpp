@@ -16,8 +16,8 @@ RW0003::RW0003(ReactionWheel rw, const int sils_port_id, const unsigned int hils
   Initialize();
 }
 
-void RW0003::MainRoutine(int count) {
-  UNUSED(count);
+void RW0003::MainRoutine(const int time_count) {
+  UNUSED(time_count);
   // TODO: HILSで回転数テレメ要求と温度テレメ要求を別々に受け取れているか確認
   // 必要に応じてHILS時のCompoUpdateIntervalSecを小さくする
   if (ReceiveCommand() > 0) {

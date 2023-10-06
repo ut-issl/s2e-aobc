@@ -22,8 +22,8 @@ INA260::INA260(INA260 &&obj) noexcept
 
 INA260::~INA260() {}
 
-void INA260::MainRoutine(int count) {
-  UNUSED(count);
+void INA260::MainRoutine(const int time_count) {
+  UNUSED(time_count);
   // Read Registers
   ReadConfigCmd();
   ReadLimitValueCmd();

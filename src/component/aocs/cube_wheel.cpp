@@ -21,7 +21,7 @@ CubeWheel::CubeWheel(RWModel rw_model, const int port_id, const unsigned char i2
   }
 }
 
-void CubeWheel::MainRoutine(int count) {
+void CubeWheel::MainRoutine(const int time_count) {
   // Control Modeの取得と処理
   ReadRegister(kWriteCmdControlMode_, &control_mode_, 1);
 

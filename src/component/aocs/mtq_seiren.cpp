@@ -13,8 +13,8 @@ MTQseiren::MTQseiren(Magnetorquer mag_torquer, std::vector<int> gpio_ports, OnBo
 
 MTQseiren::~MTQseiren() {}
 
-void MTQseiren::MainRoutine(int count) {
-  UNUSED(count);
+void MTQseiren::MainRoutine(const int time_count) {
+  UNUSED(time_count);
   // Read GPIO state
   polarity_[0] = ConvertGPIOState2Polarity(GPIO_X_POSITIVE, GPIO_X_NEGATIVE);
   polarity_[1] = ConvertGPIOState2Polarity(GPIO_Y_POSITIVE, GPIO_Y_NEGATIVE);

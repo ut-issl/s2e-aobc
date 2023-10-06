@@ -14,7 +14,7 @@ Sagitta::Sagitta(StarSensor stt, const int sils_port_id, OnBoardComputer *obc, c
                  HilsPortManager *hils_port_manager)
     : StarSensor(stt), UartCommunicationWithObc(sils_port_id, obc, hils_port_id, baud_rate, hils_port_manager) {}
 
-void Sagitta::MainRoutine(int count) {
+void Sagitta::MainRoutine(const int time_count) {
   int receive_data_size = ReceiveCommand(0, kMaxCmdSize_);
 
   if (tlm_reply_mode_ == TLM_REPLY_MODE_SYNCHRONOUS && receive_data_size < 1) return;  // テレメ送信コマンドが送られていない場合
@@ -24,7 +24,7 @@ void Sagitta::MainRoutine(int count) {
     return;
   }
   status_ = 0;
-  counter_ += count;  // TODO: 内部カウンタに合わせて修正
+  counter_ += time_count;  // TODO: 内部カウンタに合わせて修正
 
   runtime_ms_ += uint32_t(step_time_s_ * 1000);
   unix_time_us_ += uint64_t(step_time_s_ * 1000000);  // TODO: unix時間にする。simtimeを内部でもつ？

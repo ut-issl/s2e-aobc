@@ -15,7 +15,7 @@ AOBC::~AOBC() { delete components_; }
 
 void AOBC::Initialize() {}
 
-void AOBC::MainRoutine(int count) {
-  UNUSED(count);
+void AOBC::MainRoutine(const int time_count) {
+  UNUSED(time_count);
   // Currently, this class is not used.
 }

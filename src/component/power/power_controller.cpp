@@ -39,8 +39,8 @@ PowerController::PowerController(PowerControlUnit pcu, const std::vector<int> gp
   power_port->SetVoltage_V(3.3);
 }
 
-void PowerController::MainRoutine(int count) {
-  UNUSED(count);
+void PowerController::MainRoutine(const int time_count) {
+  UNUSED(time_count);
   // 電源操作
 #ifdef USE_HILS  // TODO GPIO操作もHILSでできるようになったら削除する
   for (int i = 0; i < (int)PowerPortIdx::MAX; i++) {

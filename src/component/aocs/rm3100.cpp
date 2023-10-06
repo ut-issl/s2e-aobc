@@ -11,8 +11,8 @@ RM3100::RM3100(Magnetometer mag_sensor, const int sils_port_id, const unsigned i
                HilsPortManager *hils_port_manager)
     : Magnetometer(mag_sensor), I2cTargetCommunicationWithObc(sils_port_id, hils_port_id, i2c_addr, obc, hils_port_manager) {}
 
-void RM3100::MainRoutine(int count) {
-  UNUSED(count);
+void RM3100::MainRoutine(const int time_count) {
+  UNUSED(time_count);
   unsigned char mode_data[2] = {0, 0};
   ReadCommand(mode_data, 2);
   if (mode_data[0] == kModeSetRegId && mode_data[1] == kCmmModeSettings) mode_ = 0;

@@ -44,7 +44,7 @@ class Sagitta : public StarSensor, public UartCommunicationWithObc {
    * @fn MainRoutine
    * @brief Main routine for sensor observation
    */
-  void MainRoutine(int count) override;
+  void MainRoutine(const int time_count) override;
 
  private:
   /**

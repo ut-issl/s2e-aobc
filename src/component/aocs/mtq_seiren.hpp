@@ -35,7 +35,7 @@ class MTQseiren : public Magnetorquer, public GpioConnectionWithObc {
    * @fn MainRoutine
    * @brief Main routine for sensor observation
    */
-  void MainRoutine(int count) override;
+  void MainRoutine(const int time_count) override;
   // Override ILoggable
   /**
    * @fn GetLogHeader

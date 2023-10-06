@@ -36,7 +36,7 @@ class MPU9250_MAG : public Magnetometer, public I2cTargetCommunicationWithObc {
    * @fn MainRoutine
    * @brief Main routine for sensor observation
    */
-  void MainRoutine(int count) override;
+  void MainRoutine(const int time_count) override;
 
  private:
   // Status

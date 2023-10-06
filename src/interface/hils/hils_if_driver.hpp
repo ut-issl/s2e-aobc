@@ -43,7 +43,7 @@ class HilsIfDriver : public Component, public UartCommunicationWithObc, public G
    * @fn MainRoutine
    * @brief Main routine for sensor observation
    */
-  void MainRoutine(int count) override;
+  void MainRoutine(const int time_count) override;
 
  protected:
   /**

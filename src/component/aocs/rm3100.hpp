@@ -35,7 +35,7 @@ class RM3100 : public Magnetometer, public I2cTargetCommunicationWithObc {
    * @fn MainRoutine
    * @brief Main routine for sensor observation
    */
-  void MainRoutine(int count) override;
+  void MainRoutine(const int time_count) override;
   // Override ILoggable
   /**
    * @fn GetLogHeader

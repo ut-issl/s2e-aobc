@@ -54,7 +54,7 @@ class INA260 : public Component, public I2cTargetCommunicationWithObc {
    * @fn MainRoutine
    * @brief Main routine for sensor observation
    */
-  void MainRoutine(int count) override;
+  void MainRoutine(const int time_count) override;
 
  private:
   PowerPort *observation_power_port_;  //!< Power port to measure the current, voltage by the INA260

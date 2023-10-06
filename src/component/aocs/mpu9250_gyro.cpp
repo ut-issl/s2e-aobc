@@ -17,8 +17,8 @@ MPU9250_GYRO::MPU9250_GYRO(GyroSensor gyro, const int sils_port_id, const unsign
   SetConvertCoefficients();
 }
 
-void MPU9250_GYRO::MainRoutine(int count) {
-  UNUSED(count);
+void MPU9250_GYRO::MainRoutine(const int time_count) {
+  UNUSED(time_count);
   // Read Registers
   ReadCmdGyroEnable();
   ReadCmdMagEnable();

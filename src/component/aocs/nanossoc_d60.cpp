@@ -18,8 +18,8 @@ NanoSSOCD60::NanoSSOCD60(SunSensor sun_sensor, const int sils_port_id, const uns
 
 NanoSSOCD60::~NanoSSOCD60() {}
 
-void NanoSSOCD60::MainRoutine(int count) {
-  UNUSED(count);
+void NanoSSOCD60::MainRoutine(const int time_count) {
+  UNUSED(time_count);
   Measure();
   sun_intensity_percent_ = solar_illuminance_W_m2_ / srp_environment_->GetSolarConstant_W_m2() * 100.0;
 

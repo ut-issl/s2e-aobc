@@ -9,7 +9,7 @@ class CubeWheel : public RWModel, public ObcI2cCommunicationBase {
   CubeWheel(RWModel rw_model, const int port_id, const unsigned char i2c_addr, OBC* obc);
 
   // Override: RWModel functions
-  void MainRoutine(int count) override;
+  void MainRoutine(const int time_count) override;
   std::string GetLogHeader() const override;
 
  private:

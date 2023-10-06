@@ -13,8 +13,8 @@ HilsIfDriver::HilsIfDriver(const int prescaler, ClockGenerator *clock_gen, const
 
 HilsIfDriver::~HilsIfDriver() {}
 
-void HilsIfDriver::MainRoutine(int count) {
-  UNUSED(count);
+void HilsIfDriver::MainRoutine(const int time_count) {
+  UNUSED(time_count);
   // IFボードからデータ取得
   int ret = ReceiveCommand(0, kRxMaxBytes_);
   if (ret != 0) {

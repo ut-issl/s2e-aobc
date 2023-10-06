@@ -24,8 +24,8 @@ OEM7600::OEM7600(GnssReceiver gnssr, const int sils_port_id, OnBoardComputer *ob
                  const unsigned int baud_rate, HilsPortManager *hils_port_manager)
     : GnssReceiver(gnssr), UartCommunicationWithObc(sils_port_id, obc, hils_port_id, baud_rate, hils_port_manager), oem_tlm_ch_(oem_tlm_ch) {}
 
-void OEM7600::MainRoutine(int count) {
-  UNUSED(count);
+void OEM7600::MainRoutine(const int time_count) {
+  UNUSED(time_count);
   ReceiveCommand(0, MAX_CMD_LEN);
 
 #ifdef TLM_FUNCTION_DEBUG_MODE

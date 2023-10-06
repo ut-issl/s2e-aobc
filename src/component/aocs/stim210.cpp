@@ -17,8 +17,8 @@ STIM210::STIM210(GyroSensor gyro, double compo_step_sec, const int sils_port_id,
       counter_(0),
       compo_step_sec_(compo_step_sec) {}
 
-void STIM210::MainRoutine(int count) {
-  UNUSED(count);
+void STIM210::MainRoutine(const int time_count) {
+  UNUSED(time_count);
   ReceiveCommand(0, kMaxRxSize);
   angular_velocity_c_rad_s_ = quaternion_b2c_.FrameConversion(dynamics_->GetAttitude().GetAngularVelocity_b_rad_s());  // Convert frame
   angular_velocity_c_rad_s_ = Measure(angular_velocity_c_rad_s_);                                                      // Add noises

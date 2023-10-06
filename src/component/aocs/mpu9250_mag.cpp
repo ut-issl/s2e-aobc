@@ -11,8 +11,8 @@ MPU9250_MAG::MPU9250_MAG(Magnetometer mag_sensor, const int sils_port_id, const 
                          OnBoardComputer *obc, HilsPortManager *hils_port_manager, const bool *is_mag_on)
     : Magnetometer(mag_sensor), I2cTargetCommunicationWithObc(sils_port_id, hils_port_id, i2c_addr, obc, hils_port_manager), is_mag_on_(is_mag_on) {}
 
-void MPU9250_MAG::MainRoutine(int count) {
-  UNUSED(count);
+void MPU9250_MAG::MainRoutine(const int time_count) {
+  UNUSED(time_count);
   // Read Registers
   ReadCmdConfig();
 
