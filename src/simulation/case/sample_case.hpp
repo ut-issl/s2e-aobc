@@ -9,7 +9,7 @@
 #include <simulation/case/simulation_case.hpp>
 #include <simulation/monte_carlo_simulation/monte_carlo_simulation_executor.hpp>
 
-#include "../spacecraft/sample_satellite.h"
+#include "../spacecraft/sample_satellite.hpp"
 
 /**
  * @class SampleCase
