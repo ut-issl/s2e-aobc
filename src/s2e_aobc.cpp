@@ -1,6 +1,6 @@
 /**
  * @file s2e_aobc.cpp
- * @brief The main file of S2E-AOBC
+ * @brief The main file of S2E-AOBC (Attitude On Board Computer)
  */
 
 #ifdef WIN32
