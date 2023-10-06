@@ -62,22 +62,22 @@ class Ina260 : public Component, public I2cTargetCommunicationWithObc {
   double over_current_threshold_mA;    //!< Over current threshold [mA]
 
   /**
-   * @enum INA260_REGISTER
+   * @enum Ina260Register
    * @brief Ina260 register address
    */
-  enum class INA260_REGISTER : unsigned char {
-    CURRENT = 0x01,
-    VOLTAGE = 0x02,
+  enum class Ina260Register : unsigned char {
+    kCurrent = 0x01,
+    kVoltage = 0x02,
   };
 
   /**
-   * @enum INA260_CMD
+   * @enum Ina260Command
    * @brief Ina260 command ID
    */
-  enum class INA260_CMD : unsigned char {
-    CONFIG = 0x00,
-    LIMIT_MASK = 0x06,
-    LIMIT_VALUE = 0x07,
+  enum class Ina260Command : unsigned char {
+    kConfig = 0x00,
+    kLimitMask = 0x06,
+    kLimitValue = 0x07,
   };
 
   const double kConvertObservedValue = 1.25;  //!< Conversion value

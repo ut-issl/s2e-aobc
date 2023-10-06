@@ -63,8 +63,8 @@ void Ina260::GenerateTelemetry() {
     voltage_tlm_mV[i] = (unsigned char)(voltage_u16_mV >> 8 * (1 - i));  // voltage_tlm_tmp_mV[kTlmSize - i - 1];
   }
 
-  WriteRegister((unsigned char)INA260_REGISTER::CURRENT, current_tlm_mA, kTlmSize);
-  // WriteRegister((unsigned char)INA260_REGISTER::VOLTAGE, voltage_tlm_mV,
+  WriteRegister((unsigned char)Ina260Register::kCurrent, current_tlm_mA, kTlmSize);
+  // WriteRegister((unsigned char)Ina260Register::kVoltage, voltage_tlm_mV,
   // kTlmSize); //TODO　現在のI2C
   // Portの仕様では、1レジスタが8byte以上のパターンに対応できない
   UNUSED(voltage_tlm_mV);  // TODO 上をコメントアウトしたら削除する
@@ -75,7 +75,7 @@ void Ina260::GenerateTelemetry() {
 void Ina260::ReadConfigCmd() {
   unsigned char rx_data[3] = {0, 0, 0};
   ReadCommand(rx_data, 3);
-  if (rx_data[0] != (unsigned char)INA260_CMD::CONFIG) return;
+  if (rx_data[0] != (unsigned char)Ina260Command::kConfig) return;
 
   if (rx_data[1] == 0x62 && rx_data[2] == 0x07) mode_ = 0;
   return;
@@ -84,7 +84,7 @@ void Ina260::ReadConfigCmd() {
 void Ina260::ReadLimitMaskCmd() {
   unsigned char rx_data[3] = {0, 0, 0};
   ReadCommand(rx_data, 3);
-  if (rx_data[0] != (unsigned char)INA260_CMD::LIMIT_MASK) return;
+  if (rx_data[0] != (unsigned char)Ina260Command::kLimitMask) return;
 
   if (rx_data[1] == 0x80 && rx_data[2] == 0x01) {
     observation_power_port_->SetCurrentLimit_A(over_current_threshold_mA);
@@ -97,7 +97,7 @@ void Ina260::ReadLimitMaskCmd() {
 void Ina260::ReadLimitValueCmd() {
   unsigned char rx_data[3] = {0, 0, 0};
   ReadCommand(rx_data, 3);
-  if (rx_data[0] != (unsigned char)INA260_CMD::LIMIT_VALUE) return;
+  if (rx_data[0] != (unsigned char)Ina260Command::kLimitValue) return;
 
   unsigned short over_current_threshold_raw = 0x0000;
   for (int i = 0; i < 2; i++) {
