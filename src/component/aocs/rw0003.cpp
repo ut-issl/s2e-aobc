@@ -21,7 +21,7 @@ void Rw0003::MainRoutine(const int time_count) {
   // TODO: HILSで回転数テレメ要求と温度テレメ要求を別々に受け取れているか確認
   // 必要に応じてHILS時のCompoUpdateIntervalSecを小さくする
   if (ReceiveCommand() > 0) {
-    is_cmd_written_ = true;
+    is_command_written_ = true;
   }
 
   // Read Command
@@ -34,7 +34,7 @@ void Rw0003::MainRoutine(const int time_count) {
     WriteFloatTlm(kReadAddressSpeed_, (float)angular_velocity_rad_s_);
   }
 
-  is_cmd_written_ = false;
+  is_command_written_ = false;
   return;
 }
 
@@ -152,7 +152,7 @@ void Rw0003::ReadCmdWriteFile(const std::vector<uint8_t> payload) {
 void Rw0003::ReadCmdReadFile(const std::vector<uint8_t> payload) {
   if (payload.size() != 1) return;
   if (is_rw_initialized_ != true) return;
-  if (is_cmd_written_ != true) return;
+  if (is_command_written_ != true) return;
   // これ以降はHILS用に事前にテレメトリを溜めておく
   unsigned char rx[1];
   const int kTlmSize = 15;

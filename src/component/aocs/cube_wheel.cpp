@@ -58,8 +58,8 @@ void CubeWheel::MainRoutine(const int time_count) {
       if (commanded_speed_rpm < current_speed_rpm) {
         sign = -1;
       }
-      double speed_cmd_cycle_in_sec = 0.5;
-      double target_omega_dash = to_add_rad_s / speed_cmd_cycle_in_sec * sign;
+      double speed_command_cycle_in_sec = 0.5;
+      double target_omega_dash = to_add_rad_s / speed_command_cycle_in_sec * sign;
 
       // 指令トルクをセット。
       double torque_Nm = target_omega_dash * 0.00000211;

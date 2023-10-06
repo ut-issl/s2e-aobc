@@ -151,30 +151,30 @@ class Sagitta : public StarSensor, public UartCommunicationWithObc {
   /**
    * @fn GenerateTelemetryRunTime
    * @brief Generate runtime telemetry
-   * @param [in] cmd_reply_tlm: Replay telemetry ID
+   * @param [in] command_reply_tlm: Replay telemetry ID
    * @return Encoded telemetry size
    */
-  int GenerateTelemetryRunTime(const uint8_t cmd_reply_tlm);
+  int GenerateTelemetryRunTime(const uint8_t command_reply_tlm);
   /**
    * @fn GenerateTelemetryQuaternion
    * @brief Generate quaternion telemetry
-   * @param [in] cmd_reply_tlm: Replay telemetry ID
+   * @param [in] command_reply_tlm: Replay telemetry ID
    * @return Encoded telemetry size
    */
-  int GenerateTelemetryQuaternion(const uint8_t cmd_reply_tlm);
+  int GenerateTelemetryQuaternion(const uint8_t command_reply_tlm);
   /**
    * @fn GenerateTelemetryTemperature
    * @brief Generate temperature telemetry
-   * @param [in] cmd_reply_tlm: Replay telemetry ID
+   * @param [in] command_reply_tlm: Replay telemetry ID
    * @return Encoded telemetry size
    */
-  int GenerateTelemetryTemperature(const uint8_t cmd_reply_tlm);
+  int GenerateTelemetryTemperature(const uint8_t command_reply_tlm);
 
   /**
    * @fn EncodeSLIP
    * @brief Not used? FIXME: Delete
    */
-  int EncodeSLIP(unsigned char *tlm, const int cmd_data_len);
+  int EncodeSLIP(unsigned char *tlm, const int command_data_len);
 };
 
 #endif  // S2E_AOBC_COMPONENT_AOCS_SAGITTA_HPP_

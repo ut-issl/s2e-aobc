@@ -14,14 +14,14 @@
 #define OEM7600_MAX_CMD_ARG 8   //!< Max command argument number TODO: modified in the future as needed
 
 /**
- * @struct OEM7600_CMD
+ * @struct Oem7600Command
  * @brief OEM7600 command structure
  */
 typedef struct {
-  std::string cmd_name;                       //!< Command name
-  std::string cmd_args[OEM7600_MAX_CMD_ARG];  //!< Command argument list
-  bool is_valid;                              //!< Command validation flag
-} OEM7600_CMD;
+  std::string command_name;                       //!< Command name
+  std::string command_args[OEM7600_MAX_CMD_ARG];  //!< Command argument list
+  bool is_valid;                                  //!< Command validation flag
+} Oem7600Command;
 
 /**
  * @enum OEM7600_BINARY_TLM_ID
@@ -30,14 +30,14 @@ typedef struct {
 typedef enum { OEM7600_TLM_ID_BEST_XYZ = 0x00F1, OEM7600_TLM_ID_HARDWARE_MONITOR = 0x03C3, OEM7600_TLM_ID_ERROR = 0x0000 } OEM7600_BINARY_TLM_ID;
 
 /**
- * @struct OEM7600_TLM
+ * @struct Oem7600Telemetry
  * @brief OEM7600 telemetry structure
  */
 typedef struct {
-  std::string tlm_name = "";      //!< Telemetry name
-  std::string out_type = "once";  //!< Output type
-  unsigned int output_freq = 0;   //!< Output frequency
-  unsigned int count_to_out = 0;  //!< Count to output
+  std::string telemetry_name = "";    //!< Telemetry name
+  std::string out_type = "once";      //!< Output type
+  unsigned int output_frequency = 0;  //!< Output frequency
+  unsigned int count_to_out = 0;      //!< Count to output
 
   /**
    * @fn count_up
@@ -45,11 +45,11 @@ typedef struct {
    */
   void count_up() {
     count_to_out++;
-    if (count_to_out >= output_freq) {
+    if (count_to_out >= output_frequency) {
       count_to_out = 0;
     }
   }
-} OEM7600_TLM;
+} Oem7600Telemetry;
 
 /**
  * @class OEM7600
@@ -94,9 +94,9 @@ class Oem7600 : public GnssReceiver, public UartCommunicationWithObc {
   std::string GetLogHeader() const override;
 
  private:
-  const unsigned char telemetry_channel_;    //!< OEM7600 telemetry channel
-  std::vector<OEM7600_TLM> tlm_list_;        //!< Telemetry list
-  double last_position_fix_time_local_ = 0;  //!< Last position fix time TODO: removed after s2e-core modification
+  const unsigned char telemetry_channel_;         //!< OEM7600 telemetry channel
+  std::vector<Oem7600Telemetry> telemetry_list_;  //!< Telemetry list
+  double last_position_fix_time_local_ = 0;       //!< Last position fix time TODO: removed after s2e-core modification
 
   // Override functions for UartCommunicationWithObc
   /**
@@ -112,114 +112,114 @@ class Oem7600 : public GnssReceiver, public UartCommunicationWithObc {
   int GenerateTelemetry() override;
 
   /**
-   * @fn Update_local
+   * @fn UpdateLocal
    * @brief Update positioning information (TODO: removed after s2e-core modification)
    */
-  void Update_local();
+  void UpdateLocal();
 
   // Telemetry
   /**
-   * @fn Gen_TLM_Packet
+   * @fn GenerateTelemetryPacket
    * @brief Generate telemetry body
-   * @param [in] tlm_name: Telemetry name
+   * @param [in] telemetry_name: Telemetry name
    */
-  std::string Gen_TLM_Packet(const std::string tlm_name);
+  std::string GenerateTelemetryPacket(const std::string telemetry_name);
   /**
-   * @fn Gen_TLM_Header_Ascii
+   * @fn GenerateTelemetryHeaderAscii
    * @brief Generate telemetry header with ASCII format
-   * @param [in] tlm_name: Telemetry name
+   * @param [in] telemetry_name: Telemetry name
    */
-  std::string Gen_TLM_Header_Ascii(const std::string tlm_name);
+  std::string GenerateTelemetryHeaderAscii(const std::string telemetry_name);
   /**
-   * @fn Gen_BestXYZTlm_Ascii
+   * @fn GenerateBestxyzTelemetryAscii
    * @brief Generate "bestxyza" tlm with ASCII format
    */
-  std::string Gen_BestXYZTlm_Ascii(void);
+  std::string GenerateBestxyzTelemetryAscii(void);
   /**
-   * @fn Gen_BestXYZTlm_Ascii
+   * @fn GenerateBestxyzTelemetryAscii
    * @brief Generate "timea" tlm with ASCII format
    */
-  std::string Gen_TimeTlm_Ascii(void);
+  std::string GenerateTimeTelemetryAscii(void);
   /**
-   * @fn Gen_HWMonitorTlm_Ascii
+   * @fn GenerateHwmonitorTelemetryAscii
    * @brief Generate "hwmonitora" tlm with ASCII format
    */
-  std::string Gen_HWMonitorTlm_Ascii(void);
+  std::string GenerateHwmonitorTelemetryAscii(void);
   /**
-   * @fn Gen_GPGGATlm
+   * @fn GenerateGpggaTelemetry
    * @brief Generate "gpgga" tlm
    */
-  std::string Gen_GPGGATlm(void);
+  std::string GenerateGpggaTelemetry(void);
   /**
-   * @fn Gen_TLM_Header_Binary
+   * @fn GenerateTelemetryHeaderBinary
    * @brief Generate telemetry header with binary format
-   * @param [in] tlm_name: Telemetry name
+   * @param [in] telemetry_name: Telemetry name
    */
-  std::string Gen_TLM_Header_Binary(const std::string tlm_name);
+  std::string GenerateTelemetryHeaderBinary(const std::string telemetry_name);
   /**
-   * @fn Gen_BestXYZTlm_Binary
+   * @fn GenerateBestxyzTelemetryBinary
    * @brief Generate "bestxyza" tlm with binary format
    */
-  std::string Gen_BestXYZTlm_Binary(void);
+  std::string GenerateBestxyzTelemetryBinary(void);
   /**
-   * @fn Gen_HWMonitorTlm_Binary
+   * @fn GenerateHwmonitorTelemetryBinary
    * @brief Generate "hwmonitora" tlm with binary format
    */
-  std::string Gen_HWMonitorTlm_Binary(void);
+  std::string GenerateHwmonitorTelemetryBinary(void);
 
   // CMD
   /**
    * @fn DecodeCommand
    * @brief Command decoder
    */
-  OEM7600_CMD DecodeCommand();
+  Oem7600Command DecodeCommand();
   /**
-   * @fn Cmd_LOG
+   * @fn CommandLog
    * @brief Decoder correspond to "log" command
    */
-  int Cmd_LOG(const std::string comport_ID, const std::string tlm_name, const std::string type, const std::string freq);
+  int CommandLog(const std::string comport_id, const std::string telemetry_name, const std::string type, const std::string freq);
 
   /**
-   * @fn OEM7600_calculate_crc32
+   * @fn CalculateCrc32
    * @brief CRC calculation TODO: Move to s2e-core's library
    */
-  unsigned int OEM7600_calculate_crc32(const char *tlm_data_for_crc, const size_t data_length);
+  unsigned int CalculateCrc32(const char *tlm_data_for_crc, const size_t data_length);
   /**
-   * @fn OEM7600_calculate_crc32_subroutine
+   * @fn CalculateCrc32Subroutine
    * @brief CRC calculation TODO: Move to s2e-core's library
    */
-  unsigned int OEM7600_calculate_crc32_subroutine(const unsigned int initial_value);
+  unsigned int CalculateCrc32Subroutine(const unsigned int initial_value);
 
   /**
-   * @fn TLM_NameSearch
+   * @fn TelemetryNameSearch
    * @brief Check wether the designated tlm name in "log" cmd is valid or not
-   * @param [in] tlm_name: Telemetry name
+   * @param [in] telemetry_name: Telemetry name
    * @return Valid or not
    */
-  bool TLM_NameSearch(const std::string tlm_name);
+  bool TelemetryNameSearch(const std::string telemetry_name);
   /**
    * @fn GetTlmIdOfBinaryTlm
    * @brief Get tlm id for binary format tlm packet
-   * @param [in] tlm_name: Telemetry name
+   * @param [in] telemetry_name: Telemetry name
    * @return telemetry ID
    */
-  OEM7600_BINARY_TLM_ID GetTlmIdOfBinaryTlm(const std::string tlm_name);
+  OEM7600_BINARY_TLM_ID GetTlmIdOfBinaryTlm(const std::string telemetry_name);
   /**
    * @fn GetTlmLengthOfBinaryTlm
    * @brief Get tlm length of variable part for binary format tlm
-   * @param [in] tlm_name: Telemetry name
+   * @param [in] telemetry_name: Telemetry name
    * @return Telemetry length
    */
-  unsigned short GetTlmLengthOfBinaryTlm(const std::string tlm_name);
+  unsigned short GetTlmLengthOfBinaryTlm(const std::string telemetry_name);
 
   /**
    * @fn ConvLatLonToNmea
    * @brief Convert lat/lon in [rad] to NMEA format
-   * @param [in] rad: latitude or longitude
+   * @param [in] angle_rad: latitude or longitude
    * @param [in] type: lat or lon
    * @return Converted result
    */
-  std::string ConvLatLonToNmea(const double rad, const std::string type);
+  std::string ConvLatLonToNmea(const double angle_rad, const std::string type);
 
   /**
    * @fn StringZeroPaddingLocal
@@ -245,8 +245,8 @@ class Oem7600 : public GnssReceiver, public UartCommunicationWithObc {
    */
   std::vector<unsigned char> ConvertFloatToByte(const float float_data);
 
-  const std::string tlm_name_dictionary_[OEM7600_MAX_TLM_LIST] = {"bestxyza",   "timea",    "gpgga",
-                                                                  "hwmonitora", "bestxyzb", "hwmonitorb"};  //!< Telemetry name list
+  const std::string telemetry_name_dictionary_[OEM7600_MAX_TLM_LIST] = {"bestxyza",   "timea",    "gpgga",
+                                                                        "hwmonitora", "bestxyzb", "hwmonitorb"};  //!< Telemetry name list
 };
 
 #endif  // S2E_AOBC_COMPONENT_AOCS_OEM7600_HPP_

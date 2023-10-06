@@ -285,9 +285,9 @@ int16_t Stim210::ConvertTemp2Tlm(double temp) {
 
 int Stim210::AnalyzeCmdServiceMode(std::vector<unsigned char> cmd) {
   const int kTlmSize = 12;
-  unsigned char cmd_servicemode[kTlmSize] = {'S', 'E', 'R', 'V', 'I', 'C', 'E', 'M', 'O', 'D', 'E', termination_cr};
+  unsigned char command_servicemode[kTlmSize] = {'S', 'E', 'R', 'V', 'I', 'C', 'E', 'M', 'O', 'D', 'E', termination_cr};
   for (int i = 0; i < kTlmSize; i++) {
-    if (cmd_servicemode[i] != cmd[i]) return -1;
+    if (command_servicemode[i] != cmd[i]) return -1;
   }
 
   operation_mode_ = OPERATION_SERVICE_MODE;
@@ -297,9 +297,9 @@ int Stim210::AnalyzeCmdServiceMode(std::vector<unsigned char> cmd) {
 
 int Stim210::AnalyzeCmdNormalMode(std::vector<unsigned char> cmd) {
   const int kTlmSize = 4;
-  unsigned char cmd_servicemode[kTlmSize] = {'x', ' ', 'N', termination_cr};
+  unsigned char command_servicemode[kTlmSize] = {'x', ' ', 'N', termination_cr};
   for (int i = 0; i < kTlmSize; i++) {
-    if (cmd_servicemode[i] != cmd[i]) return -1;
+    if (command_servicemode[i] != cmd[i]) return -1;
   }
 
   operation_mode_ = OPERATION_NORMAL_MODE;
