@@ -213,22 +213,22 @@ class Oem7600 : public GnssReceiver, public UartCommunicationWithObc {
   unsigned short GetTlmLengthOfBinaryTlm(const std::string tlm_name);
 
   /**
-   * @fn convLatLontoNMEA
+   * @fn ConvLatLonToNmea
    * @brief Convert lat/lon in [rad] to NMEA format
    * @param [in] rad: latitude or longitude
    * @param [in] type: lat or lon
    * @return Converted result
    */
-  std::string convLatLontoNMEA(const double rad, const std::string type);
+  std::string ConvLatLonToNmea(const double rad, const std::string type);
 
   /**
-   * @fn string_zeropad_local
+   * @fn StringZeroPaddingLocal
    * @brief Add zero for padding
    * @param [in] str_org: input string
    * @param [in] len: length of output
    * @return String with zero padding
    */
-  std::string string_zeropad_local(const std::string str_org, const unsigned int len);
+  std::string StringZeroPaddingLocal(const std::string str_org, const unsigned int len);
 
   /**
    * @fn ConvertDoubleToByte
