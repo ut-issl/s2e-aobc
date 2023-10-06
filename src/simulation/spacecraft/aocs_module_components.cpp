@@ -5,13 +5,6 @@
 
 #include "aocs_module_components.h"
 
-#include <components/real/aocs/initialize_gnss_receiver.hpp>
-#include <components/real/aocs/initialize_gyro_sensor.hpp>
-#include <components/real/aocs/initialize_magnetometer.hpp>
-#include <components/real/aocs/initialize_magnetorquer.hpp>
-#include <components/real/aocs/initialize_reaction_wheel.hpp>
-#include <components/real/aocs/initialize_star_sensor.hpp>
-#include <components/real/aocs/initialize_sun_sensor.hpp>
 #include <components/real/power/csv_scenario_interface.hpp>
 #include <library/initialize/initialize_file_access.hpp>
 #include <vector>

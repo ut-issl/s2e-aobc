@@ -26,9 +26,9 @@
 #include "../../component/aocs/sagitta.hpp"
 #include "../../component/aocs/stim210.hpp"
 // Propulsion
-#include <components/real/propulsion/initialize_simple_thruster.hpp>
+#include <components/real/propulsion/simple_thruster.hpp>
 // Mission
-#include <components/real/mission/initialize_telescope.hpp>
+#include <components/real/mission/telescope.hpp>
 // HILS IF
 #include "../../interface/hils/hils_if_driver.hpp"
 // Communication
