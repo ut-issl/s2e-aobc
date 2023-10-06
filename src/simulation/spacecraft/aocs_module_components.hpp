@@ -17,7 +17,7 @@
 #include "../../component/power/power_controller.hpp"
 // AOCS
 #include "../../component/aocs/mpu9250_gyro.hpp"
-#include "../../component/aocs/mpu9250_mag.hpp"
+#include "../../component/aocs/mpu9250_magnetometer.hpp"
 #include "../../component/aocs/mtq_seiren.hpp"
 #include "../../component/aocs/nano_ssoc_d60.hpp"
 #include "../../component/aocs/oem7600.hpp"
@@ -85,18 +85,18 @@ class AocsModuleComponents : public InstalledComponents {
   PowerController *power_controller_;  //!< Power switch controller
   std::vector<Ina260> ina260s_;        //!< Ina260 current sensor
   // AOCS
-  MPU9250_GYRO *mpu9250_gyro_sensor_;         //!< MPU9250 gyro sensor
-  Mpu9250Magnetometer *mpu9250_magnetometer_;         //!< MPU9250 magnetometer
-  Rm3100 *rm3100_aobc_;                       //!< RM3100 magnetometer on AOBC circuit board
-  Rm3100 *rm3100_external_;                   //!< External RM3100 magnetometer
-  std::vector<NanoSsocD60 *> nano_ssoc_d60_;  //!< NanoSSOC-D60 sun sensor
-  MtqSeiren *mtq_seiren_;                     //!< MTQ
-  Oem7600 *oem7600_;                          //!< OEM7600 GNSS Receiver
-  Sagitta *sagitta_;                          //!< Sagitta Star tracker
-  Stim210 *stim210_;                          //!< Stim210 gyro sensor
-  Rw0003 *rw0003_x_;                          //!< RW00003 Reaction wheel X axis
-  Rw0003 *rw0003_y_;                          //!< RW00003 Reaction wheel Y axis
-  Rw0003 *rw0003_z_;                          //!< RW00003 Reaction wheel Z axis
+  MPU9250_GYRO *mpu9250_gyro_sensor_;          //!< MPU9250 gyro sensor
+  Mpu9250Magnetometer *mpu9250_magnetometer_;  //!< MPU9250 magnetometer
+  Rm3100 *rm3100_aobc_;                        //!< RM3100 magnetometer on AOBC circuit board
+  Rm3100 *rm3100_external_;                    //!< External RM3100 magnetometer
+  std::vector<NanoSsocD60 *> nano_ssoc_d60_;   //!< NanoSSOC-D60 sun sensor
+  MtqSeiren *mtq_seiren_;                      //!< MTQ
+  Oem7600 *oem7600_;                           //!< OEM7600 GNSS Receiver
+  Sagitta *sagitta_;                           //!< Sagitta Star tracker
+  Stim210 *stim210_;                           //!< Stim210 gyro sensor
+  Rw0003 *rw0003_x_;                           //!< RW00003 Reaction wheel X axis
+  Rw0003 *rw0003_y_;                           //!< RW00003 Reaction wheel Y axis
+  Rw0003 *rw0003_z_;                           //!< RW00003 Reaction wheel Z axis
   // Thruster
   SimpleThruster *thruster_;  //!< Thruster
   // Mission
