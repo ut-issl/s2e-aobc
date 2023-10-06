@@ -21,7 +21,7 @@ class CubeWheel : public RWModel, public ObcI2cCommunicationBase {
   unsigned char encoder_state_ = 0;
   unsigned char error_flag_ = 0;
 
-  double lsb2nT_ = 13.0;
+  double kLsb2nT_ = 13.0;
   int port_id_ = 0;
 
   // Write Command

@@ -49,7 +49,7 @@ class Rm3100 : public Magnetometer, public I2cTargetCommunicationWithObc {
   const unsigned char kModeSetRegId = 0x01;     //!< Register address of mode setting
   const unsigned char kCmmModeSettings = 0x7d;  //!< CMM mode setting command
 
-  double lsb2nT_ = 13.0;                    //!< Convert coefficient raw to nT
+  const double kLsb2nT_ = 13.0;             //!< Convert coefficient raw to nT
   const unsigned int kStoredFrameSize = 3;  //!< Stored frame size for HILS
 
   /**

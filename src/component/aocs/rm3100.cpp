@@ -58,7 +58,7 @@ int Rm3100::GenerateTelemetry() {
 }
 
 int32_t Rm3100::ConvertMag2Tlm(double mag) {
-  int32_t mag_c_bit = (int32_t)(mag / lsb2nT_);
+  int32_t mag_c_bit = (int32_t)(mag / kLsb2nT_);
 
   // Limits
   int32_t upper_limit = 0x007FFFFF;        // Signed 24bit max value
