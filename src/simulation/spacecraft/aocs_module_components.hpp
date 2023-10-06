@@ -94,9 +94,9 @@ class AocsModuleComponents : public InstalledComponents {
   OEM7600 *oem7600_;                          //!< OEM7600 GNSS Receiver
   Sagitta *sagitta_;                          //!< Sagitta Star tracker
   Stim210 *stim210_;                          //!< Stim210 gyro sensor
-  RW0003 *rw0003_x_;                          //!< RW00003 Reaction wheel X axis
-  RW0003 *rw0003_y_;                          //!< RW00003 Reaction wheel Y axis
-  RW0003 *rw0003_z_;                          //!< RW00003 Reaction wheel Z axis
+  Rw0003 *rw0003_x_;                          //!< RW00003 Reaction wheel X axis
+  Rw0003 *rw0003_y_;                          //!< RW00003 Reaction wheel Y axis
+  Rw0003 *rw0003_z_;                          //!< RW00003 Reaction wheel Z axis
   // Thruster
   SimpleThruster *thruster_;  //!< Thruster
   // Mission

@@ -14,13 +14,13 @@
 #include "../../library/crc.hpp"
 
 /**
- * @class RW0003
+ * @class Rw0003
  * @brief Class to emulate RW0.003 reaction wheel
  */
-class RW0003 : public ReactionWheel, public I2cTargetCommunicationWithObc {
+class Rw0003 : public ReactionWheel, public I2cTargetCommunicationWithObc {
  public:
   /**
-   * @fn RW0003
+   * @fn Rw0003
    * @brief Constructor
    * @param [in] rw: Reaction wheel settings
    * @param [in] sils_port_id: Port ID for SILS
@@ -29,7 +29,7 @@ class RW0003 : public ReactionWheel, public I2cTargetCommunicationWithObc {
    * @param [in] obc: Connected OBC
    * @param [in] hils_port_manager: HILS port manager
    */
-  RW0003(ReactionWheel rw, const int sils_port_id, const unsigned int hils_port_id, const unsigned char i2c_addr, OnBoardComputer *obc,
+  Rw0003(ReactionWheel rw, const int sils_port_id, const unsigned int hils_port_id, const unsigned char i2c_addr, OnBoardComputer *obc,
          HilsPortManager *hils_port_manager);
 
   // Override functions for Component

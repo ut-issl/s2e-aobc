@@ -10,13 +10,13 @@
 #include <library/utilities/macros.hpp>
 #include <library/utilities/slip.hpp>
 
-RW0003::RW0003(ReactionWheel rw, const int sils_port_id, const unsigned int hils_port_id, const unsigned char i2c_addr, OnBoardComputer *obc,
+Rw0003::Rw0003(ReactionWheel rw, const int sils_port_id, const unsigned int hils_port_id, const unsigned char i2c_addr, OnBoardComputer *obc,
                HilsPortManager *hils_port_manager)
     : ReactionWheel(rw), I2cTargetCommunicationWithObc(sils_port_id, hils_port_id, i2c_addr, obc, hils_port_manager) {
   Initialize();
 }
 
-void RW0003::MainRoutine(const int time_count) {
+void Rw0003::MainRoutine(const int time_count) {
   UNUSED(time_count);
   // TODO: HILSで回転数テレメ要求と温度テレメ要求を別々に受け取れているか確認
   // 必要に応じてHILS時のCompoUpdateIntervalSecを小さくする
@@ -38,7 +38,7 @@ void RW0003::MainRoutine(const int time_count) {
   return;
 }
 
-std::string RW0003::GetLogHeader() const {
+std::string Rw0003::GetLogHeader() const {
   std::string str_tmp = "";
 
   str_tmp += WriteScalar("RW0003_angular_velocity", "rad/s");
@@ -54,7 +54,7 @@ std::string RW0003::GetLogHeader() const {
   return str_tmp;
 }
 
-void RW0003::ReadCmd() {
+void Rw0003::ReadCmd() {
   uint8_t rx_data[kMaxCmdLength_] = {0};
   ReadCommand(rx_data, kMaxCmdLength_);
 
@@ -101,7 +101,7 @@ void RW0003::ReadCmd() {
   return;
 }
 
-uint8_t RW0003::decode_mcf(uint8_t *cmd_id, const uint8_t mcf) {
+uint8_t Rw0003::decode_mcf(uint8_t *cmd_id, const uint8_t mcf) {
   uint8_t mask = 0x7f;
   *cmd_id = mcf & mask;
   if (mcf & 0x80)
@@ -110,7 +110,7 @@ uint8_t RW0003::decode_mcf(uint8_t *cmd_id, const uint8_t mcf) {
     return 0;  // without reply
 }
 
-void RW0003::ReadCmdInit(const std::vector<uint8_t> payload) {
+void Rw0003::ReadCmdInit(const std::vector<uint8_t> payload) {
   if (payload.size() != 4) return;
   std::vector<uint8_t> initial_address{0x00, 0x10, 0x00, 0x00};
   bool is_equal = std::equal(payload.cbegin(), payload.cend(), initial_address.cbegin());
@@ -123,7 +123,7 @@ void RW0003::ReadCmdInit(const std::vector<uint8_t> payload) {
   return;
 }
 
-void RW0003::ReadCmdWriteFile(const std::vector<uint8_t> payload) {
+void Rw0003::ReadCmdWriteFile(const std::vector<uint8_t> payload) {
   if (payload.size() != 6) return;
   if (payload[0] != 0x00) return;
 
@@ -149,7 +149,7 @@ void RW0003::ReadCmdWriteFile(const std::vector<uint8_t> payload) {
   return;
 }
 
-void RW0003::ReadCmdReadFile(const std::vector<uint8_t> payload) {
+void Rw0003::ReadCmdReadFile(const std::vector<uint8_t> payload) {
   if (payload.size() != 1) return;
   if (is_rw_initialized_ != true) return;
   if (is_cmd_written_ != true) return;
@@ -164,7 +164,7 @@ void RW0003::ReadCmdReadFile(const std::vector<uint8_t> payload) {
   }
 }
 
-void RW0003::WriteFloatTlm(uint8_t address, float value) {
+void Rw0003::WriteFloatTlm(uint8_t address, float value) {
   std::vector<uint8_t> tlm{kMcfReadEdac_};
   tlm.push_back(address);
 
@@ -194,7 +194,7 @@ void RW0003::WriteFloatTlm(uint8_t address, float value) {
   WriteRegister(address, &tlm_slip[0], tlm_slip.size());
 }
 
-void RW0003::Initialize() {
+void Rw0003::Initialize() {
   // HILS用に事前にテレメトリを溜めておく
   unsigned char rx[1];
   const int kTlmSize = 15;
