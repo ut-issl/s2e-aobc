@@ -40,17 +40,17 @@ class Mpu9250Magnetometer : public Magnetometer, public I2cTargetCommunicationWi
 
  private:
   // Status
-  const bool *is_mag_on_;        //!< Magnetometer ON/OFF flag which is managed by MPU9250_GYRO
-  unsigned char config_ = 0x00;  //!< Configuration infomation
-  unsigned char status_ = 0;     //!< Status TODO: Implement. Currently, this is not used.
+  const bool *is_magnetometer_on_;      //!< Magnetometer ON/OFF flag which is managed by MPU9250_GYRO
+  unsigned char configuration_ = 0x00;  //!< Configuration infomation
+  unsigned char status_ = 0;            //!< Status TODO: Implement. Currently, this is not used.
 
   // TlmCmd parameters
   const unsigned char kTlmSize_ = 2;                  //!< Telemetry size
   const double raw_max_ = pow(2, 8 * kTlmSize_ - 1);  //!< MAximum value of raw measurement value
 
   // TODO:本当はSensorBaseの最大値と関連付けたいが、今はPrivate変数になっているので、ひとまずこれで
-  const double mag_max_uT_ = 4800.0;                             //!< Maximum observation value [uT]
-  const double mag_convert_uT_to_raw_ = raw_max_ / mag_max_uT_;  //!< Conversion coefficients [uT -> raw]
+  const double magnetometer_max_uT_ = 4800.0;                                      //!< Maximum observation value [uT]
+  const double magnetometer_convert_uT_to_raw_ = raw_max_ / magnetometer_max_uT_;  //!< Conversion coefficients [uT -> raw]
 
   // Registers
   const unsigned char kRegObsMag_ = 0x02;  //!< Register address of magnetometer observation value

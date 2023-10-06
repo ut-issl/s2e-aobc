@@ -12,7 +12,7 @@ Mpu9250Magnetometer::Mpu9250Magnetometer(Magnetometer magnetometer, const int si
                                          const bool *is_mag_on)
     : Magnetometer(magnetometer),
       I2cTargetCommunicationWithObc(sils_port_id, hils_port_id, i2c_address, obc, hils_port_manager),
-      is_mag_on_(is_mag_on) {}
+      is_magnetometer_on_(is_mag_on) {}
 
 void Mpu9250Magnetometer::MainRoutine(const int time_count) {
   UNUSED(time_count);
@@ -20,7 +20,7 @@ void Mpu9250Magnetometer::MainRoutine(const int time_count) {
   ReadCmdConfig();
 
   // Generate TLM
-  if (*is_mag_on_ == true && config_ == 0x16)  // Power ON and 100Hz Continuous Measurement Mode
+  if (*is_magnetometer_on_ == true && configuration_ == 0x16)  // Power ON and 100Hz Continuous Measurement Mode
   {
     magnetic_field_c_nT_ = quaternion_b2c_.FrameConversion(geomagnetic_field_->GetGeomagneticField_b_nT());  // Convert frame
     magnetic_field_c_nT_ = Measure(magnetic_field_c_nT_);                                                    // Add noises
@@ -40,7 +40,7 @@ void Mpu9250Magnetometer::ReadCmdConfig() {
   ReadCommand(tmp, 2);
   if (tmp[0] != kCmdMagConfig_) return;
 
-  config_ = tmp[1];
+  configuration_ = tmp[1];
 
   return;
 }
@@ -56,7 +56,7 @@ void Mpu9250Magnetometer::WriteMagTlm() {
   // MAG
   for (size_t i = 0; i < kMagnetometerDimension; i++) {
     double mag_c_uT = magnetic_field_c_nT_[i] / 1000.0;
-    Convert2Tlm(tlm, mag_c_uT * mag_convert_uT_to_raw_);
+    Convert2Tlm(tlm, mag_c_uT * magnetometer_convert_uT_to_raw_);
     WriteRegister(reg_id, tlm, kTlmSize_);
     reg_id += kTlmSize_;
   }

@@ -52,7 +52,7 @@ void MPU9250_GYRO::ReadCmdMagEnable() {
   ReadCommand(tmp, 2);
   if (tmp[0] != kCmdMagEnable_) return;
 
-  if (tmp[1] == 0x02) is_mag_on_ = true;  // 0x02 means turn on mag
+  if (tmp[1] == 0x02) is_magnetometer_on_ = true;  // 0x02 means turn on mag
 
   return;
 }

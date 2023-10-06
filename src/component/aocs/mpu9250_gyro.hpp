@@ -43,11 +43,11 @@ class MPU9250_GYRO : public GyroSensor, public I2cTargetCommunicationWithObc {
    * @fn GetIsMagOn
    * @brief Return the internal magnetometer is ON or OFF
    */
-  inline const bool *GetIsMagOn(void) const { return &is_mag_on_; }
+  inline const bool *GetIsMagOn(void) const { return &is_magnetometer_on_; }
 
  private:
   bool is_gyro_on_ = false;  //!< Gyro sensor enable status
-  bool is_mag_on_ = false;   //!< Magnetometer enable status
+  bool is_magnetometer_on_ = false;   //!< Magnetometer enable status
 
   // TODO:本当はSensorBaseの最大値と関連付けたいが、今はPrivate変数になっているので、ひとまずこれで
   double omega_max_deg_s_ = 250.0;                       //!< Maximum angular rate measurement limit
