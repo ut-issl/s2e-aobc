@@ -7,11 +7,11 @@
 
 #include <library/utilities/macros.hpp>
 
-RM3100::RM3100(Magnetometer mag_sensor, const int sils_port_id, const unsigned int hils_port_id, const unsigned char i2c_address, OnBoardComputer *obc,
-               HilsPortManager *hils_port_manager)
+Rm3100::Rm3100(Magnetometer mag_sensor, const int sils_port_id, const unsigned int hils_port_id, const unsigned char i2c_address,
+               OnBoardComputer *obc, HilsPortManager *hils_port_manager)
     : Magnetometer(mag_sensor), I2cTargetCommunicationWithObc(sils_port_id, hils_port_id, i2c_address, obc, hils_port_manager) {}
 
-void RM3100::MainRoutine(const int time_count) {
+void Rm3100::MainRoutine(const int time_count) {
   UNUSED(time_count);
   unsigned char mode_data[2] = {0, 0};
   ReadCommand(mode_data, 2);
@@ -33,15 +33,15 @@ void RM3100::MainRoutine(const int time_count) {
   return;
 }
 
-std::string RM3100::GetLogHeader() const {
+std::string Rm3100::GetLogHeader() const {
   std::string str_tmp = "";
-  std::string MSSection = "RM3100";
+  std::string MSSection = "Rm3100";
   str_tmp += WriteVector(MSSection, "c", "nT", 3);
 
   return str_tmp;
 }
 
-int RM3100::GenerateTelemetry() {
+int Rm3100::GenerateTelemetry() {
   const int kTlmSize = 9;  //(24bit = 3 Byte) * 3 axis
   const int kByte2Bit = 8;
   unsigned char tlm[kTlmSize] = {1, 2, 3, 0, 0, 0, 0, 0, 4};
@@ -57,7 +57,7 @@ int RM3100::GenerateTelemetry() {
   return kTlmSize;
 }
 
-int32_t RM3100::ConvertMag2Tlm(double mag) {
+int32_t Rm3100::ConvertMag2Tlm(double mag) {
   int32_t mag_c_bit = (int32_t)(mag / lsb2nT_);
 
   // Limits

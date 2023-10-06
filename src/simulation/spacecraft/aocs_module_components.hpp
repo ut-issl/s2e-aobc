@@ -87,8 +87,8 @@ class AocsModuleComponents : public InstalledComponents {
   // AOCS
   MPU9250_GYRO *mpu9250_gyro_sensor_;         //!< MPU9250 gyro sensor
   MPU9250_MAG *mpu9250_magnetometer_;         //!< MPU9250 magnetometer
-  RM3100 *rm3100_aobc_;                       //!< RM3100 magnetometer on AOBC circuit board
-  RM3100 *rm3100_external_;                   //!< External RM3100 magnetometer
+  Rm3100 *rm3100_aobc_;                       //!< RM3100 magnetometer on AOBC circuit board
+  Rm3100 *rm3100_external_;                   //!< External RM3100 magnetometer
   std::vector<NanoSSOCD60 *> nano_ssoc_d60_;  //!< NanoSSOC-D60 sun sensor
   MTQseiren *mtq_seiren_;                     //!< MTQ
   OEM7600 *oem7600_;                          //!< OEM7600 GNSS Receiver

@@ -12,13 +12,13 @@
 #include <components/real/aocs/magnetometer.hpp>
 
 /**
- * @class RM3100
+ * @class Rm3100
  * @brief Class to emulate RM3100 magnetometer
  */
-class RM3100 : public Magnetometer, public I2cTargetCommunicationWithObc {
+class Rm3100 : public Magnetometer, public I2cTargetCommunicationWithObc {
  public:
   /**
-   * @fn RM3100
+   * @fn Rm3100
    * @brief Constructor
    * @param [in] mag_sensor: Magnetometer settings
    * @param [in] sils_port_id: Port ID for SILS
@@ -27,7 +27,7 @@ class RM3100 : public Magnetometer, public I2cTargetCommunicationWithObc {
    * @param [in] obc: Connected OBC
    * @param [in] hils_port_manager: HILS port manager
    */
-  RM3100(Magnetometer mag_sensor, const int sils_port_id, const unsigned int hils_port_id, const unsigned char i2c_address, OnBoardComputer *obc,
+  Rm3100(Magnetometer mag_sensor, const int sils_port_id, const unsigned int hils_port_id, const unsigned char i2c_address, OnBoardComputer *obc,
          HilsPortManager *hils_port_manager);
 
   // Override functions for Component
