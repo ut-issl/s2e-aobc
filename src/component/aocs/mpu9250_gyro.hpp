@@ -5,8 +5,8 @@
  *       Functions not used in the project are not implemented
  */
 
-#ifndef S2E_AOBC_COMPONENT_AOCS_MPU9250_GYRO_HPP_
-#define S2E_AOBC_COMPONENT_AOCS_MPU9250_GYRO_HPP_
+#ifndef S2E_AOBC_COMPONENT_AOCS_MPU9250_GYRO_SENSOR_HPP_
+#define S2E_AOBC_COMPONENT_AOCS_MPU9250_GYRO_SENSOR_HPP_
 
 #include <components/base/i2c_target_communication_with_obc.hpp>
 #include <components/real/aocs/gyro_sensor.hpp>
@@ -14,13 +14,13 @@
 const unsigned char kMpuTlmSize_ = 2;  //!< Telemetry size
 
 /**
- * @class MPU9250_GYRO
+ * @class Mpu9250GyroSensor
  * @brief Class to emulate gyro sensor in MPU9250 9 axis sensor
  */
-class MPU9250_GYRO : public GyroSensor, public I2cTargetCommunicationWithObc {
+class Mpu9250GyroSensor : public GyroSensor, public I2cTargetCommunicationWithObc {
  public:
   /**
-   * @fn MPU9250_GYRO
+   * @fn Mpu9250GyroSensor
    * @brief Constructor
    * @param [in] gyro: Gyro sensor settings
    * @param [in] sils_port_id: Port ID for SILS
@@ -29,8 +29,8 @@ class MPU9250_GYRO : public GyroSensor, public I2cTargetCommunicationWithObc {
    * @param [in] obc: Connected OBC
    * @param [in] hils_port_manager: HILS port manager
    */
-  MPU9250_GYRO(GyroSensor gyro, const int sils_port_id, const unsigned int hils_port_id, const unsigned char i2c_address, OnBoardComputer *obc,
-               HilsPortManager *hils_port_manager);
+  Mpu9250GyroSensor(GyroSensor gyro, const int sils_port_id, const unsigned int hils_port_id, const unsigned char i2c_address, OnBoardComputer *obc,
+                    HilsPortManager *hils_port_manager);
 
   // Override functions for Component
   /**
@@ -46,8 +46,8 @@ class MPU9250_GYRO : public GyroSensor, public I2cTargetCommunicationWithObc {
   inline const bool *GetIsMagOn(void) const { return &is_magnetometer_on_; }
 
  private:
-  bool is_gyro_on_ = false;  //!< Gyro sensor enable status
-  bool is_magnetometer_on_ = false;   //!< Magnetometer enable status
+  bool is_gyro_on_ = false;          //!< Gyro sensor enable status
+  bool is_magnetometer_on_ = false;  //!< Magnetometer enable status
 
   // TODO:本当はSensorBaseの最大値と関連付けたいが、今はPrivate変数になっているので、ひとまずこれで
   double omega_max_deg_s_ = 250.0;                       //!< Maximum angular rate measurement limit
@@ -135,4 +135,4 @@ class MPU9250_GYRO : public GyroSensor, public I2cTargetCommunicationWithObc {
   void Convert2Tlm(unsigned char tlm[kMpuTlmSize_], const double value);
 };
 
-#endif  // S2E_AOBC_COMPONENT_AOCS_MPU9250_GYRO_HPP_
+#endif  // S2E_AOBC_COMPONENT_AOCS_MPU9250_GYRO_SENSOR_HPP_

@@ -40,7 +40,7 @@ class Mpu9250Magnetometer : public Magnetometer, public I2cTargetCommunicationWi
 
  private:
   // Status
-  const bool *is_magnetometer_on_;      //!< Magnetometer ON/OFF flag which is managed by MPU9250_GYRO
+  const bool *is_magnetometer_on_;      //!< Magnetometer ON/OFF flag which is managed by Mpu9250GyroSensor
   unsigned char configuration_ = 0x00;  //!< Configuration infomation
   unsigned char status_ = 0;            //!< Status TODO: Implement. Currently, this is not used.
 

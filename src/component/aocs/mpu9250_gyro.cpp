@@ -8,8 +8,8 @@
 #include <library/math/constants.hpp>
 #include <library/utilities/macros.hpp>
 
-MPU9250_GYRO::MPU9250_GYRO(GyroSensor gyro, const int sils_port_id, const unsigned int hils_port_id, const unsigned char i2c_address,
-                           OnBoardComputer *obc, HilsPortManager *hils_port_manager)
+Mpu9250GyroSensor::Mpu9250GyroSensor(GyroSensor gyro, const int sils_port_id, const unsigned int hils_port_id, const unsigned char i2c_address,
+                                     OnBoardComputer *obc, HilsPortManager *hils_port_manager)
     : GyroSensor(gyro), I2cTargetCommunicationWithObc(sils_port_id, hils_port_id, i2c_address, obc, hils_port_manager) {
   unsigned char tmp = 0xff;
   WriteRegister(kCmdGyroEnable_, &tmp, 1);  // 初期値としてはGyro OFF
@@ -17,7 +17,7 @@ MPU9250_GYRO::MPU9250_GYRO(GyroSensor gyro, const int sils_port_id, const unsign
   SetConvertCoefficients();
 }
 
-void MPU9250_GYRO::MainRoutine(const int time_count) {
+void Mpu9250GyroSensor::MainRoutine(const int time_count) {
   UNUSED(time_count);
   // Read Registers
   ReadCmdGyroEnable();
@@ -39,7 +39,7 @@ void MPU9250_GYRO::MainRoutine(const int time_count) {
   return;
 }
 
-void MPU9250_GYRO::ReadCmdGyroEnable() {
+void Mpu9250GyroSensor::ReadCmdGyroEnable() {
   unsigned char tmp = 0xff;
   ReadRegister(kCmdGyroEnable_, &tmp, 1);
   if (tmp == 0x00) is_gyro_on_ = true;
@@ -47,7 +47,7 @@ void MPU9250_GYRO::ReadCmdGyroEnable() {
   return;
 }
 
-void MPU9250_GYRO::ReadCmdMagEnable() {
+void Mpu9250GyroSensor::ReadCmdMagEnable() {
   unsigned char tmp[2] = {0xff, 0xff};
   ReadCommand(tmp, 2);
   if (tmp[0] != kCmdMagEnable_) return;
@@ -57,27 +57,27 @@ void MPU9250_GYRO::ReadCmdMagEnable() {
   return;
 }
 
-void MPU9250_GYRO::ReadCmdGyroLpf() {
+void Mpu9250GyroSensor::ReadCmdGyroLpf() {
   // TODO 6Uでの利用では固定値なので、中身の実装は優先度低
   return;
 }
 
-void MPU9250_GYRO::ReadCmdGyroRange() {
+void Mpu9250GyroSensor::ReadCmdGyroRange() {
   // TODO 6Uでの利用では固定値なので、中身の実装は優先度低
   return;
 }
 
-void MPU9250_GYRO::ReadCmdAccLpf() {
+void Mpu9250GyroSensor::ReadCmdAccLpf() {
   // TODO 6Uでの利用では固定値なので、中身の実装は優先度低
   return;
 }
 
-void MPU9250_GYRO::ReadCmdAccRange() {
+void Mpu9250GyroSensor::ReadCmdAccRange() {
   // TODO 6Uでの利用では固定値なので、中身の実装は優先度低
   return;
 }
 
-void MPU9250_GYRO::WriteGyroTlm() {
+void Mpu9250GyroSensor::WriteGyroTlm() {
   unsigned char tlm[kMpuTlmSize_] = {0, 0};
   unsigned char reg_id = kRegObsGyro_;
 
@@ -102,7 +102,7 @@ void MPU9250_GYRO::WriteGyroTlm() {
   return;
 }
 
-void MPU9250_GYRO::Convert2Tlm(unsigned char tlm[kMpuTlmSize_], const double value) {
+void Mpu9250GyroSensor::Convert2Tlm(unsigned char tlm[kMpuTlmSize_], const double value) {
   signed short tlm_s = (signed short)(value);
 
   for (int i = 0; i < kMpuTlmSize_; i++) {
@@ -112,7 +112,7 @@ void MPU9250_GYRO::Convert2Tlm(unsigned char tlm[kMpuTlmSize_], const double val
   return;
 }
 
-void MPU9250_GYRO::SetConvertCoefficients() {
+void Mpu9250GyroSensor::SetConvertCoefficients() {
   omega_convert_deg_s_to_raw_ = raw_max_ / omega_max_deg_s_;
   acc_convert_G_to_raw_ = raw_max_ / acc_max_G_;
   return;

@@ -85,7 +85,7 @@ class AocsModuleComponents : public InstalledComponents {
   PowerController *power_controller_;  //!< Power switch controller
   std::vector<Ina260> ina260s_;        //!< Ina260 current sensor
   // AOCS
-  MPU9250_GYRO *mpu9250_gyro_sensor_;          //!< MPU9250 gyro sensor
+  Mpu9250GyroSensor *mpu9250_gyro_sensor_;          //!< MPU9250 gyro sensor
   Mpu9250Magnetometer *mpu9250_magnetometer_;  //!< MPU9250 magnetometer
   Rm3100 *rm3100_aobc_;                        //!< RM3100 magnetometer on AOBC circuit board
   Rm3100 *rm3100_external_;                    //!< External RM3100 magnetometer

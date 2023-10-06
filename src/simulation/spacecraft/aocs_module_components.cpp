@@ -64,7 +64,7 @@ AocsModuleComponents::AocsModuleComponents(const Dynamics *dynamics, Structure *
   const unsigned int mpu9250_gyro_hils_port_id = ini_access.ReadInt("COM_PORT", "mpu9250_gyro_hils_port_id");
   IniAccess mpu9250_gyro_ini_access = IniAccess(mpu9250_gyro_ini_path);
   const uint8_t mpu9250_gyro_i2c_address = (uint8_t)mpu9250_gyro_ini_access.ReadInt("I2C_PORT_GYRO", "i2c_address");
-  mpu9250_gyro_sensor_ = new MPU9250_GYRO(
+  mpu9250_gyro_sensor_ = new Mpu9250GyroSensor(
       InitGyroSensor(clock_generator, power_controller_->GetPowerPort((int)PowerPortIdx::MPU), 2, mpu9250_gyro_ini_path, compo_step_sec, dynamics_),
       0, mpu9250_gyro_hils_port_id, mpu9250_gyro_i2c_address, aobc_, hils_port_manager_);
 
