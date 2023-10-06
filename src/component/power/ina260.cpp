@@ -5,10 +5,10 @@
 
 #include "ina260.hpp"
 
-INA260::INA260(int prescaler, ClockGenerator *clock_gen, PowerPort *ina_power_port, const double ina_minimum_voltage,
+INA260::INA260(int prescaler, ClockGenerator *clock_generator, PowerPort *ina_power_port, const double ina_minimum_voltage,
                const double ina_assumed_power_consumption, PowerPort *observation_power_port, const int i2c_port_id, const unsigned char i2c_addr,
                OnBoardComputer *obc)
-    : Component(prescaler, clock_gen, ina_power_port),
+    : Component(prescaler, clock_generator, ina_power_port),
       I2cTargetCommunicationWithObc(i2c_port_id, i2c_addr, obc),
       observation_power_port_(observation_power_port) {
   power_port_->SetMinimumVoltage_V(ina_minimum_voltage);

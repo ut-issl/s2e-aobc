@@ -23,14 +23,14 @@ class HilsIfDriver : public Component, public UartCommunicationWithObc, public G
    * @fn HilsIfDriver
    * @brief Constructor
    * @param [in] prescaler: Prescaler
-   * @param [in] clock_gen: Clock generator
+   * @param [in] clock_generator: Clock generator
    * @param [in] hils_port_id: HILS port ID
    * @param [in] baud_rate: HILS communication baud rate
    * @param [in] hils_port_manager: HILS port manager
    * @param [in] gpio_ports: GPIO port information
    * @param [in] obc: On Board Computer
    */
-  HilsIfDriver(const int prescaler, ClockGenerator *clock_gen, const unsigned int hils_port_id, const unsigned int baud_rate,
+  HilsIfDriver(const int prescaler, ClockGenerator *clock_generator, const unsigned int hils_port_id, const unsigned int baud_rate,
                HilsPortManager *hils_port_manager, std::vector<int> gpio_ports, OnBoardComputer *obc);
   /**
    * @fn ~HilsIfDriver

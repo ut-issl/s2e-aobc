@@ -7,9 +7,9 @@
 
 #include <library/utilities/macros.hpp>
 
-HilsIfDriver::HilsIfDriver(const int prescaler, ClockGenerator *clock_gen, const unsigned int hils_port_id, const unsigned int baud_rate,
+HilsIfDriver::HilsIfDriver(const int prescaler, ClockGenerator *clock_generator, const unsigned int hils_port_id, const unsigned int baud_rate,
                            HilsPortManager *hils_port_manager, std::vector<int> gpio_ports, OnBoardComputer *obc)
-    : Component(prescaler, clock_gen), UartCommunicationWithObc(hils_port_id, baud_rate, hils_port_manager), GpioConnectionWithObc(gpio_ports, obc) {}
+    : Component(prescaler, clock_generator), UartCommunicationWithObc(hils_port_id, baud_rate, hils_port_manager), GpioConnectionWithObc(gpio_ports, obc) {}
 
 HilsIfDriver::~HilsIfDriver() {}
 

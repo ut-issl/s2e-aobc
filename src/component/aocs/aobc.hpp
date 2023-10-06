@@ -19,10 +19,10 @@ class AOBC : public Component {
   /**
    * @fn AOBC
    * @brief Constructor
-   * @param [in] clock_gen: Clock generator
+   * @param [in] clock_generator: Clock generator
    * @param [in] components: Components connected to the AOBC
    */
-  AOBC(ClockGenerator *clock_gen, AocsModuleComponents *components);
+  AOBC(ClockGenerator *clock_generator, AocsModuleComponents *components);
   /**
    * @fn ~AOBC
    * @brief Destructor

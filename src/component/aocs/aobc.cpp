@@ -9,7 +9,7 @@
 
 #include "../../simulation/spacecraft/aocs_module_components.hpp"
 
-AOBC::AOBC(ClockGenerator *clock_gen, AocsModuleComponents *components) : Component(100, clock_gen), components_(components) { Initialize(); }
+AOBC::AOBC(ClockGenerator *clock_generator, AocsModuleComponents *components) : Component(100, clock_generator), components_(components) { Initialize(); }
 
 AOBC::~AOBC() { delete components_; }
 

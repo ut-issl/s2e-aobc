@@ -25,7 +25,7 @@ class INA260 : public Component, public I2cTargetCommunicationWithObc {
    * @fn INA260
    * @brief Constructor with power port
    * @param [in] prescaler: Frequency scale factor for update
-   * @param [in] clock_gen: Clock generator
+   * @param [in] clock_generator: Clock generator
    * @param [in] ina_power_port: Power port witch provides electrical power to INA260
    * @param [in] ina_minimum_voltage: Minimum voltage to drive INA260 [V]
    * @param [in] ina_assumed_power_consumption: Power consumption of INA260 [W]
@@ -34,7 +34,7 @@ class INA260 : public Component, public I2cTargetCommunicationWithObc {
    * @param [in] i2c_addr: I2C address of the INA260
    * @param [in] obc: Connected OBC information
    */
-  INA260(int prescaler, ClockGenerator *clock_gen, PowerPort *ina_power_port, const double ina_minimum_voltage,
+  INA260(int prescaler, ClockGenerator *clock_generator, PowerPort *ina_power_port, const double ina_minimum_voltage,
          const double ina_assumed_power_consumption, PowerPort *observation_power_port, const int i2c_port_id, const unsigned char i2c_addr,
          OnBoardComputer *obc);
   /**
