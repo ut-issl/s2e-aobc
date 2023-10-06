@@ -6,7 +6,7 @@
 
 class CubeWheel : public RWModel, public ObcI2cCommunicationBase {
  public:
-  CubeWheel(RWModel rw_model, const int port_id, const unsigned char i2c_addr, OBC* obc);
+  CubeWheel(RWModel rw_model, const int port_id, const unsigned char i2c_address, OBC* obc);
 
   // Override: RWModel functions
   void MainRoutine(const int time_count) override;

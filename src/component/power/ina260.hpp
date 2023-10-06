@@ -31,11 +31,11 @@ class Ina260 : public Component, public I2cTargetCommunicationWithObc {
    * @param [in] ina_assumed_power_consumption: Power consumption of Ina260 [W]
    * @param [in] observation_power_port: Power port to measure the current, voltage by the Ina260
    * @param [in] i2c_port_id: I2C port ID for the Ina260
-   * @param [in] i2c_addr: I2C address of the Ina260
+   * @param [in] i2c_address: I2C address of the Ina260
    * @param [in] obc: Connected OBC information
    */
   Ina260(int prescaler, ClockGenerator *clock_generator, PowerPort *ina_power_port, const double ina_minimum_voltage,
-         const double ina_assumed_power_consumption, PowerPort *observation_power_port, const int i2c_port_id, const unsigned char i2c_addr,
+         const double ina_assumed_power_consumption, PowerPort *observation_power_port, const int i2c_port_id, const unsigned char i2c_address,
          OnBoardComputer *obc);
   /**
    * @fn Ina260

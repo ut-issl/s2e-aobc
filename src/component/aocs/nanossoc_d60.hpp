@@ -22,11 +22,11 @@ class NanoSSOCD60 : public SunSensor, public I2cTargetCommunicationWithObc {
    * @param [in] sun_sensor: Sun sensor settings
    * @param [in] sils_port_id: Port ID for SILS
    * @param [in] hils_port_id: Port ID for HILS
-   * @param [in] i2c_addr: I2C address
+   * @param [in] i2c_address: I2C address
    * @param [in] obc: Connected OBC
    * @param [in] hils_port_manager: HILS port manager
    */
-  NanoSSOCD60(SunSensor sun_sensor, const int sils_port_id, const unsigned int hils_port_id, const unsigned char i2c_addr, OnBoardComputer *obc,
+  NanoSSOCD60(SunSensor sun_sensor, const int sils_port_id, const unsigned int hils_port_id, const unsigned char i2c_address, OnBoardComputer *obc,
               HilsPortManager *hils_port_manager);
   /**
    * @fn ~NanoSSOCD60

@@ -8,9 +8,9 @@
 #include <library/math/constants.hpp>
 #include <library/utilities/macros.hpp>
 
-MPU9250_GYRO::MPU9250_GYRO(GyroSensor gyro, const int sils_port_id, const unsigned int hils_port_id, const unsigned char i2c_addr,
+MPU9250_GYRO::MPU9250_GYRO(GyroSensor gyro, const int sils_port_id, const unsigned int hils_port_id, const unsigned char i2c_address,
                            OnBoardComputer *obc, HilsPortManager *hils_port_manager)
-    : GyroSensor(gyro), I2cTargetCommunicationWithObc(sils_port_id, hils_port_id, i2c_addr, obc, hils_port_manager) {
+    : GyroSensor(gyro), I2cTargetCommunicationWithObc(sils_port_id, hils_port_id, i2c_address, obc, hils_port_manager) {
   unsigned char tmp = 0xff;
   WriteRegister(kCmdGyroEnable_, &tmp, 1);  // 初期値としてはGyro OFF
 

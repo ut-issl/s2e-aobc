@@ -23,11 +23,11 @@ class RM3100 : public Magnetometer, public I2cTargetCommunicationWithObc {
    * @param [in] mag_sensor: Magnetometer settings
    * @param [in] sils_port_id: Port ID for SILS
    * @param [in] hils_port_id: Port ID for HILS
-   * @param [in] i2c_addr: I2C address
+   * @param [in] i2c_address: I2C address
    * @param [in] obc: Connected OBC
    * @param [in] hils_port_manager: HILS port manager
    */
-  RM3100(Magnetometer mag_sensor, const int sils_port_id, const unsigned int hils_port_id, const unsigned char i2c_addr, OnBoardComputer *obc,
+  RM3100(Magnetometer mag_sensor, const int sils_port_id, const unsigned int hils_port_id, const unsigned char i2c_address, OnBoardComputer *obc,
          HilsPortManager *hils_port_manager);
 
   // Override functions for Component
