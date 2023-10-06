@@ -12,13 +12,13 @@
 #include <library/math/constants.hpp>
 #include <library/utilities/macros.hpp>
 
-NanoSSOCD60::NanoSSOCD60(SunSensor sun_sensor, const int sils_port_id, const unsigned int hils_port_id, const unsigned char i2c_address,
+NanoSsocD60::NanoSsocD60(SunSensor sun_sensor, const int sils_port_id, const unsigned int hils_port_id, const unsigned char i2c_address,
                          OnBoardComputer *obc, HilsPortManager *hils_port_manager)
     : SunSensor(sun_sensor), I2cTargetCommunicationWithObc(sils_port_id, hils_port_id, i2c_address, obc, hils_port_manager), i2c_addr_(i2c_address) {}
 
-NanoSSOCD60::~NanoSSOCD60() {}
+NanoSsocD60::~NanoSsocD60() {}
 
-void NanoSSOCD60::MainRoutine(const int time_count) {
+void NanoSsocD60::MainRoutine(const int time_count) {
   UNUSED(time_count);
   Measure();
   sun_intensity_percent_ = solar_illuminance_W_m2_ / srp_environment_->GetSolarConstant_W_m2() * 100.0;
@@ -33,7 +33,7 @@ void NanoSSOCD60::MainRoutine(const int time_count) {
   return;
 }
 
-int NanoSSOCD60::GenerateTelemetry() {
+int NanoSsocD60::GenerateTelemetry() {
   const int kByte2Bit = 8;
 
   const int kTlmSize = 15;
@@ -64,19 +64,19 @@ int NanoSSOCD60::GenerateTelemetry() {
   return kTlmSize;
 }
 
-int32_t NanoSSOCD60::ConvertFloat2FloatingPoint(float data) {
+int32_t NanoSsocD60::ConvertFloat2FloatingPoint(float data) {
   int32_t internal_representation = *((int32_t *)&data);  // The internal representation of "data" in decimal notation.
   return internal_representation;
 }
 
-int32_t NanoSSOCD60::ConvertAngle2Tlm(double angle) {
+int32_t NanoSsocD60::ConvertAngle2Tlm(double angle) {
   double angle_deg = angle * libra::rad_to_deg;
 
   int32_t angle_tlm_data = ConvertFloat2FloatingPoint((float)angle_deg);
   return angle_tlm_data;
 }
 
-unsigned char NanoSSOCD60::GenerateErrorCode() {
+unsigned char NanoSsocD60::GenerateErrorCode() {
   unsigned char error_code;
 
   if (!sun_detected_flag_) {
@@ -98,7 +98,7 @@ unsigned char NanoSSOCD60::GenerateErrorCode() {
   return error_code;
 }
 
-std::string NanoSSOCD60::GetLogHeader() const {
+std::string NanoSsocD60::GetLogHeader() const {
   std::string str_tmp = "";
   const std::string st_id = std::to_string(static_cast<long long>(component_id_));
 

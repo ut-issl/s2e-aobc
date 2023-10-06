@@ -11,13 +11,13 @@
 #include <components/real/aocs/sun_sensor.hpp>
 
 /**
- * @class NanoSSOCD60
+ * @class NanoSsocD60
  * @brief Class to emulate NanoSSOC D60 sun sensor
  */
-class NanoSSOCD60 : public SunSensor, public I2cTargetCommunicationWithObc {
+class NanoSsocD60 : public SunSensor, public I2cTargetCommunicationWithObc {
  public:
   /**
-   * @fn NanoSSOCD60
+   * @fn NanoSsocD60
    * @brief Constructor
    * @param [in] sun_sensor: Sun sensor settings
    * @param [in] sils_port_id: Port ID for SILS
@@ -26,13 +26,13 @@ class NanoSSOCD60 : public SunSensor, public I2cTargetCommunicationWithObc {
    * @param [in] obc: Connected OBC
    * @param [in] hils_port_manager: HILS port manager
    */
-  NanoSSOCD60(SunSensor sun_sensor, const int sils_port_id, const unsigned int hils_port_id, const unsigned char i2c_address, OnBoardComputer *obc,
+  NanoSsocD60(SunSensor sun_sensor, const int sils_port_id, const unsigned int hils_port_id, const unsigned char i2c_address, OnBoardComputer *obc,
               HilsPortManager *hils_port_manager);
   /**
-   * @fn ~NanoSSOCD60
+   * @fn ~NanoSsocD60
    * @brief Destructor
    */
-  ~NanoSSOCD60();
+  ~NanoSsocD60();
 
   // Override functions for Component
   /**

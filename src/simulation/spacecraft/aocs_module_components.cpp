@@ -104,8 +104,8 @@ AocsModuleComponents::AocsModuleComponents(const Dynamics *dynamics, Structure *
 
     const std::string ss_section_name = "I2C_PORT_" + std::to_string(static_cast<long long>(ss_idx));
     const uint8_t i2c_address = ss_ini_file.ReadInt(ss_section_name.c_str(), "i2c_address");
-    NanoSSOCD60 *ss =
-        new NanoSSOCD60(InitSunSensor(clock_generator, power_controller_->GetPowerPort((int)PowerPortIdx::SS), ss_idx, nanoSSOC_D60_ini_path,
+    NanoSsocD60 *ss =
+        new NanoSsocD60(InitSunSensor(clock_generator, power_controller_->GetPowerPort((int)PowerPortIdx::SS), ss_idx, nanoSSOC_D60_ini_path,
                                       &(local_environment_->GetSolarRadiationPressure()), &(local_environment_->GetCelestialInformation())),
                         0, nanoSSOC_D60_hils_port_id, i2c_address, aobc_, hils_port_manager_);
     nano_ssoc_d60_.push_back(ss);
