@@ -1,9 +1,9 @@
 /**
- * @file mpu9250_gyro.cpp
+ * @file mpu9250_gyro_sensor.cpp
  * @brief Class to emulate gyro sensor in MPU9250 9 axis sensor
  */
 
-#include "mpu9250_gyro.hpp"
+#include "mpu9250_gyro_sensor.hpp"
 
 #include <library/math/constants.hpp>
 #include <library/utilities/macros.hpp>

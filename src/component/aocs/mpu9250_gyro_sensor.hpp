@@ -1,5 +1,5 @@
 /**
- * @file mpu9250_gyro.hpp
+ * @file mpu9250_gyro_sensor.hpp
  * @brief Class to emulate gyro sensor in MPU9250 9 axis sensor
  * @note Manual: https://media.digikey.com/pdf/Data%20Sheets/TDK%20PDFs/MPU-9250_Rev_1.1.pdf
  *       Functions not used in the project are not implemented
