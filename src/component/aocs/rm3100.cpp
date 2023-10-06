@@ -35,8 +35,8 @@ void Rm3100::MainRoutine(const int time_count) {
 
 std::string Rm3100::GetLogHeader() const {
   std::string str_tmp = "";
-  std::string MSSection = "Rm3100";
-  str_tmp += WriteVector(MSSection, "c", "nT", 3);
+  std::string section = "Rm3100";
+  str_tmp += WriteVector(section, "c", "nT", 3);
 
   return str_tmp;
 }

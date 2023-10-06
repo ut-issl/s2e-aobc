@@ -19,11 +19,11 @@ class MtqSeiren : public Magnetorquer, public GpioConnectionWithObc {
   /**
    * @fn MtqSeiren
    * @brief Constructor
-   * @param [in] mag_torquer: Magnetorquer setting
+   * @param [in] magnetorquer: Magnetorquer setting
    * @param [in] gpio_port: Port ID for GPIO
    * @param [in] obc: Connected OBC
    */
-  MtqSeiren(Magnetorquer mag_torquer, std::vector<int> gpio_ports, OnBoardComputer *obc);
+  MtqSeiren(Magnetorquer magnetorquer, std::vector<int> gpio_ports, OnBoardComputer *obc);
   /**
    * @fn ~MtqSeiren
    * @brief Destructor

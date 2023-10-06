@@ -36,8 +36,8 @@ void Stim210::MainRoutine(const int time_count) {
 
 std::string Stim210::GetLogHeader() const {
   std::string str_tmp = "";
-  std::string MSSection = "Stim210";
-  str_tmp += WriteVector(MSSection, "c", "deg/s", 3);
+  std::string section = "Stim210";
+  str_tmp += WriteVector(section, "c", "deg/s", 3);
 
   return str_tmp;
 }

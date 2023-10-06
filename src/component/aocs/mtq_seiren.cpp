@@ -8,8 +8,8 @@
 
 #include <library/utilities/macros.hpp>
 
-MtqSeiren::MtqSeiren(Magnetorquer mag_torquer, std::vector<int> gpio_ports, OnBoardComputer *obc)
-    : Magnetorquer(mag_torquer), GpioConnectionWithObc(gpio_ports, obc) {}
+MtqSeiren::MtqSeiren(Magnetorquer magnetorquer, std::vector<int> gpio_ports, OnBoardComputer *obc)
+    : Magnetorquer(magnetorquer), GpioConnectionWithObc(gpio_ports, obc) {}
 
 MtqSeiren::~MtqSeiren() {}
 
@@ -66,10 +66,10 @@ std::string MtqSeiren::GetLogHeader() const {
   std::string str_tmp = "";
   const std::string st_sensor_id = std::to_string(static_cast<long long>(component_id_));
   const char *cs = st_sensor_id.data();
-  std::string MSSection = "MTQ_seiren";
+  std::string section = "MTQ_seiren";
 
-  str_tmp += WriteVector(MSSection + cs, "b", "Am^2", kMtqDimension);
-  str_tmp += WriteVector(MSSection + cs, "b", "Nm", kMtqDimension);
+  str_tmp += WriteVector(section + cs, "b", "Am^2", kMtqDimension);
+  str_tmp += WriteVector(section + cs, "b", "Nm", kMtqDimension);
 
   return str_tmp;
 }

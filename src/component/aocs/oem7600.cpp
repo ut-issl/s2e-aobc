@@ -956,15 +956,15 @@ unsigned int Oem7600::CalculateCrc32Subroutine(const unsigned int initial_value)
 
 std::string Oem7600::GetLogHeader() const {
   std::string str_tmp = "";
-  std::string MSSection = "OEM7600";
+  std::string section = "OEM7600";
   str_tmp += WriteScalar("OEM7600_year");
   str_tmp += WriteScalar("OEM7600_month");
   str_tmp += WriteScalar("OEM7600_day");
   str_tmp += WriteScalar("OEM7600_hour");
   str_tmp += WriteScalar("OEM7600_min");
   str_tmp += WriteScalar("OEM7600_sec");
-  str_tmp += WriteVector(MSSection, "posXYZ_ECEF", "m", 3);
-  str_tmp += WriteVector(MSSection, "velXYZ_ECEF", "m/s", 3);
+  str_tmp += WriteVector(section, "posXYZ_ECEF", "m", 3);
+  str_tmp += WriteVector(section, "velXYZ_ECEF", "m/s", 3);
   str_tmp += WriteScalar("OEM7600_lat", "rad");
   str_tmp += WriteScalar("OEM7600_lon", "rad");
   str_tmp += WriteScalar("OEM7600_alt", "m");
