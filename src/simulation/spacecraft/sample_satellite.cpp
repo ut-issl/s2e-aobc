@@ -1,3 +1,8 @@
+/**
+ * @file sample_satellite.cpp
+ * @brief An example of user side spacecraft class
+ */
+
 #include "sample_satellite.h"
 
 #include "aocs_module_components.h"

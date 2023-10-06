@@ -30,25 +30,8 @@
 ## For general users
 ### How to make a project-specific repository
 
-- We recommend making a project-specific repository named `s2e-aobc-project-name`.
-- Users can refer to the `s2e-aobc/example` directory to make a directory construction of `s2e-aobc-project-name`.
-  - **NOTE** Please change all words like `example, EXAMPLE, or Example` in the files in this directory to suit your project name.
-  ```
-  - s2e-aobc (git submodule)
-    - We recommend to use a released version of s2e-aobc.
-  - data
-  - CMakeLists.txt
-  - CMakeSettings.json
-  - README.md
-  ```
-- To construct the `s2e-aobc` directory, we recommend to use `git submodule` to take in the `s2e-aobc` repository.
-  - Reference: [Git Tools Submodule](https://git-scm.com/book/en/v2/Git-Tools-Submodules).
-- `CMakeLists.txt`
-  - Please change all words `example, EXAMPLE, or Example` in the file to suit your project name.
-
-### How to build and execute the project-specific repository
-
-- Please see the [README.md](./example/README.md) in the `example` directly.
+- Please refer [s2e-aobc-example](https://github.com/ut-issl/s2e-aobc-example) repository.
+- Users can fork or copy of this example directory.
 
 ### How to join the development of this repository
 

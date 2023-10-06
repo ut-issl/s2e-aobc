@@ -1,4 +1,9 @@
-﻿#include "oem7600.hpp"
+﻿/**
+ * @file oem7600.cpp
+ * @brief Class to emulate OEM7600 GNSS receiver
+ */
+
+#include "oem7600.hpp"
 
 #include <algorithm>  // toupper
 #include <library/utilities/macros.hpp>
