@@ -7,7 +7,7 @@
 
 #include <library/utilities/macros.hpp>
 
-#include "../../simulation/spacecraft/aocs_module_port_config.h"
+#include "../../simulation/spacecraft/aocs_module_port_config.hpp"
 
 PowerController::PowerController(PowerControlUnit pcu, const std::vector<int> gpio_ports, const std::vector<double> output_voltage_list,
                                  OnBoardComputer *obc)

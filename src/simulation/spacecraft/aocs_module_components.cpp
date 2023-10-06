@@ -10,7 +10,7 @@
 #include <vector>
 
 #include "../../component/aocs/aobc.hpp"
-#include "aocs_module_port_config.h"
+#include "aocs_module_port_config.hpp"
 
 AocsModuleComponents::AocsModuleComponents(const Dynamics *dynamics, Structure *structure, const LocalEnvironment *local_environment,
                                            const GlobalEnvironment *global_environment, const SimulationConfiguration *configuration,
