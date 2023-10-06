@@ -19,7 +19,7 @@
 #include "../../component/aocs/mpu9250_gyro.hpp"
 #include "../../component/aocs/mpu9250_mag.hpp"
 #include "../../component/aocs/mtq_seiren.hpp"
-#include "../../component/aocs/nanossoc_d60.hpp"
+#include "../../component/aocs/nano_ssoc_d60.hpp"
 #include "../../component/aocs/oem7600.hpp"
 #include "../../component/aocs/rm3100.hpp"
 #include "../../component/aocs/rw0003.hpp"
