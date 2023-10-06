@@ -148,7 +148,7 @@ AocsModuleComponents::AocsModuleComponents(const Dynamics *dynamics, Structure *
   const unsigned char stim210_uart_sils_port = (unsigned char)stim210_ini_file.ReadInt("UART_PORT", "uart_port_sils");
   const unsigned int stim210_hils_port_id = ini_access.ReadInt("COM_PORT", "stim210_hils_port_id");
   const unsigned int stim210_baud_rate = ini_access.ReadInt("COM_PORT", "stim210_baud_rate");
-  stim210_ = new STIM210(
+  stim210_ = new Stim210(
       InitGyroSensor(clock_generator, power_controller_->GetPowerPort((int)PowerPortIdx::STIM), 1, stim210_ini_path, compo_step_sec, dynamics_),
       compo_step_sec, stim210_uart_sils_port, aobc_, stim210_hils_port_id, stim210_baud_rate, hils_port_manager_);
 

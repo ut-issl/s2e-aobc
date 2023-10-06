@@ -13,22 +13,22 @@
 #include "../../library/crc.hpp"
 
 /**
- * @class STIM210
+ * @class Stim210
  * @brief Class to emulate STIM210 gyro sensor
  */
-class STIM210 : public GyroSensor, public UartCommunicationWithObc {
+class Stim210 : public GyroSensor, public UartCommunicationWithObc {
  public:
   /**
-   * @fn STIM210
+   * @fn Stim210
    * @brief Constructor
    * @param [in] gyro: Gyro sensor setting
    * @param [in] compo_step_sec: Component update step [s]
    * @param [in] sils_port_id: Port ID for SILS
    * @param [in] obc: Connected OBC
    */
-  STIM210(GyroSensor gyro, double compo_step_sec, const int sils_port_id, OnBoardComputer *obc);
+  Stim210(GyroSensor gyro, double compo_step_sec, const int sils_port_id, OnBoardComputer *obc);
   /**
-   * @fn STIM210
+   * @fn Stim210
    * @brief Constructor with HILS
    * @param [in] gyro: Gyro sensor setting
    * @param [in] compo_step_sec: Component update step [s]
@@ -38,7 +38,7 @@ class STIM210 : public GyroSensor, public UartCommunicationWithObc {
    * @param [in] baud_rate: UART baud rate
    * @param [in] hils_port_manager: HILS port manager
    */
-  STIM210(GyroSensor gyro, double compo_step_sec, const int sils_port_id, OnBoardComputer *obc, const unsigned int hils_port_id,
+  Stim210(GyroSensor gyro, double compo_step_sec, const int sils_port_id, OnBoardComputer *obc, const unsigned int hils_port_id,
           const unsigned int baud_rate, HilsPortManager *hils_port_manager);
 
   // Override functions for Component
@@ -65,7 +65,7 @@ class STIM210 : public GyroSensor, public UartCommunicationWithObc {
 
   /**
    * @enum   OPERATION_MODE
-   * @brief  STIM210 Operation mode
+   * @brief  Stim210 Operation mode
    */
   typedef enum { OPERATION_INIT_MODE = 0, OPERATION_NORMAL_MODE, OPERATION_SERVICE_MODE, OPERATION_MODE_MAX } OPERATION_MODE;
 
@@ -131,9 +131,9 @@ class STIM210 : public GyroSensor, public UartCommunicationWithObc {
   LPF lpf_freq_ = LPF_262HZ;                                      //!< Internal low pass filter setting
   SAMPLE_RATE sample_rate_mode_ = SAMPLE_RATE_2000HZ;             //!< Sample rate
 
-  const uint8_t normal_mode_format_idx_[STIM210::NORMAL_MODE_MAX] = {0x90, 0x92, 0xa0, 0xa2, 0xa4,
+  const uint8_t normal_mode_format_idx_[Stim210::NORMAL_MODE_MAX] = {0x90, 0x92, 0xa0, 0xa2, 0xa4,
                                                                      0xa5, 0x99, 0xa6, 0xa8};  //!< Telemetry header in normal mode
-  const uint32_t sample_rate_hz_[STIM210::SAMPLE_RATE_MAX] = {1, 125, 250, 500, 1000, 2000};   //!< Sample rate list [Hz]
+  const uint32_t sample_rate_hz_[Stim210::SAMPLE_RATE_MAX] = {1, 125, 250, 500, 1000, 2000};   //!< Sample rate list [Hz]
 
   const unsigned char termination_cr = 0x0d;  //!< Termination of CR
   const int kMaxRxSize = 12;                  //!< Max RX size (command)

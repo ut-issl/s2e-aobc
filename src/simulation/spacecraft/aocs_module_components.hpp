@@ -93,7 +93,7 @@ class AocsModuleComponents : public InstalledComponents {
   MTQseiren *mtq_seiren_;                     //!< MTQ
   OEM7600 *oem7600_;                          //!< OEM7600 GNSS Receiver
   Sagitta *sagitta_;                          //!< Sagitta Star tracker
-  STIM210 *stim210_;                          //!< STIM210 gyro sensor
+  Stim210 *stim210_;                          //!< Stim210 gyro sensor
   RW0003 *rw0003_x_;                          //!< RW00003 Reaction wheel X axis
   RW0003 *rw0003_y_;                          //!< RW00003 Reaction wheel Y axis
   RW0003 *rw0003_z_;                          //!< RW00003 Reaction wheel Z axis
