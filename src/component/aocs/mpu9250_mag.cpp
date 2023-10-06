@@ -7,9 +7,9 @@
 
 #include <library/utilities/macros.hpp>
 
-MPU9250_MAG::MPU9250_MAG(Magnetometer mag_sensor, const int sils_port_id, const unsigned int hils_port_id, const unsigned char i2c_address,
+MPU9250_MAG::MPU9250_MAG(Magnetometer magnetometer, const int sils_port_id, const unsigned int hils_port_id, const unsigned char i2c_address,
                          OnBoardComputer *obc, HilsPortManager *hils_port_manager, const bool *is_mag_on)
-    : Magnetometer(mag_sensor), I2cTargetCommunicationWithObc(sils_port_id, hils_port_id, i2c_address, obc, hils_port_manager), is_mag_on_(is_mag_on) {}
+    : Magnetometer(magnetometer), I2cTargetCommunicationWithObc(sils_port_id, hils_port_id, i2c_address, obc, hils_port_manager), is_mag_on_(is_mag_on) {}
 
 void MPU9250_MAG::MainRoutine(const int time_count) {
   UNUSED(time_count);

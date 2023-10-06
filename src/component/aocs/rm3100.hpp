@@ -20,14 +20,14 @@ class Rm3100 : public Magnetometer, public I2cTargetCommunicationWithObc {
   /**
    * @fn Rm3100
    * @brief Constructor
-   * @param [in] mag_sensor: Magnetometer settings
+   * @param [in] magnetometer: Magnetometer settings
    * @param [in] sils_port_id: Port ID for SILS
    * @param [in] hils_port_id: Port ID for HILS
    * @param [in] i2c_address: I2C address
    * @param [in] obc: Connected OBC
    * @param [in] hils_port_manager: HILS port manager
    */
-  Rm3100(Magnetometer mag_sensor, const int sils_port_id, const unsigned int hils_port_id, const unsigned char i2c_address, OnBoardComputer *obc,
+  Rm3100(Magnetometer magnetometer, const int sils_port_id, const unsigned int hils_port_id, const unsigned char i2c_address, OnBoardComputer *obc,
          HilsPortManager *hils_port_manager);
 
   // Override functions for Component
