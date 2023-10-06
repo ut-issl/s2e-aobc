@@ -42,11 +42,11 @@ std::string STIM210::GetLogHeader() const {
   return str_tmp;
 }
 
-int STIM210::ParseCommand(const int cmd_size) {
+int STIM210::ParseCommand(const int command_size) {
   std::vector<unsigned char> cmd = rx_buffer_;
   int idx = 0;
   int ret;
-  for (int i = 0; i < cmd_size; i++) {
+  for (int i = 0; i < command_size; i++) {
     cmd[idx] = rx_buffer_[i];
     idx++;
     if (rx_buffer_[i] == termination_cr)  // CRでコマンドを区切る

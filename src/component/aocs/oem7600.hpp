@@ -102,9 +102,9 @@ class OEM7600 : public GnssReceiver, public UartCommunicationWithObc {
   /**
    * @fn ParseCommand
    * @brief Parse command
-   * @param [in] cmd_size: Command size
+   * @param [in] command_size: Command size
    */
-  int ParseCommand(const int cmd_size) override;
+  int ParseCommand(const int command_size) override;
   /**
    * @fn GenerateTelemetry
    * @brief Generate telemetry

@@ -25,8 +25,8 @@ void NanoSSOCD60::MainRoutine(int count) {
 
   GenerateTelemetry();
 
-  int cmd_size = ReceiveCommand();
-  if (cmd_size != 1) return;  // length == 1 means setting of read register address
+  int command_size = ReceiveCommand();
+  if (command_size != 1) return;  // length == 1 means setting of read register address
   // これ以降はHILS用に事前にテレメトリを溜めておく
   const int kTlmSize = 15;
   StoreTelemetry(kStoredFrameSize, kTlmSize);

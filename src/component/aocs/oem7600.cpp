@@ -75,8 +75,8 @@ void OEM7600::Update_local() {
   }
 }
 
-int OEM7600::ParseCommand(const int cmd_size) {
-  UNUSED(cmd_size);
+int OEM7600::ParseCommand(const int command_size) {
+  UNUSED(command_size);
   // decode recieved cmd
   OEM7600_CMD rcvd_cmd = DecodeCommand();
 

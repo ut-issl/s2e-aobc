@@ -49,9 +49,9 @@ class HilsIfDriver : public Component, public UartCommunicationWithObc, public G
   /**
    * @fn ParseCommand
    * @brief Override function for UART communication
-   * @param [in] cmd_size: Command size
+   * @param [in] command_size: Command size
    */
-  int ParseCommand(const int cmd_size) override;
+  int ParseCommand(const int command_size) override;
   /**
    * @fn GenerateTelemetry
    * @brief Override function for UART communication

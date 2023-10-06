@@ -30,10 +30,10 @@ void HilsIfDriver::MainRoutine(int count) {
   return;
 }
 
-int HilsIfDriver::ParseCommand(const int cmd_size) {
+int HilsIfDriver::ParseCommand(const int command_size) {
   std::vector<unsigned char> cmd = rx_buffer_;
   int idx = 0;
-  for (int i = 0; i < cmd_size; i++) {
+  for (int i = 0; i < command_size; i++) {
     cmd[idx] = rx_buffer_[i];
     idx++;
   }

@@ -119,7 +119,7 @@ class Sagitta : public StarSensor, public UartCommunicationWithObc {
    * @fn ParseCommand
    * @brief Override function of UartCommunicationWithObc
    */
-  int ParseCommand(const int cmd_size) override;
+  int ParseCommand(const int command_size) override;
   /**
    * @fn GenerateTelemetry
    * @brief Override function of UartCommunicationWithObc

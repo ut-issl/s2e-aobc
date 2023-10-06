@@ -45,8 +45,8 @@ void Sagitta::MainRoutine(int count) {
   return;
 }
 
-int Sagitta::ParseCommand(const int cmd_size) {
-  if (cmd_size < 1) return -1;
+int Sagitta::ParseCommand(const int command_size) {
+  if (command_size < 1) return -1;
   std::vector<uint8_t> decoded_rx = decode_slip_with_header(rx_buffer_);
   if (decoded_rx.size() < sizeof(kAddress_) + kXxhashSize_) return -1;
 
