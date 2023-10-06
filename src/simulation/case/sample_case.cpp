@@ -3,7 +3,7 @@
  * @brief Example of user defined simulation case
  */
 
-#include "sample_case.h"
+#include "sample_case.hpp"
 
 #include <./simulation/monte_carlo_simulation/simulation_object.hpp>
 
