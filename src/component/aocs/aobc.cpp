@@ -9,13 +9,15 @@
 
 #include "../../simulation/spacecraft/aocs_module_components.hpp"
 
-AOBC::AOBC(ClockGenerator *clock_generator, AocsModuleComponents *components) : Component(100, clock_generator), components_(components) { Initialize(); }
+Aobc::Aobc(ClockGenerator *clock_generator, AocsModuleComponents *components) : Component(100, clock_generator), components_(components) {
+  Initialize();
+}
 
-AOBC::~AOBC() { delete components_; }
+Aobc::~Aobc() { delete components_; }
 
-void AOBC::Initialize() {}
+void Aobc::Initialize() {}
 
-void AOBC::MainRoutine(const int time_count) {
+void Aobc::MainRoutine(const int time_count) {
   UNUSED(time_count);
   // Currently, this class is not used.
 }

@@ -11,23 +11,23 @@
 class AocsModuleComponents;
 
 /**
- * @class AOBC
+ * @class Aobc
  * @brief Class to emulate AOBC
  */
-class AOBC : public Component {
+class Aobc : public Component {
  public:
   /**
-   * @fn AOBC
+   * @fn Aobc
    * @brief Constructor
    * @param [in] clock_generator: Clock generator
    * @param [in] components: Components connected to the AOBC
    */
-  AOBC(ClockGenerator *clock_generator, AocsModuleComponents *components);
+  Aobc(ClockGenerator *clock_generator, AocsModuleComponents *components);
   /**
-   * @fn ~AOBC
+   * @fn ~Aobc
    * @brief Destructor
    */
-  ~AOBC();
+  ~Aobc();
 
   /**
    * @fn Initialize
