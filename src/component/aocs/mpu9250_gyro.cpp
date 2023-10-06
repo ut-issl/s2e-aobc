@@ -83,18 +83,18 @@ void Mpu9250GyroSensor::WriteGyroTlm() {
 
   // Acc
   for (size_t i = 0; i < kGyroDimension; i++) {
-    Convert2Tlm(tlm, acc_c_G_[i] * acc_convert_G_to_raw_);
+    Convert2Tlm(tlm, accelerometer_c_G_[i] * accelerometer_convert_G_to_raw_);
     WriteRegister(reg_id, tlm, kMpuTlmSize_);
     reg_id += kMpuTlmSize_;
   }
   // Temperature
-  Convert2Tlm(tlm, (temperature_degC_ - temp_offset_degC_) * temp_convert_degC_to_raw_);
+  Convert2Tlm(tlm, (temperature_degC_ - temperature_offset_degC_) * temperature_convert_degC_to_raw_);
   WriteRegister(reg_id, tlm, kMpuTlmSize_);
   reg_id += kMpuTlmSize_;
   // Gyro
   for (size_t i = 0; i < kGyroDimension; i++) {
-    double omega_c_deg_s = angular_velocity_c_rad_s_[i] * libra::rad_to_deg;
-    Convert2Tlm(tlm, omega_c_deg_s * omega_convert_deg_s_to_raw_);
+    double angular_velocity_c_deg_s = angular_velocity_c_rad_s_[i] * libra::rad_to_deg;
+    Convert2Tlm(tlm, angular_velocity_c_deg_s * angular_velocity_convert_deg_s_to_raw_);
     WriteRegister(reg_id, tlm, kMpuTlmSize_);
     reg_id += kMpuTlmSize_;
   }
@@ -113,7 +113,7 @@ void Mpu9250GyroSensor::Convert2Tlm(unsigned char tlm[kMpuTlmSize_], const doubl
 }
 
 void Mpu9250GyroSensor::SetConvertCoefficients() {
-  omega_convert_deg_s_to_raw_ = raw_max_ / omega_max_deg_s_;
-  acc_convert_G_to_raw_ = raw_max_ / acc_max_G_;
+  angular_velocity_convert_deg_s_to_raw_ = raw_max_ / angular_velocity_max_deg_s_;
+  accelerometer_convert_G_to_raw_ = raw_max_ / accelerometer_max_G_;
   return;
 }

@@ -126,7 +126,7 @@ class Stim210 : public GyroSensor, public UartCommunicationWithObc {
 
   OPERATION_MODE operation_mode_ = OPERATION_INIT_MODE;           //!< Operation mode
   NORMAL_MODE_FORMAT normal_mode_format_ = NORMAL_MODE_STANDARD;  //!< Normal mode telemetry format
-  GYRO_OUTPUT_MODE omega_mode_ = GYRO_OUTPUT_ANGULAR_RATE;        //!< Measurement result output mode
+  GYRO_OUTPUT_MODE angular_velocity_mode_ = GYRO_OUTPUT_ANGULAR_RATE;        //!< Measurement result output mode
   TERMINATION_MODE termination_mode_ = TERMINATION_OFF;           //!< Termination mode
   LPF lpf_freq_ = LPF_262HZ;                                      //!< Internal low pass filter setting
   SAMPLE_RATE sample_rate_mode_ = SAMPLE_RATE_2000HZ;             //!< Sample rate

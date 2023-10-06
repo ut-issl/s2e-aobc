@@ -50,19 +50,19 @@ class Mpu9250GyroSensor : public GyroSensor, public I2cTargetCommunicationWithOb
   bool is_magnetometer_on_ = false;  //!< Magnetometer enable status
 
   // TODO:本当はSensorBaseの最大値と関連付けたいが、今はPrivate変数になっているので、ひとまずこれで
-  double omega_max_deg_s_ = 250.0;                       //!< Maximum angular rate measurement limit
-  double acc_max_G_ = 2.0;                               //!< Maximum acceleration measurement limit
+  double angular_velocity_max_deg_s_ = 250.0;            //!< Maximum angular rate measurement limit
+  double accelerometer_max_G_ = 2.0;                     //!< Maximum acceleration measurement limit
   const double raw_max_ = pow(2, 8 * kMpuTlmSize_ - 1);  //!< Maximum value of raw value
 
   // Conversion coefficients
-  double omega_convert_deg_s_to_raw_;               //!< Conversion coefficients for angular rate [deg/s -> raw]
-  double acc_convert_G_to_raw_;                     //!< Conversion coefficients for acceleration [G -> raw]
-  const double temp_convert_degC_to_raw_ = 333.87;  //!< Conversion coefficients for temperature [degC -> raw]
-  const double temp_offset_degC_ = 21.0;            //!< Temperature offset [degC]
+  double angular_velocity_convert_deg_s_to_raw_;           //!< Conversion coefficients for angular rate [deg/s -> raw]
+  double accelerometer_convert_G_to_raw_;                  //!< Conversion coefficients for acceleration [G -> raw]
+  const double temperature_convert_degC_to_raw_ = 333.87;  //!< Conversion coefficients for temperature [degC -> raw]
+  const double temperature_offset_degC_ = 21.0;            //!< Temperature offset [degC]
 
   // Dummy data
-  double acc_c_G_[kGyroDimension] = {-0.02, 0.01, -1.0};  //!< Observed acceleration [G]
-  double temperature_degC_ = 30.0;                        //!< Observed temperature [degC]
+  double accelerometer_c_G_[kGyroDimension] = {-0.02, 0.01, -1.0};  //!< Observed acceleration [G]
+  double temperature_degC_ = 30.0;                                  //!< Observed temperature [degC]
 
   // Registers
   const unsigned char kRegObsGyro_ = 0x3b;  //!< Register address for gyro observation

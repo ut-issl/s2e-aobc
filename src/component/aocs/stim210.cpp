@@ -158,14 +158,14 @@ void Stim210::GenerateOmegaTlm(int &offset) {
   const int kOmegaByte = 3;  // 1軸当たりのバイト数
   const int kTlmSize = kOmegaByte * kGyroDimension;
   std::vector<unsigned char> tlm(kTlmSize, 0);
-  int omega_c_tlm[kGyroDimension] = {0, 0, 0};
+  int angular_velocity_c_tlm[kGyroDimension] = {0, 0, 0};
 
   // TODO: LPFの実装
 
   for (size_t i = 0; i < kGyroDimension; i++) {
-    omega_c_tlm[i] = ConvertOmega2Tlm(angular_velocity_c_rad_s_[i]);
+    angular_velocity_c_tlm[i] = ConvertOmega2Tlm(angular_velocity_c_rad_s_[i]);
     for (size_t j = 0; j < kOmegaByte; j++) {
-      tlm[i * kOmegaByte + j] = (unsigned char)(omega_c_tlm[i] >> kByte2Bit * (kOmegaByte - j - 1)) & 0xff;
+      tlm[i * kOmegaByte + j] = (unsigned char)(angular_velocity_c_tlm[i] >> kByte2Bit * (kOmegaByte - j - 1)) & 0xff;
     }
   }
   SetTlm(tlm, offset, kTlmSize);
@@ -248,22 +248,22 @@ void Stim210::SetTlm(std::vector<unsigned char> tlm, int &offset, size_t tlm_siz
   return;
 }
 
-int32_t Stim210::ConvertOmega2Tlm(double omega_c_rad_s) {
-  double omega_c_dps = omega_c_rad_s * 180.0 / libra::pi;
-  int32_t omega_c_bit = int32_t(omega_c_dps * pow(2, 14));
+int32_t Stim210::ConvertOmega2Tlm(double angular_velocity_c_rad_s) {
+  double angular_velocity_c_dps = angular_velocity_c_rad_s * 180.0 / libra::pi;
+  int32_t angular_velocity_c_bit = int32_t(angular_velocity_c_dps * pow(2, 14));
 
   // Limits
   int32_t upper_limit = 0x007FFFFF;        // Signed 24bit max value
   int32_t lower_limit = -upper_limit - 1;  // Signed 24bit min value
-  omega_c_bit = (std::min)(upper_limit, omega_c_bit);
-  omega_c_bit = (std::max)(lower_limit, omega_c_bit);
+  angular_velocity_c_bit = (std::min)(upper_limit, angular_velocity_c_bit);
+  angular_velocity_c_bit = (std::max)(lower_limit, angular_velocity_c_bit);
   // 24 bit
-  if (omega_c_bit >= 0) {
-    omega_c_bit = omega_c_bit & upper_limit;
+  if (angular_velocity_c_bit >= 0) {
+    angular_velocity_c_bit = angular_velocity_c_bit & upper_limit;
   } else {
-    omega_c_bit = (omega_c_bit & upper_limit) | (upper_limit + 1);
+    angular_velocity_c_bit = (angular_velocity_c_bit & upper_limit) | (upper_limit + 1);
   }
-  return omega_c_bit;
+  return angular_velocity_c_bit;
 }
 
 int16_t Stim210::ConvertTemp2Tlm(double temp) {
@@ -402,16 +402,16 @@ int Stim210::AnalyzeCmdSetOmegaMode(std::vector<unsigned char> cmd) {
   if (cmd[1] != ' ') return -1;
   switch (cmd[2]) {
     case 'a':
-      omega_mode_ = GYRO_OUTPUT_ANGULAR_RATE;
+      angular_velocity_mode_ = GYRO_OUTPUT_ANGULAR_RATE;
       break;
     case 'i':
-      omega_mode_ = GYRO_OUTPUT_INCREMENTAL_ANGLE;
+      angular_velocity_mode_ = GYRO_OUTPUT_INCREMENTAL_ANGLE;
       break;
     case 'm':
-      omega_mode_ = GYRO_OUTPUT_AVERAGE_ANGULAR_RATE;
+      angular_velocity_mode_ = GYRO_OUTPUT_AVERAGE_ANGULAR_RATE;
       break;
     case 's':
-      omega_mode_ = GYRO_OUTPUT_INTEGRATED_ANGLE;
+      angular_velocity_mode_ = GYRO_OUTPUT_INTEGRATED_ANGLE;
       break;
     default:
       return -1;

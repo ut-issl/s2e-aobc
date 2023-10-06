@@ -59,10 +59,10 @@ void CubeWheel::MainRoutine(const int time_count) {
         sign = -1;
       }
       double speed_command_cycle_in_sec = 0.5;
-      double target_omega_dash = to_add_rad_s / speed_command_cycle_in_sec * sign;
+      double target_angular_velocity_dash = to_add_rad_s / speed_command_cycle_in_sec * sign;
 
       // 指令トルクをセット。
-      double torque_Nm = target_omega_dash * 0.00000211;
+      double torque_Nm = target_angular_velocity_dash * 0.00000211;
       SetTargetTorqueRw(torque_Nm);
 
       // dummy値を書き込む。次にspeed cmdを受信するまで処理をしないため。
