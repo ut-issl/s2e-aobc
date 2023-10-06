@@ -124,12 +124,12 @@ class Stim210 : public GyroSensor, public UartCommunicationWithObc {
     SAMPLE_RATE_MAX
   } SAMPLE_RATE;
 
-  OPERATION_MODE operation_mode_ = OPERATION_INIT_MODE;           //!< Operation mode
-  NORMAL_MODE_FORMAT normal_mode_format_ = NORMAL_MODE_STANDARD;  //!< Normal mode telemetry format
-  GYRO_OUTPUT_MODE angular_velocity_mode_ = GYRO_OUTPUT_ANGULAR_RATE;        //!< Measurement result output mode
-  TERMINATION_MODE termination_mode_ = TERMINATION_OFF;           //!< Termination mode
-  LPF lpf_freq_ = LPF_262HZ;                                      //!< Internal low pass filter setting
-  SAMPLE_RATE sample_rate_mode_ = SAMPLE_RATE_2000HZ;             //!< Sample rate
+  OPERATION_MODE operation_mode_ = OPERATION_INIT_MODE;                //!< Operation mode
+  NORMAL_MODE_FORMAT normal_mode_format_ = NORMAL_MODE_STANDARD;       //!< Normal mode telemetry format
+  GYRO_OUTPUT_MODE angular_velocity_mode_ = GYRO_OUTPUT_ANGULAR_RATE;  //!< Measurement result output mode
+  TERMINATION_MODE termination_mode_ = TERMINATION_OFF;                //!< Termination mode
+  LPF lpf_freq_ = LPF_262HZ;                                           //!< Internal low pass filter setting
+  SAMPLE_RATE sample_rate_mode_ = SAMPLE_RATE_2000HZ;                  //!< Sample rate
 
   const uint8_t normal_mode_format_idx_[Stim210::NORMAL_MODE_MAX] = {0x90, 0x92, 0xa0, 0xa2, 0xa4,
                                                                      0xa5, 0x99, 0xa6, 0xa8};  //!< Telemetry header in normal mode
