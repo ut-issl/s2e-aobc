@@ -8,7 +8,7 @@
 
 #include <simulation/spacecraft/spacecraft.hpp>
 
-#include "aocs_module_components.h"
+#include "aocs_module_components.hpp"
 
 /**
  * @class SampleSatellite

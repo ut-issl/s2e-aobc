@@ -7,7 +7,7 @@
 
 #include <library/utilities/macros.hpp>
 
-#include "../../simulation/spacecraft/aocs_module_components.h"
+#include "../../simulation/spacecraft/aocs_module_components.hpp"
 
 AOBC::AOBC(ClockGenerator *clock_gen, AocsModuleComponents *components) : Component(100, clock_gen), components_(components) { Initialize(); }
 
