@@ -43,7 +43,7 @@ std::string Rw0003::GetLogHeader() const {
 
   str_tmp += WriteScalar("RW0003_angular_velocity", "rad/s");
   str_tmp += WriteScalar("RW0003_angular_velocity_rpm", "rpm");
-  str_tmp += WriteScalar("RW0003_angular_velocity_upperlimit", "rpm");
+  str_tmp += WriteScalar("RW0003_angular_velocity_upper_limit", "rpm");
   str_tmp += WriteScalar("RW0003_angular_acceleration", "rad/s^2");
 
   if (is_logged_jitter_) {
@@ -69,10 +69,10 @@ void Rw0003::ReadCmd() {
 
   // CRC
   const unsigned char i2c_address = GetI2cAddress();
-  uint16_t calced_crc = kCrcInitial_;
-  calced_crc = Crc16CcittRight(calced_crc, &i2c_address, sizeof(i2c_address), kCrcRevFlag_);
-  calced_crc = Crc16CcittRight(calced_crc, &decoded_rx[0], decoded_rx.size(), kCrcRevFlag_);
-  if (calced_crc != 0x0000) return;  // CRC error
+  uint16_t calculated_crc = kCrcInitial_;
+  calculated_crc = Crc16CcittRight(calculated_crc, &i2c_address, sizeof(i2c_address), kCrcRevFlag_);
+  calculated_crc = Crc16CcittRight(calculated_crc, &decoded_rx[0], decoded_rx.size(), kCrcRevFlag_);
+  if (calculated_crc != 0x0000) return;  // CRC error
 
   // MCF
   uint8_t mcf = decoded_rx[1];
