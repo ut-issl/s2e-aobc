@@ -61,24 +61,24 @@ AocsModuleComponents::AocsModuleComponents(const Dynamics *dynamics, Structure *
 
   // MPU9250
   const std::string mpu9250_gyro_ini_path = ini_access.ReadString("COMPONENTS_FILE", "gyro_l_file");
-  const unsigned int mpu9250_gyro_hils_port_id = ini_access.ReadInt("COM_PORT", "mpu9250_gyro_hils_port_id");
+  const unsigned int mpu9250_gyro_sensor_hils_port_id = ini_access.ReadInt("COM_PORT", "mpu9250_gyro_sensor_hils_port_id");
   IniAccess mpu9250_gyro_ini_access = IniAccess(mpu9250_gyro_ini_path);
   const uint8_t mpu9250_gyro_i2c_address = (uint8_t)mpu9250_gyro_ini_access.ReadInt("I2C_PORT_GYRO", "i2c_address");
   mpu9250_gyro_sensor_ = new Mpu9250GyroSensor(
       InitGyroSensor(clock_generator, power_controller_->GetPowerPort((int)PowerPortIdx::MPU), 2, mpu9250_gyro_ini_path, compo_step_sec, dynamics_),
-      0, mpu9250_gyro_hils_port_id, mpu9250_gyro_i2c_address, aobc_, hils_port_manager_);
+      0, mpu9250_gyro_sensor_hils_port_id, mpu9250_gyro_i2c_address, aobc_, hils_port_manager_);
 
-  const std::string mpu9250_mag_ini_path = ini_access.ReadString("COMPONENTS_FILE", "magsensor_l_file");
-  const unsigned int mpu9250_mag_hils_port_id = ini_access.ReadInt("COM_PORT", "mpu9250_mag_hils_port_id");
+  const std::string mpu9250_mag_ini_path = ini_access.ReadString("COMPONENTS_FILE", "coarse_magnetometer_file");
+  const unsigned int mpu9250_magnetometer_hils_port_id = ini_access.ReadInt("COM_PORT", "mpu9250_magnetometer_hils_port_id");
   IniAccess mpu9250_mag_ini_access = IniAccess(mpu9250_mag_ini_path);
   const uint8_t mpu9250_mag_i2c_address = (uint8_t)mpu9250_mag_ini_access.ReadInt("I2C_PORT_MAG", "i2c_address");
-  mpu9250_magnetometer_ =
-      new Mpu9250Magnetometer(InitMagnetometer(clock_generator, power_controller_->GetPowerPort((int)PowerPortIdx::MPU), 2, mpu9250_mag_ini_path,
-                                       compo_step_sec, &(local_environment_->GetGeomagneticField())),
-                      0, mpu9250_mag_hils_port_id, mpu9250_mag_i2c_address, aobc_, hils_port_manager_, mpu9250_gyro_sensor_->GetIsMagOn());
+  mpu9250_magnetometer_ = new Mpu9250Magnetometer(
+      InitMagnetometer(clock_generator, power_controller_->GetPowerPort((int)PowerPortIdx::MPU), 2, mpu9250_mag_ini_path, compo_step_sec,
+                       &(local_environment_->GetGeomagneticField())),
+      0, mpu9250_magnetometer_hils_port_id, mpu9250_mag_i2c_address, aobc_, hils_port_manager_, mpu9250_gyro_sensor_->GetIsMagOn());
 
   // RM3100
-  const std::string rm3100_aobc_ini_path = ini_access.ReadString("COMPONENTS_FILE", "magsensor_h_aobc_file");
+  const std::string rm3100_aobc_ini_path = ini_access.ReadString("COMPONENTS_FILE", "fine_magnetometer_file");
   const unsigned int rm3100_aobc_hils_port_id = ini_access.ReadInt("COM_PORT", "rm3100_aobc_hils_port_id");
   IniAccess rm3100_aobc_ini_access = IniAccess(rm3100_aobc_ini_path);
   const uint8_t rm3100_aobc_i2c_address = (uint8_t)rm3100_aobc_ini_access.ReadInt("I2C_PORT_1", "i2c_address");
@@ -86,7 +86,7 @@ AocsModuleComponents::AocsModuleComponents(const Dynamics *dynamics, Structure *
                                                           rm3100_aobc_ini_path, compo_step_sec, &local_environment_->GetGeomagneticField())),
                             0, rm3100_aobc_hils_port_id, rm3100_aobc_i2c_address, aobc_, hils_port_manager_);
 
-  const std::string rm3100_ext_ini_path = ini_access.ReadString("COMPONENTS_FILE", "magsensor_h_ext_file");
+  const std::string rm3100_ext_ini_path = ini_access.ReadString("COMPONENTS_FILE", "external_fine_magnetometer_file");
   const unsigned int rm3100_ext_hils_port_id = ini_access.ReadInt("COM_PORT", "rm3100_ext_hils_port_id");
   IniAccess rm3100_ext_ini_access = IniAccess(rm3100_ext_ini_path);
   const uint8_t rm3100_ext_i2c_address = (uint8_t)rm3100_ext_ini_access.ReadInt("I2C_PORT_2", "i2c_address");
@@ -95,7 +95,7 @@ AocsModuleComponents::AocsModuleComponents(const Dynamics *dynamics, Structure *
                                 0, rm3100_ext_hils_port_id, rm3100_ext_i2c_address, aobc_, hils_port_manager_);
 
   // Sun sensors
-  const std::string nanoSSOC_D60_ini_path = ini_access.ReadString("COMPONENTS_FILE", "ss_file");
+  const std::string nanoSSOC_D60_ini_path = ini_access.ReadString("COMPONENTS_FILE", "sun_sensor_file");
   IniAccess ss_ini_file = IniAccess(nanoSSOC_D60_ini_path);
   const size_t number_of_mounted_ss = ss_ini_file.ReadInt("GENERAL", "number_of_mounted_sensors");
   for (size_t ss_idx = 0; ss_idx < number_of_mounted_ss; ss_idx++) {
@@ -112,7 +112,7 @@ AocsModuleComponents::AocsModuleComponents(const Dynamics *dynamics, Structure *
   }
 
   // MTQ
-  const std::string mtq_ini_path = ini_access.ReadString("COMPONENTS_FILE", "mtq_file");
+  const std::string mtq_ini_path = ini_access.ReadString("COMPONENTS_FILE", "magnetorquer_file");
   IniAccess mtq_ini_file = IniAccess(mtq_ini_path);
   int number_of_mtq_ports = mtq_ini_file.ReadInt("MTQ_GPIO_PORT", "number_of_ports");
   std::vector<int> mtq_gpio_ports = mtq_ini_file.ReadVectorInt("MTQ_GPIO_PORT", "gpio_port", number_of_mtq_ports);
@@ -121,7 +121,7 @@ AocsModuleComponents::AocsModuleComponents(const Dynamics *dynamics, Structure *
                               mtq_gpio_ports, aobc_);
 
   // GPS-R
-  const std::string oem7600_ini_path = ini_access.ReadString("COMPONENTS_FILE", "gnssr_file");
+  const std::string oem7600_ini_path = ini_access.ReadString("COMPONENTS_FILE", "gnss_receiver_file");
   IniAccess oem7600_ini_file = IniAccess(oem7600_ini_path);
   const unsigned char oem7600_uart_sils_port = (unsigned char)oem7600_ini_file.ReadInt("UART_PORT", "uart_port_sils");
   const unsigned char oem7600_com_port = (unsigned char)oem7600_ini_file.ReadInt("UART_PORT", "oem_com_port");
@@ -133,7 +133,7 @@ AocsModuleComponents::AocsModuleComponents(const Dynamics *dynamics, Structure *
                   oem7600_uart_sils_port, aobc_, oem7600_com_port, oem7600_hils_port_id, oem7600_baud_rate, hils_port_manager_);
 
   // STT
-  const std::string sagitta_ini_path = ini_access.ReadString("COMPONENTS_FILE", "stt_file");
+  const std::string sagitta_ini_path = ini_access.ReadString("COMPONENTS_FILE", "star_sensor_file");
   IniAccess sagitta_ini_file = IniAccess(sagitta_ini_path);
   const unsigned char sagitta_uart_sils_port = (unsigned char)sagitta_ini_file.ReadInt("UART_PORT", "uart_port_sils");
   const unsigned int sagitta_hils_port_id = ini_access.ReadInt("COM_PORT", "sagitta_hils_port_id");
@@ -143,7 +143,7 @@ AocsModuleComponents::AocsModuleComponents(const Dynamics *dynamics, Structure *
                          sagitta_uart_sils_port, aobc_, sagitta_hils_port_id, sagitta_baud_rate, hils_port_manager_);
 
   // Accurate gyro sensor
-  const std::string stim210_ini_path = ini_access.ReadString("COMPONENTS_FILE", "gyro_h_file");
+  const std::string stim210_ini_path = ini_access.ReadString("COMPONENTS_FILE", "fine_gyro_sensor_file");
   IniAccess stim210_ini_file = IniAccess(stim210_ini_path);
   const unsigned char stim210_uart_sils_port = (unsigned char)stim210_ini_file.ReadInt("UART_PORT", "uart_port_sils");
   const unsigned int stim210_hils_port_id = ini_access.ReadInt("COM_PORT", "stim210_hils_port_id");
@@ -153,7 +153,7 @@ AocsModuleComponents::AocsModuleComponents(const Dynamics *dynamics, Structure *
       compo_step_sec, stim210_uart_sils_port, aobc_, stim210_hils_port_id, stim210_baud_rate, hils_port_manager_);
 
   // Reaction Wheel
-  const std::string rw_ini_path = ini_access.ReadString("COMPONENTS_FILE", "rw_file");
+  const std::string rw_ini_path = ini_access.ReadString("COMPONENTS_FILE", "reaction_wheel_file");
   IniAccess rw_ini_access = IniAccess(rw_ini_path);
   const unsigned int rw0003_x_hils_port_id = ini_access.ReadInt("COM_PORT", "rw0003_x_hils_port_id");
   const uint8_t i2c_address_x = (uint8_t)rw_ini_access.ReadInt("I2C_PORT_1", "i2c_address");
