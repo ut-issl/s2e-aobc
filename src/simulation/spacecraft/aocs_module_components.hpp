@@ -83,7 +83,7 @@ class AocsModuleComponents : public InstalledComponents {
   ObcWithC2a *aobc_;  //!< Attitude On Board Computer
   // Power
   PowerController *power_controller_;  //!< Power switch controller
-  std::vector<INA260> ina260s_;        //!< INA260 current sensor
+  std::vector<Ina260> ina260s_;        //!< Ina260 current sensor
   // AOCS
   MPU9250_GYRO *mpu9250_gyro_sensor_;         //!< MPU9250 gyro sensor
   MPU9250_MAG *mpu9250_magnetometer_;         //!< MPU9250 magnetometer

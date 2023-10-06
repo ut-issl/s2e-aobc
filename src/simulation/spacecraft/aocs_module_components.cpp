@@ -49,13 +49,13 @@ AocsModuleComponents::AocsModuleComponents(const Dynamics *dynamics, Structure *
   unsigned char ina_i2c_addr_pic = (unsigned char)power_controller_access.ReadInt("POWER_SENSOR", "i2c_address_pic");
 
   // PICのみ特別
-  ina260s_.push_back(INA260(ina_prescaler, clock_generator, ina_power_port, ina_min_voltage, ina_power_consumption,
+  ina260s_.push_back(Ina260(ina_prescaler, clock_generator, ina_power_port, ina_min_voltage, ina_power_consumption,
                             power_controller_->GetPowerPort((int)PowerPortIdx::PIC), ina_i2c_port, ina_i2c_addr_pic, aobc_));
   // RM, SS, MTQ, STIM, STT, OEM, RWX, RWY, RWZ
   int number_of_sensors = power_controller_access.ReadInt("POWER_SENSOR", "number_of_sensors");
   std::vector<unsigned char> ina_i2c_addr_list = power_controller_access.ReadVectorUnsignedChar("POWER_SENSOR", "i2c_address", number_of_sensors);
   for (size_t i = 0; i < ina_i2c_addr_list.size(); i++) {
-    ina260s_.push_back(INA260(ina_prescaler, clock_generator, ina_power_port, ina_min_voltage, ina_power_consumption,
+    ina260s_.push_back(Ina260(ina_prescaler, clock_generator, ina_power_port, ina_min_voltage, ina_power_consumption,
                               power_controller_->GetPowerPort(i + 2), ina_i2c_port, ina_i2c_addr_list[i], aobc_));  // INAとMPUは観測対象でない
   }
 
@@ -212,7 +212,7 @@ AocsModuleComponents::~AocsModuleComponents() {
   delete rw0003_z_;
   delete oem7600_;
   delete thruster_;
-  std::vector<INA260>().swap(ina260s_);
+  std::vector<Ina260>().swap(ina260s_);
   delete power_controller_;
 #ifdef USE_HILS
   delete hils_if_driver_;

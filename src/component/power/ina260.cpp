@@ -5,7 +5,7 @@
 
 #include "ina260.hpp"
 
-INA260::INA260(int prescaler, ClockGenerator *clock_generator, PowerPort *ina_power_port, const double ina_minimum_voltage,
+Ina260::Ina260(int prescaler, ClockGenerator *clock_generator, PowerPort *ina_power_port, const double ina_minimum_voltage,
                const double ina_assumed_power_consumption, PowerPort *observation_power_port, const int i2c_port_id, const unsigned char i2c_addr,
                OnBoardComputer *obc)
     : Component(prescaler, clock_generator, ina_power_port),
@@ -15,14 +15,14 @@ INA260::INA260(int prescaler, ClockGenerator *clock_generator, PowerPort *ina_po
   power_port_->SetAssumedPowerConsumption_W(ina_assumed_power_consumption);
 }
 
-INA260::INA260(INA260 &&obj) noexcept
+Ina260::Ina260(Ina260 &&obj) noexcept
     : Component(obj), I2cTargetCommunicationWithObc(std::move(obj)), observation_power_port_(obj.observation_power_port_) {
   obj.observation_power_port_ = nullptr;
 }
 
-INA260::~INA260() {}
+Ina260::~Ina260() {}
 
-void INA260::MainRoutine(const int time_count) {
+void Ina260::MainRoutine(const int time_count) {
   UNUSED(time_count);
   // Read Registers
   ReadConfigCmd();
@@ -37,7 +37,7 @@ void INA260::MainRoutine(const int time_count) {
   return;
 }
 
-void INA260::GenerateTelemetry() {
+void Ina260::GenerateTelemetry() {
   // Read PowerPort
   double current_mA = observation_power_port_->GetCurrentConsumption_A() * 1000.0;
   double voltage_mV = observation_power_port_->GetVoltage_V() * 1000.0;
@@ -72,7 +72,7 @@ void INA260::GenerateTelemetry() {
   return;
 }
 
-void INA260::ReadConfigCmd() {
+void Ina260::ReadConfigCmd() {
   unsigned char rx_data[3] = {0, 0, 0};
   ReadCommand(rx_data, 3);
   if (rx_data[0] != (unsigned char)INA260_CMD::CONFIG) return;
@@ -81,7 +81,7 @@ void INA260::ReadConfigCmd() {
   return;
 }
 
-void INA260::ReadLimitMaskCmd() {
+void Ina260::ReadLimitMaskCmd() {
   unsigned char rx_data[3] = {0, 0, 0};
   ReadCommand(rx_data, 3);
   if (rx_data[0] != (unsigned char)INA260_CMD::LIMIT_MASK) return;
@@ -94,7 +94,7 @@ void INA260::ReadLimitMaskCmd() {
   return;
 }
 
-void INA260::ReadLimitValueCmd() {
+void Ina260::ReadLimitValueCmd() {
   unsigned char rx_data[3] = {0, 0, 0};
   ReadCommand(rx_data, 3);
   if (rx_data[0] != (unsigned char)INA260_CMD::LIMIT_VALUE) return;
