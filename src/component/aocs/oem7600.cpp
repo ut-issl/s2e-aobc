@@ -377,7 +377,7 @@ std::string Oem7600::GenerateTelemetryHeaderBinary(const std::string telemetry_n
     tlm[tlm_parse_pointer++] = 0x14;  // Unknown
   }
 
-  // week(uint16),msec(uint32)
+  // week(uint16), msec(uint32)
   tlm[tlm_parse_pointer++] = (unsigned char)(((unsigned short)(gps_time_week_) & 0x00ff));
   tlm[tlm_parse_pointer++] = (unsigned char)(((unsigned short)(gps_time_week_) & 0xff00) >> 8);
 
