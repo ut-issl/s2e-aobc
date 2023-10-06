@@ -30,7 +30,7 @@ void Rw0003::MainRoutine(const int time_count) {
   // Generate TLM
   if (is_rw_initialized_ == true) {
     CalcTorque();
-    WriteFloatTlm(kReadAddressTemperature_, temperture_degC_);
+    WriteFloatTlm(kReadAddressTemperature_, temperature_degC_);
     WriteFloatTlm(kReadAddressSpeed_, (float)angular_velocity_rad_s_);
   }
 

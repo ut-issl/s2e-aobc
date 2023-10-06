@@ -47,7 +47,7 @@ class Rw0003 : public ReactionWheel, public I2cTargetCommunicationWithObc {
 
  private:
   bool is_rw_initialized_ = false;  //!< Flag to detect initializing operation
-  double temperture_degC_ = 30.0;   //!< RW measured temperature [degC] (dummy data)
+  double temperature_degC_ = 30.0;  //!< RW measured temperature [degC] (dummy data)
 
   // Communication
   uint16_t crc_;                             //!< Calculated CRC value
