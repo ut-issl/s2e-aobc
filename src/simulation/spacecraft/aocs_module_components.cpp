@@ -128,7 +128,7 @@ AocsModuleComponents::AocsModuleComponents(const Dynamics *dynamics, Structure *
   const unsigned int oem7600_hils_port_id = ini_access.ReadInt("COM_PORT", "oem7600_hils_port_id");
   const unsigned int oem7600_baud_rate = ini_access.ReadInt("COM_PORT", "oem7600_baud_rate");
   oem7600_ =
-      new OEM7600(GnssReceiver(InitGnssReceiver(clock_generator, power_controller_->GetPowerPort((int)PowerPortIdx::OEM), 1, oem7600_ini_path,
+      new Oem7600(GnssReceiver(InitGnssReceiver(clock_generator, power_controller_->GetPowerPort((int)PowerPortIdx::OEM), 1, oem7600_ini_path,
                                                 dynamics_, &(global_environment_->GetGnssSatellites()), &(global_environment_->GetSimulationTime()))),
                   oem7600_uart_sils_port, aobc_, oem7600_com_port, oem7600_hils_port_id, oem7600_baud_rate, hils_port_manager_);
 
