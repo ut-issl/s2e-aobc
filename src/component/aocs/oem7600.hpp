@@ -60,25 +60,25 @@ class Oem7600 : public GnssReceiver, public UartCommunicationWithObc {
   /**
    * @fn Oem7600
    * @brief Constructor
-   * @param [in] gnssr: GNSS-R setting
+   * @param [in] gnss_receiver: GNSS-R setting
    * @param [in] sils_port_id: Port ID for SILS
    * @param [in] obc: Connected OBC
-   * @param [in] oem_tlm_ch: OEM7600 telemetry channel
+   * @param [in] telemetry_channel: OEM7600 telemetry channel
    */
-  Oem7600(GnssReceiver gnssr, const int sils_port_id, OnBoardComputer *obc, const unsigned char oem_tlm_ch);
+  Oem7600(GnssReceiver gnss_receiver, const int sils_port_id, OnBoardComputer *obc, const unsigned char telemetry_channel);
   /**
    * @fn Oem7600
    * @brief Constructor with HILS setting
-   * @param [in] gnssr: GNSS-R setting
+   * @param [in] gnss_receiver: GNSS-R setting
    * @param [in] sils_port_id: Port ID for SILS
    * @param [in] obc: Connected OBC
-   * @param [in] oem_tlm_ch: OEM7600 telemetry channel
+   * @param [in] telemetry_channel: OEM7600 telemetry channel
    * @param [in] hils_port_id: Port ID for HILS
    * @param [in] baud_rate: UART baud rate
    * @param [in] hils_port_manager: HILS port manager
    */
-  Oem7600(GnssReceiver gnssr, const int sils_port_id, OnBoardComputer *obc, const unsigned char oem_tlm_ch, const unsigned int hils_port_id,
-          const unsigned int baud_rate, HilsPortManager *hils_port_manager);
+  Oem7600(GnssReceiver gnss_receiver, const int sils_port_id, OnBoardComputer *obc, const unsigned char telemetry_channel,
+          const unsigned int hils_port_id, const unsigned int baud_rate, HilsPortManager *hils_port_manager);
 
   // Override functions for Component
   /**
@@ -94,7 +94,7 @@ class Oem7600 : public GnssReceiver, public UartCommunicationWithObc {
   std::string GetLogHeader() const override;
 
  private:
-  const unsigned char oem_tlm_ch_;           //!< OEM7600 telemetry channel
+  const unsigned char telemetry_channel_;    //!< OEM7600 telemetry channel
   std::vector<OEM7600_TLM> tlm_list_;        //!< Telemetry list
   double last_position_fix_time_local_ = 0;  //!< Last position fix time TODO: removed after s2e-core modification
 

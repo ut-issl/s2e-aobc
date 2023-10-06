@@ -17,12 +17,14 @@
 #define _USE_MATH_DEFINES
 // #define TLM_FUNCTION_DEBUG_MODE
 
-Oem7600::Oem7600(GnssReceiver gnssr, const int sils_port_id, OnBoardComputer *obc, const unsigned char oem_tlm_ch)
-    : GnssReceiver(gnssr), UartCommunicationWithObc(sils_port_id, obc), oem_tlm_ch_(oem_tlm_ch) {}
+Oem7600::Oem7600(GnssReceiver gnss_receiver, const int sils_port_id, OnBoardComputer *obc, const unsigned char telemetry_channel)
+    : GnssReceiver(gnss_receiver), UartCommunicationWithObc(sils_port_id, obc), telemetry_channel_(telemetry_channel) {}
 
-Oem7600::Oem7600(GnssReceiver gnssr, const int sils_port_id, OnBoardComputer *obc, const unsigned char oem_tlm_ch, const unsigned int hils_port_id,
-                 const unsigned int baud_rate, HilsPortManager *hils_port_manager)
-    : GnssReceiver(gnssr), UartCommunicationWithObc(sils_port_id, obc, hils_port_id, baud_rate, hils_port_manager), oem_tlm_ch_(oem_tlm_ch) {}
+Oem7600::Oem7600(GnssReceiver gnss_receiver, const int sils_port_id, OnBoardComputer *obc, const unsigned char telemetry_channel,
+                 const unsigned int hils_port_id, const unsigned int baud_rate, HilsPortManager *hils_port_manager)
+    : GnssReceiver(gnss_receiver),
+      UartCommunicationWithObc(sils_port_id, obc, hils_port_id, baud_rate, hils_port_manager),
+      telemetry_channel_(telemetry_channel) {}
 
 void Oem7600::MainRoutine(const int time_count) {
   UNUSED(time_count);
@@ -199,7 +201,7 @@ int Oem7600::Cmd_LOG(const std::string comport_ID, const std::string tlm_name, c
   }
 
   // if recieved comport id is correct
-  if (oem_tlm_ch_ == rcvd_comport) {
+  if (telemetry_channel_ == rcvd_comport) {
     // check wether the designated tlm name is valid or not
     if (TLM_NameSearch(tlm_name)) {
       // update current tlm list
@@ -307,10 +309,10 @@ std::string Oem7600::Gen_TLM_Header_Ascii(const std::string tlm_name) {
   std::string str_tmp = "#" + tlm_name;
   std::transform(tlm_name.begin(), tlm_name.end(), (str_tmp.begin() + 1), ::toupper);
 
-  std::string port = "COM" + WriteScalar((int)(oem_tlm_ch_), 1);  // Port
-  str_tmp += "," + port;                                          // after port, "," is already added (WriteScalar did it)
-  str_tmp += "0";                                                 // Sequence number
-  str_tmp += ",90.5";                                             // CPU idle time (currently dummy data is padded)
+  std::string port = "COM" + WriteScalar((int)(telemetry_channel_), 1);  // Port
+  str_tmp += "," + port;                                                 // after port, "," is already added (WriteScalar did it)
+  str_tmp += "0";                                                        // Sequence number
+  str_tmp += ",90.5";                                                    // CPU idle time (currently dummy data is padded)
 
   // Time status
   if (is_gnss_visible_) {
