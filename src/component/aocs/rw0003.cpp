@@ -70,8 +70,8 @@ void RW0003::ReadCmd() {
   // CRC
   const unsigned char i2c_address = GetI2cAddress();
   uint16_t calced_crc = kCrcInitial_;
-  calced_crc = crc_16_ccitt_right(calced_crc, &i2c_address, sizeof(i2c_address), kCrcRevFlag_);
-  calced_crc = crc_16_ccitt_right(calced_crc, &decoded_rx[0], decoded_rx.size(), kCrcRevFlag_);
+  calced_crc = Crc16CcittRight(calced_crc, &i2c_address, sizeof(i2c_address), kCrcRevFlag_);
+  calced_crc = Crc16CcittRight(calced_crc, &decoded_rx[0], decoded_rx.size(), kCrcRevFlag_);
   if (calced_crc != 0x0000) return;  // CRC error
 
   // MCF
@@ -177,9 +177,9 @@ void RW0003::WriteFloatTlm(uint8_t address, float value) {
   // CRC
   const unsigned char i2c_address = GetI2cAddress();
   uint16_t crc = kCrcInitial_;
-  crc = crc_16_ccitt_right(crc, &kSrcAddr_, sizeof(kSrcAddr_), kCrcRevFlag_);
-  crc = crc_16_ccitt_right(crc, &i2c_address, sizeof(i2c_address), kCrcRevFlag_);
-  crc = crc_16_ccitt_right(crc, &tlm[0], tlm.size(), kCrcRevFlag_);
+  crc = Crc16CcittRight(crc, &kSrcAddr_, sizeof(kSrcAddr_), kCrcRevFlag_);
+  crc = Crc16CcittRight(crc, &i2c_address, sizeof(i2c_address), kCrcRevFlag_);
+  crc = Crc16CcittRight(crc, &tlm[0], tlm.size(), kCrcRevFlag_);
   uint8_t crc_u8[kCrcSize_];
   memcpy(crc_u8, &crc, kCrcSize_);
   for (unsigned int i = 0; i < kCrcSize_; i++) {

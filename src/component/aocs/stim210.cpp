@@ -218,7 +218,7 @@ void STIM210::GenerateLatencyTlm(int &offset) {
 
 void STIM210::GenerateCRCTlm(int &offset) {
   const int kTlmSize = 1;
-  std::vector<unsigned char> tlm = {crc_8_atm_left(kCrcInitial, &tx_buffer_[0], offset, kRevFlag)};
+  std::vector<unsigned char> tlm = {Crc8AtmLeft(kCrcInitial, &tx_buffer_[0], offset, kRevFlag)};
   SetTlm(tlm, offset, kTlmSize);
   return;
 }
