@@ -68,7 +68,7 @@ std::string MtqSeiren::GetLogHeader() const {
   const char *cs = st_sensor_id.data();
   std::string section = "MTQ_seiren";
 
-  str_tmp += WriteVector(section + cs, "b", "Am^2", kMtqDimension);
+  str_tmp += WriteVector(section + cs, "b", "Am2", kMtqDimension);
   str_tmp += WriteVector(section + cs, "b", "Nm", kMtqDimension);
 
   return str_tmp;
