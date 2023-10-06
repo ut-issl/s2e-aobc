@@ -39,7 +39,7 @@ void SampleCase::UpdateTargetObjects() {
 std::string SampleCase::GetLogHeader() const {
   std::string str_tmp = "";
   str_tmp += WriteScalar("time", "s");
-  str_tmp += WriteVector("Omega", "b", "rad/s", 3);
+  str_tmp += WriteVector("spacecraft_angular_velocity", "b", "rad/s", 3);
 
   return str_tmp;
 }
