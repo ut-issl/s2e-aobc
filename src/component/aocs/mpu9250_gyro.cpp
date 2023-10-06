@@ -67,12 +67,12 @@ void Mpu9250GyroSensor::ReadCmdGyroRange() {
   return;
 }
 
-void Mpu9250GyroSensor::ReadCmdAccLpf() {
+void Mpu9250GyroSensor::ReadCmdAccelerometerLpf() {
   // TODO 6Uでの利用では固定値なので、中身の実装は優先度低
   return;
 }
 
-void Mpu9250GyroSensor::ReadCmdAccRange() {
+void Mpu9250GyroSensor::ReadCmdAccelerometerRange() {
   // TODO 6Uでの利用では固定値なので、中身の実装は優先度低
   return;
 }
@@ -81,7 +81,7 @@ void Mpu9250GyroSensor::WriteGyroTlm() {
   unsigned char tlm[kMpuTlmSize_] = {0, 0};
   unsigned char reg_id = kRegObsGyro_;
 
-  // Acc
+  // Accelerometer
   for (size_t i = 0; i < kGyroDimension; i++) {
     Convert2Tlm(tlm, accelerometer_c_G_[i] * accelerometer_convert_G_to_raw_);
     WriteRegister(reg_id, tlm, kMpuTlmSize_);

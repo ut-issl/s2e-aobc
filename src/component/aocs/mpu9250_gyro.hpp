@@ -68,12 +68,12 @@ class Mpu9250GyroSensor : public GyroSensor, public I2cTargetCommunicationWithOb
   const unsigned char kRegObsGyro_ = 0x3b;  //!< Register address for gyro observation
 
   // Commands
-  const unsigned char kCmdGyroEnable_ = 0x6b;  //!< Command to enable gyro sensor
-  const unsigned char kCmdMagEnable_ = 0x37;   //!< Command to enable magnetometer
-  const unsigned char kCmdGyroLPF_ = 0x1a;     //!< Command to set gyro sensor Low Pass Filter
-  const unsigned char kCmdGyroRange_ = 0x1b;   //!< Command to set gyro sensor measurement range
-  const unsigned char kCmdAccRange_ = 0x1c;    //!< Command to set accelerator measurement range
-  const unsigned char kCmdAccLPF_ = 0x1d;      //!< Command to set accelerator Low Pass Filter
+  const unsigned char kCmdGyroEnable_ = 0x6b;          //!< Command to enable gyro sensor
+  const unsigned char kCmdMagEnable_ = 0x37;           //!< Command to enable magnetometer
+  const unsigned char kCmdGyroLPF_ = 0x1a;             //!< Command to set gyro sensor Low Pass Filter
+  const unsigned char kCmdGyroRange_ = 0x1b;           //!< Command to set gyro sensor measurement range
+  const unsigned char kCmdAccelerometerRange_ = 0x1c;  //!< Command to set accelerator measurement range
+  const unsigned char kCmdAccelerometerLPF_ = 0x1d;    //!< Command to set accelerator Low Pass Filter
 
   // HILS
   const unsigned int kStoredFrameSize = 3;  //!< Stored frame size
@@ -102,17 +102,17 @@ class Mpu9250GyroSensor : public GyroSensor, public I2cTargetCommunicationWithOb
    */
   void ReadCmdGyroRange();
   /**
-   * @fn ReadCmdAccLpf
+   * @fn ReadCmdAccelerometerLpf
    * @brief Read and execute accelerator low pass filter command
    * @note TODO: Not implemented yet
    */
-  void ReadCmdAccLpf();
+  void ReadCmdAccelerometerLpf();
   /**
-   * @fn ReadCmdAccRange
+   * @fn ReadCmdAccelerometerRange
    * @brief Read and execute accelerator range command
    * @note TODO: Not implemented yet
    */
-  void ReadCmdAccRange();
+  void ReadCmdAccelerometerRange();
 
   // Telemetry
   /**
