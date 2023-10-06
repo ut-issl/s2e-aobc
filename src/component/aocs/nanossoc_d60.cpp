@@ -1,5 +1,5 @@
 /**
- * @file nanossoc_d60.cpp
+ * @file nano_ssoc_d60.cpp
  * @brief Class to emulate NanoSSOC D60 sun sensor
  * @note Manual: NA
  */
@@ -14,7 +14,9 @@
 
 NanoSsocD60::NanoSsocD60(SunSensor sun_sensor, const int sils_port_id, const unsigned int hils_port_id, const unsigned char i2c_address,
                          OnBoardComputer *obc, HilsPortManager *hils_port_manager)
-    : SunSensor(sun_sensor), I2cTargetCommunicationWithObc(sils_port_id, hils_port_id, i2c_address, obc, hils_port_manager), i2c_addr_(i2c_address) {}
+    : SunSensor(sun_sensor),
+      I2cTargetCommunicationWithObc(sils_port_id, hils_port_id, i2c_address, obc, hils_port_manager),
+      i2c_address_(i2c_address) {}
 
 NanoSsocD60::~NanoSsocD60() {}
 
@@ -69,8 +71,8 @@ int32_t NanoSsocD60::ConvertFloat2FloatingPoint(float data) {
   return internal_representation;
 }
 
-int32_t NanoSsocD60::ConvertAngle2Tlm(double angle) {
-  double angle_deg = angle * libra::rad_to_deg;
+int32_t NanoSsocD60::ConvertAngle2Tlm(double angle_rad) {
+  double angle_deg = angle_rad * libra::rad_to_deg;
 
   int32_t angle_tlm_data = ConvertFloat2FloatingPoint((float)angle_deg);
   return angle_tlm_data;
@@ -102,7 +104,7 @@ std::string NanoSsocD60::GetLogHeader() const {
   std::string str_tmp = "";
   const std::string st_id = std::to_string(static_cast<long long>(component_id_));
 
-  str_tmp += WriteVector("NanoSSOC D60" + st_id, "c", "-", 3);
+  str_tmp += WriteVector("NanoSSOC_D60" + st_id, "c", "-", 3);
   str_tmp += WriteScalar("sun_detected_flag" + st_id, "-");
 
   return str_tmp;

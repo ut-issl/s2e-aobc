@@ -46,17 +46,17 @@ AocsModuleComponents::AocsModuleComponents(const Dynamics *dynamics, Structure *
   double ina_power_consumption = power_controller_access.ReadDouble("POWER_SENSOR", "ina_power_consumption_W");
   int ina_prescaler = power_controller_access.ReadInt("POWER_SENSOR", "ina_prescaler");
   unsigned char ina_i2c_port = (unsigned char)power_controller_access.ReadInt("POWER_SENSOR", "i2c_port_id");
-  unsigned char ina_i2c_addr_pic = (unsigned char)power_controller_access.ReadInt("POWER_SENSOR", "i2c_address_pic");
+  unsigned char ina_i2c_address_pic = (unsigned char)power_controller_access.ReadInt("POWER_SENSOR", "i2c_address_pic");
 
   // PICのみ特別
   ina260s_.push_back(Ina260(ina_prescaler, clock_generator, ina_power_port, ina_min_voltage, ina_power_consumption,
-                            power_controller_->GetPowerPort((int)PowerPortIdx::PIC), ina_i2c_port, ina_i2c_addr_pic, aobc_));
+                            power_controller_->GetPowerPort((int)PowerPortIdx::PIC), ina_i2c_port, ina_i2c_address_pic, aobc_));
   // RM, SS, MTQ, STIM, STT, OEM, RWX, RWY, RWZ
   int number_of_sensors = power_controller_access.ReadInt("POWER_SENSOR", "number_of_sensors");
-  std::vector<unsigned char> ina_i2c_addr_list = power_controller_access.ReadVectorUnsignedChar("POWER_SENSOR", "i2c_address", number_of_sensors);
-  for (size_t i = 0; i < ina_i2c_addr_list.size(); i++) {
+  std::vector<unsigned char> ina_i2c_address_list = power_controller_access.ReadVectorUnsignedChar("POWER_SENSOR", "i2c_address", number_of_sensors);
+  for (size_t i = 0; i < ina_i2c_address_list.size(); i++) {
     ina260s_.push_back(Ina260(ina_prescaler, clock_generator, ina_power_port, ina_min_voltage, ina_power_consumption,
-                              power_controller_->GetPowerPort(i + 2), ina_i2c_port, ina_i2c_addr_list[i], aobc_));  // INAとMPUは観測対象でない
+                              power_controller_->GetPowerPort(i + 2), ina_i2c_port, ina_i2c_address_list[i], aobc_));  // INAとMPUは観測対象でない
   }
 
   // MPU9250
