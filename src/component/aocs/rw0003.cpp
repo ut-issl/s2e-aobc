@@ -65,26 +65,26 @@ void Rw0003::ReadCmd() {
 
   // Source Address
   uint8_t src_addr = decoded_rx[0];
-  if (src_addr != kSrcAddr_) return;  // command error
+  if (src_addr != kSourceAddress_) return;  // command error
 
   // CRC
   const unsigned char i2c_address = GetI2cAddress();
   uint16_t calculated_crc = kCrcInitial_;
-  calculated_crc = Crc16CcittRight(calculated_crc, &i2c_address, sizeof(i2c_address), kCrcRevFlag_);
-  calculated_crc = Crc16CcittRight(calculated_crc, &decoded_rx[0], decoded_rx.size(), kCrcRevFlag_);
+  calculated_crc = Crc16CcittRight(calculated_crc, &i2c_address, sizeof(i2c_address), kCrcReverseFlag_);
+  calculated_crc = Crc16CcittRight(calculated_crc, &decoded_rx[0], decoded_rx.size(), kCrcReverseFlag_);
   if (calculated_crc != 0x0000) return;  // CRC error
 
   // MCF
   uint8_t mcf = decoded_rx[1];
-  uint8_t cmd_id, reply_flag;
-  reply_flag = decode_mcf(&cmd_id, mcf);
+  uint8_t command_id, reply_flag;
+  reply_flag = decode_mcf(&command_id, mcf);
   UNUSED(reply_flag);
 
   // Payload
   std::vector<uint8_t> payload{decoded_rx.begin() + kHeaderSize_, decoded_rx.end() - kCrcSize_};
 
   // Command handling
-  switch (cmd_id) {
+  switch (command_id) {
     case kCmdIdInit_:
       ReadCmdInit(payload);
       break;
@@ -101,9 +101,9 @@ void Rw0003::ReadCmd() {
   return;
 }
 
-uint8_t Rw0003::decode_mcf(uint8_t *cmd_id, const uint8_t mcf) {
+uint8_t Rw0003::decode_mcf(uint8_t *command_id, const uint8_t mcf) {
   uint8_t mask = 0x7f;
-  *cmd_id = mcf & mask;
+  *command_id = mcf & mask;
   if (mcf & 0x80)
     return 1;  // with reply
   else
@@ -127,9 +127,9 @@ void Rw0003::ReadCmdWriteFile(const std::vector<uint8_t> payload) {
   if (payload.size() != 6) return;
   if (payload[0] != 0x00) return;
 
-  uint8_t cmd_id = payload[1];
+  uint8_t command_id = payload[1];
 
-  switch (cmd_id) {
+  switch (command_id) {
     case kWriteCmdIdle_:
       SetDriveFlag(false);
       SetTargetTorque_rw_Nm(0.0);
@@ -177,9 +177,9 @@ void Rw0003::WriteFloatTlm(uint8_t address, float value) {
   // CRC
   const unsigned char i2c_address = GetI2cAddress();
   uint16_t crc = kCrcInitial_;
-  crc = Crc16CcittRight(crc, &kSrcAddr_, sizeof(kSrcAddr_), kCrcRevFlag_);
-  crc = Crc16CcittRight(crc, &i2c_address, sizeof(i2c_address), kCrcRevFlag_);
-  crc = Crc16CcittRight(crc, &tlm[0], tlm.size(), kCrcRevFlag_);
+  crc = Crc16CcittRight(crc, &kSourceAddress_, sizeof(kSourceAddress_), kCrcReverseFlag_);
+  crc = Crc16CcittRight(crc, &i2c_address, sizeof(i2c_address), kCrcReverseFlag_);
+  crc = Crc16CcittRight(crc, &tlm[0], tlm.size(), kCrcReverseFlag_);
   uint8_t crc_u8[kCrcSize_];
   memcpy(crc_u8, &crc, kCrcSize_);
   for (unsigned int i = 0; i < kCrcSize_; i++) {

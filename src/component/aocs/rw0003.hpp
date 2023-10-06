@@ -51,7 +51,7 @@ class Rw0003 : public ReactionWheel, public I2cTargetCommunicationWithObc {
 
   // Communication
   uint16_t crc_;                             //!< Calculated CRC value
-  const uint8_t kSrcAddr_ = 0x11;            //!< Source address
+  const uint8_t kSourceAddress_ = 0x11;      //!< Source address
   static const uint8_t kHeaderSize_ = 2;     //!< Header size
   static const uint8_t kFooterSize_ = 1;     //!< Footer size
   static const uint8_t kCrcSize_ = 2;        //!< CRC size
@@ -76,7 +76,7 @@ class Rw0003 : public ReactionWheel, public I2cTargetCommunicationWithObc {
 
   static const uint8_t kMcfReadEdac_ = 0xa7;    //!< Read EDAC memory MCF value
   static const uint16_t kCrcInitial_ = 0xffff;  //!< CRC initial value
-  static const bool kCrcRevFlag_ = false;       //!< CRC reverse flag
+  static const bool kCrcReverseFlag_ = false;   //!< CRC reverse flag
 
   // HILS
   bool is_cmd_written_ = false;             //!< Command written flag
@@ -114,11 +114,11 @@ class Rw0003 : public ReactionWheel, public I2cTargetCommunicationWithObc {
   /**
    * @fn decode_mcf
    * @brief Decode MCF to detect reply requirement
-   * @param [in] cmd_id: Command ID
+   * @param [in] command_id: Command ID
    * @param [in] mcf: MCF data
    * @return 1: with reply, 0: without reply
    */
-  uint8_t decode_mcf(uint8_t *cmd_id, const uint8_t mcf);
+  uint8_t decode_mcf(uint8_t *command_id, const uint8_t mcf);
 
   // Telemetry
   /**
