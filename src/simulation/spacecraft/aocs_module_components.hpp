@@ -86,7 +86,7 @@ class AocsModuleComponents : public InstalledComponents {
   std::vector<Ina260> ina260s_;        //!< Ina260 current sensor
   // AOCS
   MPU9250_GYRO *mpu9250_gyro_sensor_;         //!< MPU9250 gyro sensor
-  MPU9250_MAG *mpu9250_magnetometer_;         //!< MPU9250 magnetometer
+  Mpu9250Magnetometer *mpu9250_magnetometer_;         //!< MPU9250 magnetometer
   Rm3100 *rm3100_aobc_;                       //!< RM3100 magnetometer on AOBC circuit board
   Rm3100 *rm3100_external_;                   //!< External RM3100 magnetometer
   std::vector<NanoSsocD60 *> nano_ssoc_d60_;  //!< NanoSSOC-D60 sun sensor

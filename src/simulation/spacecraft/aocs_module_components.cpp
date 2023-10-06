@@ -73,7 +73,7 @@ AocsModuleComponents::AocsModuleComponents(const Dynamics *dynamics, Structure *
   IniAccess mpu9250_mag_ini_access = IniAccess(mpu9250_mag_ini_path);
   const uint8_t mpu9250_mag_i2c_address = (uint8_t)mpu9250_mag_ini_access.ReadInt("I2C_PORT_MAG", "i2c_address");
   mpu9250_magnetometer_ =
-      new MPU9250_MAG(InitMagnetometer(clock_generator, power_controller_->GetPowerPort((int)PowerPortIdx::MPU), 2, mpu9250_mag_ini_path,
+      new Mpu9250Magnetometer(InitMagnetometer(clock_generator, power_controller_->GetPowerPort((int)PowerPortIdx::MPU), 2, mpu9250_mag_ini_path,
                                        compo_step_sec, &(local_environment_->GetGeomagneticField())),
                       0, mpu9250_mag_hils_port_id, mpu9250_mag_i2c_address, aobc_, hils_port_manager_, mpu9250_gyro_sensor_->GetIsMagOn());
 

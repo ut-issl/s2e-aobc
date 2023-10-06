@@ -5,20 +5,20 @@
  *       Functions not used in the project are not implemented
  */
 
-#ifndef S2E_AOBC_COMPONENT_AOCS_MPU9250_MAG_HPP_
-#define S2E_AOBC_COMPONENT_AOCS_MPU9250_MAG_HPP_
+#ifndef S2E_AOBC_COMPONENT_AOCS_MPU9250_MAGNETOMETER_HPP_
+#define S2E_AOBC_COMPONENT_AOCS_MPU9250_MAGNETOMETER_HPP_
 
 #include <components/base/i2c_target_communication_with_obc.hpp>
 #include <components/real/aocs/magnetometer.hpp>
 
 /**
- * @class MPU9250_MAG
+ * @class Mpu9250Magnetometer
  * @brief Class to emulate magnetometer in MPU9250 9 axis sensor
  */
-class MPU9250_MAG : public Magnetometer, public I2cTargetCommunicationWithObc {
+class Mpu9250Magnetometer : public Magnetometer, public I2cTargetCommunicationWithObc {
  public:
   /**
-   * @fn MPU9250_MAG
+   * @fn Mpu9250Magnetometer
    * @brief Constructor
    * @param [in] magnetometer: Magnetometer settings
    * @param [in] sils_port_id: Port ID for SILS
@@ -28,8 +28,8 @@ class MPU9250_MAG : public Magnetometer, public I2cTargetCommunicationWithObc {
    * @param [in] hils_port_manager: HILS port manager
    * @param [in] is_mag_on: Magnetometer ON/OFF flag
    */
-  MPU9250_MAG(Magnetometer magnetometer, const int sils_port_id, const unsigned int hils_port_id, const unsigned char i2c_address, OnBoardComputer *obc,
-              HilsPortManager *hils_port_manager, const bool *is_mag_on);
+  Mpu9250Magnetometer(Magnetometer magnetometer, const int sils_port_id, const unsigned int hils_port_id, const unsigned char i2c_address,
+                      OnBoardComputer *obc, HilsPortManager *hils_port_manager, const bool *is_mag_on);
 
   // Override functions for Component
   /**
@@ -89,4 +89,4 @@ class MPU9250_MAG : public Magnetometer, public I2cTargetCommunicationWithObc {
   void Convert2Tlm(unsigned char tlm[2], const double value);
 };
 
-#endif  // S2E_AOBC_COMPONENT_AOCS_MPU9250_MAG_HPP_
+#endif  // S2E_AOBC_COMPONENT_AOCS_MPU9250_MAGNETOMETER_HPP_

@@ -7,11 +7,14 @@
 
 #include <library/utilities/macros.hpp>
 
-MPU9250_MAG::MPU9250_MAG(Magnetometer magnetometer, const int sils_port_id, const unsigned int hils_port_id, const unsigned char i2c_address,
-                         OnBoardComputer *obc, HilsPortManager *hils_port_manager, const bool *is_mag_on)
-    : Magnetometer(magnetometer), I2cTargetCommunicationWithObc(sils_port_id, hils_port_id, i2c_address, obc, hils_port_manager), is_mag_on_(is_mag_on) {}
+Mpu9250Magnetometer::Mpu9250Magnetometer(Magnetometer magnetometer, const int sils_port_id, const unsigned int hils_port_id,
+                                         const unsigned char i2c_address, OnBoardComputer *obc, HilsPortManager *hils_port_manager,
+                                         const bool *is_mag_on)
+    : Magnetometer(magnetometer),
+      I2cTargetCommunicationWithObc(sils_port_id, hils_port_id, i2c_address, obc, hils_port_manager),
+      is_mag_on_(is_mag_on) {}
 
-void MPU9250_MAG::MainRoutine(const int time_count) {
+void Mpu9250Magnetometer::MainRoutine(const int time_count) {
   UNUSED(time_count);
   // Read Registers
   ReadCmdConfig();
@@ -32,7 +35,7 @@ void MPU9250_MAG::MainRoutine(const int time_count) {
   return;
 }
 
-void MPU9250_MAG::ReadCmdConfig() {
+void Mpu9250Magnetometer::ReadCmdConfig() {
   unsigned char tmp[2] = {0xff, 0xff};
   ReadCommand(tmp, 2);
   if (tmp[0] != kCmdMagConfig_) return;
@@ -42,7 +45,7 @@ void MPU9250_MAG::ReadCmdConfig() {
   return;
 }
 
-void MPU9250_MAG::WriteMagTlm() {
+void Mpu9250Magnetometer::WriteMagTlm() {
   unsigned char tlm[] = {0, 0};
   unsigned char reg_id = kRegObsMag_;
 
@@ -61,7 +64,7 @@ void MPU9250_MAG::WriteMagTlm() {
   return;
 }
 
-void MPU9250_MAG::Convert2Tlm(unsigned char tlm[2], const double value) {
+void Mpu9250Magnetometer::Convert2Tlm(unsigned char tlm[2], const double value) {
   signed short tlm_s = (signed short)(value);
   memcpy(tlm, &tlm_s, 2);
 
