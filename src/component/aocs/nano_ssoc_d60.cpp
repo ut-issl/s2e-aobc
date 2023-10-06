@@ -4,7 +4,7 @@
  * @note Manual: NA
  */
 
-#include "nanossoc_d60.hpp"
+#include "nano_ssoc_d60.hpp"
 #define _USE_MATH_DEFINES
 #include <string.h>  // for memcpy
 

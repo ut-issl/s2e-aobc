@@ -90,7 +90,7 @@ class AocsModuleComponents : public InstalledComponents {
   Rm3100 *rm3100_aobc_;                       //!< RM3100 magnetometer on AOBC circuit board
   Rm3100 *rm3100_external_;                   //!< External RM3100 magnetometer
   std::vector<NanoSsocD60 *> nano_ssoc_d60_;  //!< NanoSSOC-D60 sun sensor
-  MTQseiren *mtq_seiren_;                     //!< MTQ
+  MtqSeiren *mtq_seiren_;                     //!< MTQ
   Oem7600 *oem7600_;                          //!< OEM7600 GNSS Receiver
   Sagitta *sagitta_;                          //!< Sagitta Star tracker
   Stim210 *stim210_;                          //!< Stim210 gyro sensor

@@ -8,12 +8,12 @@
 
 #include <library/utilities/macros.hpp>
 
-MTQseiren::MTQseiren(Magnetorquer mag_torquer, std::vector<int> gpio_ports, OnBoardComputer *obc)
+MtqSeiren::MtqSeiren(Magnetorquer mag_torquer, std::vector<int> gpio_ports, OnBoardComputer *obc)
     : Magnetorquer(mag_torquer), GpioConnectionWithObc(gpio_ports, obc) {}
 
-MTQseiren::~MTQseiren() {}
+MtqSeiren::~MtqSeiren() {}
 
-void MTQseiren::MainRoutine(const int time_count) {
+void MtqSeiren::MainRoutine(const int time_count) {
   UNUSED(time_count);
   // Read GPIO state
   polarity_[0] = ConvertGPIOState2Polarity(GPIO_X_POSITIVE, GPIO_X_NEGATIVE);
@@ -27,7 +27,7 @@ void MTQseiren::MainRoutine(const int time_count) {
   CalcOutputTorque();
 }
 
-int MTQseiren::ConvertGPIOState2Polarity(int positive_gpio_pin_idx, int negative_gpio_pin_idx) {
+int MtqSeiren::ConvertGPIOState2Polarity(int positive_gpio_pin_idx, int negative_gpio_pin_idx) {
   int polarity;
 
   bool positive_gpio_pin_state;  // true = HIGH, false = LOW
@@ -50,7 +50,7 @@ int MTQseiren::ConvertGPIOState2Polarity(int positive_gpio_pin_idx, int negative
   return polarity;
 }
 
-void MTQseiren::ConvertPolarity2OutputMag() {
+void MtqSeiren::ConvertPolarity2OutputMag() {
   for (size_t i = 0; i < kMtqDimension; i++) {
     if (polarity_[i] == 1) {
       output_magnetic_moment_c_Am2_[i] = max_magnetic_moment_c_Am2_[i];
@@ -62,7 +62,7 @@ void MTQseiren::ConvertPolarity2OutputMag() {
   }
 }
 
-std::string MTQseiren::GetLogHeader() const {
+std::string MtqSeiren::GetLogHeader() const {
   std::string str_tmp = "";
   const std::string st_sensor_id = std::to_string(static_cast<long long>(component_id_));
   const char *cs = st_sensor_id.data();
