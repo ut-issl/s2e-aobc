@@ -30,7 +30,7 @@ void Rw0003::MainRoutine(const int time_count) {
   // Generate TLM
   if (is_rw_initialized_ == true) {
     CalcTorque();
-    WriteFloatTlm(kReadAddressTemperature_, temperature_degC_);
+    WriteFloatTlm(kReadAddressTemperature_, (float)temperature_degC_);
     WriteFloatTlm(kReadAddressSpeed_, (float)angular_velocity_rad_s_);
   }
 
@@ -191,7 +191,7 @@ void Rw0003::WriteFloatTlm(uint8_t address, float value) {
   tlm_slip = encode_slip(tlm);
 
   // Write Tlm
-  WriteRegister(address, &tlm_slip[0], tlm_slip.size());
+  WriteRegister(address, &tlm_slip[0], (uint8_t)tlm_slip.size());
 }
 
 void Rw0003::Initialize() {
