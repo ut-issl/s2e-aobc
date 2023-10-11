@@ -26,11 +26,13 @@
 #include "../../component/aocs/sagitta.hpp"
 #include "../../component/aocs/stim210.hpp"
 // Propulsion
-#include <components/real/propulsion/initialize_simple_thruster.hpp>
+#include <components/real/propulsion/simple_thruster.hpp>
 // Mission
-#include <components/real/mission/initialize_telescope.hpp>
+#include <components/real/mission/telescope.hpp>
 // HILS IF
 #include "../../interface/hils/hils_if_driver.hpp"
+// Communication
+#include <components/real/communication/wings_command_sender_to_c2a.hpp>
 
 using libra::Vector;
 
@@ -110,8 +112,10 @@ class AocsModuleComponents : public InstalledComponents {
   // Mission
   Telescope *telescope_;  //!< Telescope
   // HILS
-  HilsPortManager *hils_port_manager_;  //!< HILS port manager
-  HilsIfDriver *hils_if_driver_;        //!< HILS Interface driver
+  HilsPortManager *hils_port_manager_;
+  HilsIfDriver *hils_if_driver_;
+  // Communication
+  WingsCommandSenderToC2a *wings_command_sender_to_c2a_;
 
   // States
   const Dynamics *dynamics_;                      //!< Dynamics information of the spacecraft
