@@ -33,7 +33,7 @@ typedef enum { OEM7600_TLM_ID_BEST_XYZ = 0x00F1, OEM7600_TLM_ID_HARDWARE_MONITOR
  * @struct Oem7600Telemetry
  * @brief OEM7600 telemetry structure
  */
-typedef struct {
+struct Oem7600Telemetry {
   std::string telemetry_name = "";    //!< Telemetry name
   std::string out_type = "once";      //!< Output type
   unsigned int output_frequency = 0;  //!< Output frequency
@@ -49,7 +49,7 @@ typedef struct {
       count_to_out = 0;
     }
   }
-} Oem7600Telemetry;
+};
 
 /**
  * @class OEM7600
