@@ -45,7 +45,7 @@ std::string Stim210::GetLogHeader() const {
 int Stim210::ParseCommand(const int command_size) {
   std::vector<unsigned char> cmd = rx_buffer_;
   int idx = 0;
-  int ret;
+  int ret = -1;
   for (int i = 0; i < command_size; i++) {
     cmd[idx] = rx_buffer_[i];
     idx++;
@@ -75,7 +75,7 @@ int Stim210::ParseCommand(const int command_size) {
           if (operation_mode_ == OPERATION_SERVICE_MODE) ret = AnalyzeCmdSetLPFFrequency(cmd);
           break;
         default:
-          return -1;
+          ret = -1;
       }
     }
   }
