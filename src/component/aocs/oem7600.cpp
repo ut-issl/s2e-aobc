@@ -143,7 +143,7 @@ Oem7600Command Oem7600::DecodeCommand() {
   // find empty space character(separator)
   for (size_t i = 0; i < rx_buffer_.size(); i++) {
     if (rx_buffer_[i] == ' ') {
-      space_pos[space_pos_count] = i;
+      space_pos[space_pos_count] = (uint8_t)i;
       space_pos_count++;
 
       if (space_pos_count > OEM7600_MAX_CMD_ARG) {
