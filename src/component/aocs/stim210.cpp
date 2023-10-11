@@ -28,7 +28,7 @@ void Stim210::MainRoutine(const int time_count) {
   for (size_t i = 0; i < kGyroDimension; i++) {
     temperature_c_degC_[i] = 30.0 + ((double)i) * 0.1;  // TODO: 温度の反映
   }
-  // Send Tlmetry
+  // Send Telemetry
   SendTelemetry(0);
 
   return;
