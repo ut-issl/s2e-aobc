@@ -1,6 +1,6 @@
 /**
  * @file s2e_aobc.cpp
- * @brief The main file of S2E-AOBC
+ * @brief The main file of S2E-AOBC (Attitude On Board Computer)
  */
 
 #ifdef WIN32
@@ -20,7 +20,7 @@
 #include <simulation/monte_carlo_simulation/initialize_monte_carlo_simulation.hpp>
 
 // Add custom include files
-#include "./simulation/case/sample_case.h"
+#include "./simulation/case/sample_case.hpp"
 
 void print_path(std::string path) {
 #ifdef WIN32
@@ -39,31 +39,31 @@ int main(int argc, char *argv[]) {
   UNUSED(argv);
 
   std::string ini_file = "../../data/initialize_files/simulation_base.ini";
-  MonteCarloSimulationExecutor *mc_simulator = InitMonteCarloSimulation(ini_file);
-  Logger *log_mc_simulator = InitMonteCarloLog(ini_file, mc_simulator->IsEnabled());
+  MonteCarloSimulationExecutor *monte_carlo_simulator = InitMonteCarloSimulation(ini_file);
+  Logger *log_monte_carlo_simulator = InitMonteCarloLog(ini_file, monte_carlo_simulator->IsEnabled());
 
   std::cout << "Starting simulation..." << std::endl;
   std::cout << "\tIni file: ";
   print_path(ini_file);
 
-  while (mc_simulator->WillExecuteNextCase()) {
+  while (monte_carlo_simulator->WillExecuteNextCase()) {
     std::chrono::system_clock::time_point start, end;
     start = std::chrono::system_clock::now();
 
-    auto simcase = SampleCase(ini_file, *mc_simulator, log_mc_simulator->GetLogPath());
+    auto simulation_case = SampleCase(ini_file, *monte_carlo_simulator, log_monte_carlo_simulator->GetLogPath());
     // Initialize
-    log_mc_simulator->AddLogList(&simcase);
-    if (mc_simulator->GetNumberOfExecutionsDone() == 0) {
-      log_mc_simulator->WriteHeaders();
+    log_monte_carlo_simulator->AddLogList(&simulation_case);
+    if (monte_carlo_simulator->GetNumberOfExecutionsDone() == 0) {
+      log_monte_carlo_simulator->WriteHeaders();
     }
-    simcase.Initialize();
+    simulation_case.Initialize();
 
     // Main
-    log_mc_simulator->WriteValues();  // log initial value
-    simcase.Main();
-    mc_simulator->AtTheEndOfEachCase();
-    log_mc_simulator->WriteValues();  // log final value
-    log_mc_simulator->ClearLogList();
+    log_monte_carlo_simulator->WriteValues();  // log initial value
+    simulation_case.Main();
+    monte_carlo_simulator->AtTheEndOfEachCase();
+    log_monte_carlo_simulator->WriteValues();  // log final value
+    log_monte_carlo_simulator->ClearLogList();
 
     end = std::chrono::system_clock::now();
     double time = static_cast<double>(std::chrono::duration_cast<std::chrono::microseconds>(end - start).count() / 1000000.0);

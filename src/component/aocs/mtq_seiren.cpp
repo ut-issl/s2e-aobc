@@ -8,13 +8,13 @@
 
 #include <library/utilities/macros.hpp>
 
-MTQseiren::MTQseiren(Magnetorquer mag_torquer, std::vector<int> gpio_ports, OnBoardComputer *obc)
-    : Magnetorquer(mag_torquer), GpioConnectionWithObc(gpio_ports, obc) {}
+MtqSeiren::MtqSeiren(Magnetorquer magnetorquer, std::vector<int> gpio_ports, OnBoardComputer *obc)
+    : Magnetorquer(magnetorquer), GpioConnectionWithObc(gpio_ports, obc) {}
 
-MTQseiren::~MTQseiren() {}
+MtqSeiren::~MtqSeiren() {}
 
-void MTQseiren::MainRoutine(int count) {
-  UNUSED(count);
+void MtqSeiren::MainRoutine(const int time_count) {
+  UNUSED(time_count);
   // Read GPIO state
   polarity_[0] = ConvertGPIOState2Polarity(GPIO_X_POSITIVE, GPIO_X_NEGATIVE);
   polarity_[1] = ConvertGPIOState2Polarity(GPIO_Y_POSITIVE, GPIO_Y_NEGATIVE);
@@ -27,7 +27,7 @@ void MTQseiren::MainRoutine(int count) {
   CalcOutputTorque();
 }
 
-int MTQseiren::ConvertGPIOState2Polarity(int positive_gpio_pin_idx, int negative_gpio_pin_idx) {
+int MtqSeiren::ConvertGPIOState2Polarity(int positive_gpio_pin_idx, int negative_gpio_pin_idx) {
   int polarity;
 
   bool positive_gpio_pin_state;  // true = HIGH, false = LOW
@@ -50,7 +50,7 @@ int MTQseiren::ConvertGPIOState2Polarity(int positive_gpio_pin_idx, int negative
   return polarity;
 }
 
-void MTQseiren::ConvertPolarity2OutputMag() {
+void MtqSeiren::ConvertPolarity2OutputMag() {
   for (size_t i = 0; i < kMtqDimension; i++) {
     if (polarity_[i] == 1) {
       output_magnetic_moment_c_Am2_[i] = max_magnetic_moment_c_Am2_[i];
@@ -62,14 +62,14 @@ void MTQseiren::ConvertPolarity2OutputMag() {
   }
 }
 
-std::string MTQseiren::GetLogHeader() const {
+std::string MtqSeiren::GetLogHeader() const {
   std::string str_tmp = "";
   const std::string st_sensor_id = std::to_string(static_cast<long long>(component_id_));
   const char *cs = st_sensor_id.data();
-  std::string MSSection = "MTQ_seiren";
+  std::string section = "MTQ_seiren";
 
-  str_tmp += WriteVector(MSSection + cs, "b", "Am^2", kMtqDimension);
-  str_tmp += WriteVector(MSSection + cs, "b", "Nm", kMtqDimension);
+  str_tmp += WriteVector(section + cs, "b", "Am2", kMtqDimension);
+  str_tmp += WriteVector(section + cs, "b", "Nm", kMtqDimension);
 
   return str_tmp;
 }

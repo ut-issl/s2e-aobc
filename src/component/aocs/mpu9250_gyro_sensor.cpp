@@ -1,24 +1,24 @@
 /**
- * @file mpu9250_gyro.cpp
+ * @file mpu9250_gyro_sensor.cpp
  * @brief Class to emulate gyro sensor in MPU9250 9 axis sensor
  */
 
-#include "mpu9250_gyro.hpp"
+#include "mpu9250_gyro_sensor.hpp"
 
 #include <library/math/constants.hpp>
 #include <library/utilities/macros.hpp>
 
-MPU9250_GYRO::MPU9250_GYRO(GyroSensor gyro, const int sils_port_id, const unsigned int hils_port_id, const unsigned char i2c_addr,
-                           OnBoardComputer *obc, HilsPortManager *hils_port_manager)
-    : GyroSensor(gyro), I2cTargetCommunicationWithObc(sils_port_id, hils_port_id, i2c_addr, obc, hils_port_manager) {
+Mpu9250GyroSensor::Mpu9250GyroSensor(GyroSensor gyro, const int sils_port_id, const unsigned int hils_port_id, const unsigned char i2c_address,
+                                     OnBoardComputer *obc, HilsPortManager *hils_port_manager)
+    : GyroSensor(gyro), I2cTargetCommunicationWithObc(sils_port_id, hils_port_id, i2c_address, obc, hils_port_manager) {
   unsigned char tmp = 0xff;
   WriteRegister(kCmdGyroEnable_, &tmp, 1);  // 初期値としてはGyro OFF
 
   SetConvertCoefficients();
 }
 
-void MPU9250_GYRO::MainRoutine(int count) {
-  UNUSED(count);
+void Mpu9250GyroSensor::MainRoutine(const int time_count) {
+  UNUSED(time_count);
   // Read Registers
   ReadCmdGyroEnable();
   ReadCmdMagEnable();
@@ -31,15 +31,15 @@ void MPU9250_GYRO::MainRoutine(int count) {
     WriteGyroTlm();
   }
 
-  int cmd_size = ReceiveCommand();
-  if (cmd_size != 1) return;  // length == 1 means setting of read register address
+  int command_size = ReceiveCommand();
+  if (command_size != 1) return;  // length == 1 means setting of read register address
   // これ以降はHILS用に事前にテレメトリを溜めておく
   const int kTlmSize = 14;
   StoreTelemetry(kStoredFrameSize, kTlmSize);
   return;
 }
 
-void MPU9250_GYRO::ReadCmdGyroEnable() {
+void Mpu9250GyroSensor::ReadCmdGyroEnable() {
   unsigned char tmp = 0xff;
   ReadRegister(kCmdGyroEnable_, &tmp, 1);
   if (tmp == 0x00) is_gyro_on_ = true;
@@ -47,54 +47,54 @@ void MPU9250_GYRO::ReadCmdGyroEnable() {
   return;
 }
 
-void MPU9250_GYRO::ReadCmdMagEnable() {
+void Mpu9250GyroSensor::ReadCmdMagEnable() {
   unsigned char tmp[2] = {0xff, 0xff};
   ReadCommand(tmp, 2);
   if (tmp[0] != kCmdMagEnable_) return;
 
-  if (tmp[1] == 0x02) is_mag_on_ = true;  // 0x02 means turn on mag
+  if (tmp[1] == 0x02) is_magnetometer_on_ = true;  // 0x02 means turn on mag
 
   return;
 }
 
-void MPU9250_GYRO::ReadCmdGyroLpf() {
+void Mpu9250GyroSensor::ReadCmdGyroLpf() {
   // TODO 6Uでの利用では固定値なので、中身の実装は優先度低
   return;
 }
 
-void MPU9250_GYRO::ReadCmdGyroRange() {
+void Mpu9250GyroSensor::ReadCmdGyroRange() {
   // TODO 6Uでの利用では固定値なので、中身の実装は優先度低
   return;
 }
 
-void MPU9250_GYRO::ReadCmdAccLpf() {
+void Mpu9250GyroSensor::ReadCmdAccelerometerLpf() {
   // TODO 6Uでの利用では固定値なので、中身の実装は優先度低
   return;
 }
 
-void MPU9250_GYRO::ReadCmdAccRange() {
+void Mpu9250GyroSensor::ReadCmdAccelerometerRange() {
   // TODO 6Uでの利用では固定値なので、中身の実装は優先度低
   return;
 }
 
-void MPU9250_GYRO::WriteGyroTlm() {
+void Mpu9250GyroSensor::WriteGyroTlm() {
   unsigned char tlm[kMpuTlmSize_] = {0, 0};
   unsigned char reg_id = kRegObsGyro_;
 
-  // Acc
+  // Accelerometer
   for (size_t i = 0; i < kGyroDimension; i++) {
-    Convert2Tlm(tlm, acc_c_G_[i] * acc_convert_G_to_raw_);
+    Convert2Tlm(tlm, accelerometer_c_G_[i] * accelerometer_convert_G_to_raw_);
     WriteRegister(reg_id, tlm, kMpuTlmSize_);
     reg_id += kMpuTlmSize_;
   }
   // Temperature
-  Convert2Tlm(tlm, (temperature_degC_ - temp_offset_degC_) * temp_convert_degC_to_raw_);
+  Convert2Tlm(tlm, (temperature_degC_ - temperature_offset_degC_) * temperature_convert_degC_to_raw_);
   WriteRegister(reg_id, tlm, kMpuTlmSize_);
   reg_id += kMpuTlmSize_;
   // Gyro
   for (size_t i = 0; i < kGyroDimension; i++) {
-    double omega_c_deg_s = angular_velocity_c_rad_s_[i] * libra::rad_to_deg;
-    Convert2Tlm(tlm, omega_c_deg_s * omega_convert_deg_s_to_raw_);
+    double angular_velocity_c_deg_s = angular_velocity_c_rad_s_[i] * libra::rad_to_deg;
+    Convert2Tlm(tlm, angular_velocity_c_deg_s * angular_velocity_convert_deg_s_to_raw_);
     WriteRegister(reg_id, tlm, kMpuTlmSize_);
     reg_id += kMpuTlmSize_;
   }
@@ -102,7 +102,7 @@ void MPU9250_GYRO::WriteGyroTlm() {
   return;
 }
 
-void MPU9250_GYRO::Convert2Tlm(unsigned char tlm[kMpuTlmSize_], const double value) {
+void Mpu9250GyroSensor::Convert2Tlm(unsigned char tlm[kMpuTlmSize_], const double value) {
   signed short tlm_s = (signed short)(value);
 
   for (int i = 0; i < kMpuTlmSize_; i++) {
@@ -112,8 +112,8 @@ void MPU9250_GYRO::Convert2Tlm(unsigned char tlm[kMpuTlmSize_], const double val
   return;
 }
 
-void MPU9250_GYRO::SetConvertCoefficients() {
-  omega_convert_deg_s_to_raw_ = raw_max_ / omega_max_deg_s_;
-  acc_convert_G_to_raw_ = raw_max_ / acc_max_G_;
+void Mpu9250GyroSensor::SetConvertCoefficients() {
+  angular_velocity_convert_deg_s_to_raw_ = raw_max_ / angular_velocity_max_deg_s_;
+  accelerometer_convert_G_to_raw_ = raw_max_ / accelerometer_max_G_;
   return;
 }

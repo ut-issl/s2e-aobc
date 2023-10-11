@@ -11,23 +11,23 @@
 class AocsModuleComponents;
 
 /**
- * @class AOBC
+ * @class Aobc
  * @brief Class to emulate AOBC
  */
-class AOBC : public Component {
+class Aobc : public Component {
  public:
   /**
-   * @fn AOBC
+   * @fn Aobc
    * @brief Constructor
-   * @param [in] clock_gen: Clock generator
+   * @param [in] clock_generator: Clock generator
    * @param [in] components: Components connected to the AOBC
    */
-  AOBC(ClockGenerator *clock_gen, AocsModuleComponents *components);
+  Aobc(ClockGenerator *clock_generator, AocsModuleComponents *components);
   /**
-   * @fn ~AOBC
+   * @fn ~Aobc
    * @brief Destructor
    */
-  ~AOBC();
+  ~Aobc();
 
   /**
    * @fn Initialize
@@ -43,7 +43,7 @@ class AOBC : public Component {
    * @fn MainRoutine
    * @brief Main routine for sensor observation
    */
-  void MainRoutine(int count);
+  void MainRoutine(const int time_count);
 };
 
 #endif  // S2E_AOBC_COMPONENT_AOCS_AOBC_HPP_

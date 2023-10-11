@@ -14,22 +14,22 @@
 #include "../../library/crc.hpp"
 
 /**
- * @class RW0003
+ * @class Rw0003
  * @brief Class to emulate RW0.003 reaction wheel
  */
-class RW0003 : public ReactionWheel, public I2cTargetCommunicationWithObc {
+class Rw0003 : public ReactionWheel, public I2cTargetCommunicationWithObc {
  public:
   /**
-   * @fn RW0003
+   * @fn Rw0003
    * @brief Constructor
    * @param [in] rw: Reaction wheel settings
    * @param [in] sils_port_id: Port ID for SILS
    * @param [in] hils_port_id: Port ID for HILS
-   * @param [in] i2c_addr: I2C address
+   * @param [in] i2c_address: I2C address
    * @param [in] obc: Connected OBC
    * @param [in] hils_port_manager: HILS port manager
    */
-  RW0003(ReactionWheel rw, const int sils_port_id, const unsigned int hils_port_id, const unsigned char i2c_addr, OnBoardComputer *obc,
+  Rw0003(ReactionWheel rw, const int sils_port_id, const unsigned int hils_port_id, const unsigned char i2c_address, OnBoardComputer *obc,
          HilsPortManager *hils_port_manager);
 
   // Override functions for Component
@@ -37,7 +37,7 @@ class RW0003 : public ReactionWheel, public I2cTargetCommunicationWithObc {
    * @fn MainRoutine
    * @brief Main routine for sensor observation
    */
-  void MainRoutine(int count) override;
+  void MainRoutine(const int time_count) override;
   // Override ILoggable
   /**
    * @fn GetLogHeader
@@ -47,11 +47,11 @@ class RW0003 : public ReactionWheel, public I2cTargetCommunicationWithObc {
 
  private:
   bool is_rw_initialized_ = false;  //!< Flag to detect initializing operation
-  double temperture_degC_ = 30.0;   //!< RW measured temperature [degC] (dummy data)
+  double temperature_degC_ = 30.0;  //!< RW measured temperature [degC] (dummy data)
 
   // Communication
   uint16_t crc_;                             //!< Calculated CRC value
-  const uint8_t kSrcAddr_ = 0x11;            //!< Source address
+  const uint8_t kSourceAddress_ = 0x11;      //!< Source address
   static const uint8_t kHeaderSize_ = 2;     //!< Header size
   static const uint8_t kFooterSize_ = 1;     //!< Footer size
   static const uint8_t kCrcSize_ = 2;        //!< CRC size
@@ -76,10 +76,10 @@ class RW0003 : public ReactionWheel, public I2cTargetCommunicationWithObc {
 
   static const uint8_t kMcfReadEdac_ = 0xa7;    //!< Read EDAC memory MCF value
   static const uint16_t kCrcInitial_ = 0xffff;  //!< CRC initial value
-  static const bool kCrcRevFlag_ = false;       //!< CRC reverse flag
+  static const bool kCrcReverseFlag_ = false;   //!< CRC reverse flag
 
   // HILS
-  bool is_cmd_written_ = false;             //!< Command written flag
+  bool is_command_written_ = false;         //!< Command written flag
   const unsigned int kStoredFrameSize = 3;  //!< Stored frame size for HILS
   /**
    * @fn Initialize
@@ -114,11 +114,11 @@ class RW0003 : public ReactionWheel, public I2cTargetCommunicationWithObc {
   /**
    * @fn decode_mcf
    * @brief Decode MCF to detect reply requirement
-   * @param [in] cmd_id: Command ID
+   * @param [in] command_id: Command ID
    * @param [in] mcf: MCF data
    * @return 1: with reply, 0: without reply
    */
-  uint8_t decode_mcf(uint8_t *cmd_id, const uint8_t mcf);
+  uint8_t decode_mcf(uint8_t *command_id, const uint8_t mcf);
 
   // Telemetry
   /**

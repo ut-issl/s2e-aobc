@@ -1,27 +1,27 @@
 #include "cube_wheel.h"
 
-CubeWheel::CubeWheel(RWModel rw_model, const int port_id, const unsigned char i2c_addr, OBC* obc)
-    : RWModel(rw_model), ObcI2cCommunicationBase(port_id, i2c_addr, obc) {
-  port_id_ = i2c_addr - 0x67;  // port_idは1固定のため。
+CubeWheel::CubeWheel(RWModel rw_model, const int port_id, const unsigned char i2c_address, OBC* obc)
+    : RWModel(rw_model), ObcI2cCommunicationBase(port_id, i2c_address, obc) {
+  port_id_ = i2c_address - 0x67;  // port_idは1固定のため。
 
   unsigned char data[] = {0x08};
 
-  if (i2c_addr == 0x68) {
+  if (i2c_address == 0x68) {
     WriteRegister(0x80, data, 1);
     data[0] = 0xd0;
     WriteRegister(0x83, data, 1);
-  } else if (i2c_addr == 0x69) {
+  } else if (i2c_address == 0x69) {
     WriteRegister(0x80, data, 1);
     data[0] = 0xd2;
     WriteRegister(0x83, data, 1);
-  } else if (i2c_addr == 0x6A) {
+  } else if (i2c_address == 0x6A) {
     WriteRegister(0x80, data, 1);
     data[0] = 0xd4;
     WriteRegister(0x83, data, 1);
   }
 }
 
-void CubeWheel::MainRoutine(int count) {
+void CubeWheel::MainRoutine(const int time_count) {
   // Control Modeの取得と処理
   ReadRegister(kWriteCmdControlMode_, &control_mode_, 1);
 
@@ -58,11 +58,11 @@ void CubeWheel::MainRoutine(int count) {
       if (commanded_speed_rpm < current_speed_rpm) {
         sign = -1;
       }
-      double speed_cmd_cycle_in_sec = 0.5;
-      double target_omega_dash = to_add_rad_s / speed_cmd_cycle_in_sec * sign;
+      double speed_command_cycle_in_sec = 0.5;
+      double target_angular_velocity_dash = to_add_rad_s / speed_command_cycle_in_sec * sign;
 
       // 指令トルクをセット。
-      double torque_Nm = target_omega_dash * 0.00000211;
+      double torque_Nm = target_angular_velocity_dash * 0.00000211;
       SetTargetTorqueRw(torque_Nm);
 
       // dummy値を書き込む。次にspeed cmdを受信するまで処理をしないため。

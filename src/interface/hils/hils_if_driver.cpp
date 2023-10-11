@@ -7,14 +7,16 @@
 
 #include <library/utilities/macros.hpp>
 
-HilsIfDriver::HilsIfDriver(const int prescaler, ClockGenerator *clock_gen, const unsigned int hils_port_id, const unsigned int baud_rate,
+HilsIfDriver::HilsIfDriver(const int prescaler, ClockGenerator *clock_generator, const unsigned int hils_port_id, const unsigned int baud_rate,
                            HilsPortManager *hils_port_manager, std::vector<int> gpio_ports, OnBoardComputer *obc)
-    : Component(prescaler, clock_gen), UartCommunicationWithObc(hils_port_id, baud_rate, hils_port_manager), GpioConnectionWithObc(gpio_ports, obc) {}
+    : Component(prescaler, clock_generator),
+      UartCommunicationWithObc(hils_port_id, baud_rate, hils_port_manager),
+      GpioConnectionWithObc(gpio_ports, obc) {}
 
 HilsIfDriver::~HilsIfDriver() {}
 
-void HilsIfDriver::MainRoutine(int count) {
-  UNUSED(count);
+void HilsIfDriver::MainRoutine(const int time_count) {
+  UNUSED(time_count);
   // IFボードからデータ取得
   int ret = ReceiveCommand(0, kRxMaxBytes_);
   if (ret != 0) {
@@ -30,10 +32,10 @@ void HilsIfDriver::MainRoutine(int count) {
   return;
 }
 
-int HilsIfDriver::ParseCommand(const int cmd_size) {
+int HilsIfDriver::ParseCommand(const int command_size) {
   std::vector<unsigned char> cmd = rx_buffer_;
   int idx = 0;
-  for (int i = 0; i < cmd_size; i++) {
+  for (int i = 0; i < command_size; i++) {
     cmd[idx] = rx_buffer_[i];
     idx++;
   }

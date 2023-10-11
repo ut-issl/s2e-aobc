@@ -12,22 +12,22 @@
 #include <components/real/aocs/magnetometer.hpp>
 
 /**
- * @class RM3100
+ * @class Rm3100
  * @brief Class to emulate RM3100 magnetometer
  */
-class RM3100 : public Magnetometer, public I2cTargetCommunicationWithObc {
+class Rm3100 : public Magnetometer, public I2cTargetCommunicationWithObc {
  public:
   /**
-   * @fn RM3100
+   * @fn Rm3100
    * @brief Constructor
-   * @param [in] mag_sensor: Magnetometer settings
+   * @param [in] magnetometer: Magnetometer settings
    * @param [in] sils_port_id: Port ID for SILS
    * @param [in] hils_port_id: Port ID for HILS
-   * @param [in] i2c_addr: I2C address
+   * @param [in] i2c_address: I2C address
    * @param [in] obc: Connected OBC
    * @param [in] hils_port_manager: HILS port manager
    */
-  RM3100(Magnetometer mag_sensor, const int sils_port_id, const unsigned int hils_port_id, const unsigned char i2c_addr, OnBoardComputer *obc,
+  Rm3100(Magnetometer magnetometer, const int sils_port_id, const unsigned int hils_port_id, const unsigned char i2c_address, OnBoardComputer *obc,
          HilsPortManager *hils_port_manager);
 
   // Override functions for Component
@@ -35,7 +35,7 @@ class RM3100 : public Magnetometer, public I2cTargetCommunicationWithObc {
    * @fn MainRoutine
    * @brief Main routine for sensor observation
    */
-  void MainRoutine(int count) override;
+  void MainRoutine(const int time_count) override;
   // Override ILoggable
   /**
    * @fn GetLogHeader
@@ -49,7 +49,7 @@ class RM3100 : public Magnetometer, public I2cTargetCommunicationWithObc {
   const unsigned char kModeSetRegId = 0x01;     //!< Register address of mode setting
   const unsigned char kCmmModeSettings = 0x7d;  //!< CMM mode setting command
 
-  double lsb2nT_ = 13.0;                    //!< Convert coefficient raw to nT
+  const double kLsb2nT_ = 13.0;             //!< Convert coefficient raw to nT
   const unsigned int kStoredFrameSize = 3;  //!< Stored frame size for HILS
 
   /**

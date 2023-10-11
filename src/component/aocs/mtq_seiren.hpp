@@ -11,31 +11,31 @@
 #include <components/real/aocs/magnetorquer.hpp>
 
 /**
- * @class MTQseiren
+ * @class MtqSeiren
  * @brief Class to emulate MTQ developed by Seiren
  */
-class MTQseiren : public Magnetorquer, public GpioConnectionWithObc {
+class MtqSeiren : public Magnetorquer, public GpioConnectionWithObc {
  public:
   /**
-   * @fn MTQseiren
+   * @fn MtqSeiren
    * @brief Constructor
-   * @param [in] mag_torquer: Magnetorquer setting
+   * @param [in] magnetorquer: Magnetorquer setting
    * @param [in] gpio_port: Port ID for GPIO
    * @param [in] obc: Connected OBC
    */
-  MTQseiren(Magnetorquer mag_torquer, std::vector<int> gpio_ports, OnBoardComputer *obc);
+  MtqSeiren(Magnetorquer magnetorquer, std::vector<int> gpio_ports, OnBoardComputer *obc);
   /**
-   * @fn ~MTQseiren
+   * @fn ~MtqSeiren
    * @brief Destructor
    */
-  ~MTQseiren();
+  ~MtqSeiren();
 
   // Override functions for Component
   /**
    * @fn MainRoutine
    * @brief Main routine for sensor observation
    */
-  void MainRoutine(int count) override;
+  void MainRoutine(const int time_count) override;
   // Override ILoggable
   /**
    * @fn GetLogHeader

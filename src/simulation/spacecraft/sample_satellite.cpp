@@ -3,9 +3,7 @@
  * @brief An example of user side spacecraft class
  */
 
-#include "sample_satellite.h"
-
-#include "aocs_module_components.h"
+#include "sample_satellite.hpp"
 
 SampleSatellite::SampleSatellite(const SimulationConfiguration *simulation_configuration, const GlobalEnvironment *global_environment,
                                  const unsigned int spacecraft_id)

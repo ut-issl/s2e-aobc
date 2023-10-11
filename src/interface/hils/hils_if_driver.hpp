@@ -23,14 +23,14 @@ class HilsIfDriver : public Component, public UartCommunicationWithObc, public G
    * @fn HilsIfDriver
    * @brief Constructor
    * @param [in] prescaler: Prescaler
-   * @param [in] clock_gen: Clock generator
+   * @param [in] clock_generator: Clock generator
    * @param [in] hils_port_id: HILS port ID
    * @param [in] baud_rate: HILS communication baud rate
    * @param [in] hils_port_manager: HILS port manager
    * @param [in] gpio_ports: GPIO port information
    * @param [in] obc: On Board Computer
    */
-  HilsIfDriver(const int prescaler, ClockGenerator *clock_gen, const unsigned int hils_port_id, const unsigned int baud_rate,
+  HilsIfDriver(const int prescaler, ClockGenerator *clock_generator, const unsigned int hils_port_id, const unsigned int baud_rate,
                HilsPortManager *hils_port_manager, std::vector<int> gpio_ports, OnBoardComputer *obc);
   /**
    * @fn ~HilsIfDriver
@@ -43,15 +43,15 @@ class HilsIfDriver : public Component, public UartCommunicationWithObc, public G
    * @fn MainRoutine
    * @brief Main routine for sensor observation
    */
-  void MainRoutine(int count) override;
+  void MainRoutine(const int time_count) override;
 
  protected:
   /**
    * @fn ParseCommand
    * @brief Override function for UART communication
-   * @param [in] cmd_size: Command size
+   * @param [in] command_size: Command size
    */
-  int ParseCommand(const int cmd_size) override;
+  int ParseCommand(const int command_size) override;
   /**
    * @fn GenerateTelemetry
    * @brief Override function for UART communication
