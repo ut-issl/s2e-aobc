@@ -170,6 +170,12 @@ AocsModuleComponents::AocsModuleComponents(const Dynamics *dynamics, Structure *
   rw0003_z_ = new Rw0003(InitReactionWheel(clock_generator, power_controller_->GetPowerPort((int)PowerPortIdx::RWZ), 3, rw_ini_path, compo_step_sec),
                          1, rw0003_z_hils_port_id, i2c_address_z, aobc_, hils_port_manager_);
 
+
+  // Component interference
+  const std::string interference_file_path = ini_access.ReadString("COMPONENTS_FILES", "component_interference_file");
+  configuration_->main_logger_->CopyFileToLogDirectory(interference_file_path);
+  mtq_magnetometer_interference_ = new MtqMagnetometerInterference(interference_file_path, *rm3100_external_, *mtq_seiren_);
+
   // Thruster
   const std::string thruster_ini_path = ini_access.ReadString("COMPONENTS_FILE", "thruster_file");
   thruster_ = new SimpleThruster(InitSimpleThruster(clock_generator, 1, thruster_ini_path, structure_, dynamics_));

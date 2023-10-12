@@ -25,6 +25,7 @@
 #include "../../component/aocs/rw0003.hpp"
 #include "../../component/aocs/sagitta.hpp"
 #include "../../component/aocs/stim210.hpp"
+#include <components/real/aocs/mtq_magnetometer_interference.hpp>
 // Propulsion
 #include <components/real/propulsion/simple_thruster.hpp>
 // Mission
@@ -97,6 +98,8 @@ class AocsModuleComponents : public InstalledComponents {
   Rw0003 *rw0003_x_;                           //!< RW00003 Reaction wheel X axis
   Rw0003 *rw0003_y_;                           //!< RW00003 Reaction wheel Y axis
   Rw0003 *rw0003_z_;                           //!< RW00003 Reaction wheel Z axis
+  // Component Interference
+  MtqMagnetometerInterference* mtq_magnetometer_interference_;  //!< Additional Bias noise by MTQ-Magnetometer interference
   // Thruster
   SimpleThruster *thruster_;  //!< Thruster
   // Mission
