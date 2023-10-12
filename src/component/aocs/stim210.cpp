@@ -28,7 +28,7 @@ void Stim210::MainRoutine(const int time_count) {
   for (size_t i = 0; i < kGyroDimension; i++) {
     temperature_c_degC_[i] = 30.0 + ((double)i) * 0.1;  // TODO: 温度の反映
   }
-  // Send Tlmetry
+  // Send Telemetry
   SendTelemetry(0);
 
   return;
@@ -45,7 +45,7 @@ std::string Stim210::GetLogHeader() const {
 int Stim210::ParseCommand(const int command_size) {
   std::vector<unsigned char> cmd = rx_buffer_;
   int idx = 0;
-  int ret;
+  int ret = -1;
   for (int i = 0; i < command_size; i++) {
     cmd[idx] = rx_buffer_[i];
     idx++;

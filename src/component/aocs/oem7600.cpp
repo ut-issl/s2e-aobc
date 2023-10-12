@@ -7,6 +7,7 @@
 
 #include <algorithm>  // toupper
 #include <library/utilities/macros.hpp>
+#include <locale>
 
 #define MAX_CMD_LEN 1024                        // TBD
 #define MAX_TLM_LEN 1024                        // TBD
@@ -143,7 +144,7 @@ Oem7600Command Oem7600::DecodeCommand() {
   // find empty space character(separator)
   for (size_t i = 0; i < rx_buffer_.size(); i++) {
     if (rx_buffer_[i] == ' ') {
-      space_pos[space_pos_count] = i;
+      space_pos[space_pos_count] = (uint8_t)i;
       space_pos_count++;
 
       if (space_pos_count > OEM7600_MAX_CMD_ARG) {
@@ -307,7 +308,8 @@ std::string Oem7600::GenerateTelemetryHeaderAscii(const std::string telemetry_na
 
   // Sync + Message
   std::string str_tmp = "#" + telemetry_name;
-  std::transform(telemetry_name.begin(), telemetry_name.end(), (str_tmp.begin() + 1), ::toupper);
+  std::locale loc = std::locale::classic();
+  std::transform(telemetry_name.begin(), telemetry_name.end(), (str_tmp.begin() + 1), [loc](char c) { return std::toupper(c, loc); });
 
   std::string port = "COM" + WriteScalar((int)(telemetry_channel_), 1);  // Port
   str_tmp += "," + port;                                                 // after port, "," is already added (WriteScalar did it)
