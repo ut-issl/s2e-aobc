@@ -110,8 +110,14 @@
     - VSCode: [C/C++](https://marketplace.visualstudio.com/items?itemName=ms-vscode.cpptools)
     - Vim: [vim-clang-format](https://github.com/rhysd/vim-clang-format)
 
+## Used Projects
 
-## Brief history of development
+| Project Name          | Developer                             | Launch  | Refs       |
+| ----------------------| ------------------------------------  | ------- | ---------- |
+| SPHERE-1 EYE          | Sony Group Corporation and ISSL, UT   | 2023    | [Sekine 2023](https://archive.ists.ne.jp/upload_pdf/2023-f-6-02.pdf) |
+| ONGLAISAT             | ISSL, UT                              | -       | [Ikari 2022](https://doi.org/10.57350/jesa.63) |
+
+## Brief history of development before GitHub
 ### History
 - 21st Apr. 2020: Development started in a private repository at GitLab.
 - 26th Sep. 2022: Initial development was finished.
