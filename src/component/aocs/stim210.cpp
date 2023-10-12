@@ -75,7 +75,7 @@ int Stim210::ParseCommand(const int command_size) {
           if (operation_mode_ == OPERATION_SERVICE_MODE) ret = AnalyzeCmdSetLPFFrequency(cmd);
           break;
         default:
-          ret = -1;
+          return = -1;
       }
     }
   }
