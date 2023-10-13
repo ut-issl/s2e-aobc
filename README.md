@@ -17,7 +17,7 @@
 ## Documents
 
 - [s2e-document](https://github.com/ut-issl/s2e-documents)
-- We also have manuals to construct SILS test environment. Please visit the [Google Drive](https://drive.google.com/drive/folders/19g8cxltzAX10oCNxCCKT4S8HwTYReHKe)
+- We also have manuals to construct SILS test environment. Please visit the [Google Drive](https://drive.google.com/drive/folders/19g8cxltzAX10oCNxCCKT4S8HwTYReHKe) to find the manuals.
   - Sorry, but we only have manuals written in Japanese now. We need help to translate them.
 
 ## Release style
