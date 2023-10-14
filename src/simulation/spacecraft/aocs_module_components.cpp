@@ -157,21 +157,25 @@ AocsModuleComponents::AocsModuleComponents(const Dynamics *dynamics, Structure *
   IniAccess rw_ini_access = IniAccess(rw_ini_path);
   const unsigned int rw0003_x_hils_port_id = ini_access.ReadInt("COM_PORT", "rw0003_x_hils_port_id");
   const uint8_t i2c_address_x = (uint8_t)rw_ini_access.ReadInt("I2C_PORT_1", "i2c_address");
-  rw0003_x_ = new Rw0003(InitReactionWheel(clock_generator, power_controller_->GetPowerPort((int)PowerPortIdx::RWX), 1, rw_ini_path,
-                                           dynamics_->GetAttitude().GetPropStep_s(), compo_step_sec),
+  rw0003_x_ = new Rw0003(InitReactionWheel(clock_generator, power_controller_->GetPowerPort((int)PowerPortIdx::RWX), 1, rw_ini_path, compo_step_sec),
                          1, rw0003_x_hils_port_id, i2c_address_x, aobc_, hils_port_manager_);
 
   const unsigned int rw0003_y_hils_port_id = ini_access.ReadInt("COM_PORT", "rw0003_y_hils_port_id");
   const uint8_t i2c_address_y = (uint8_t)rw_ini_access.ReadInt("I2C_PORT_2", "i2c_address");
-  rw0003_y_ = new Rw0003(InitReactionWheel(clock_generator, power_controller_->GetPowerPort((int)PowerPortIdx::RWY), 2, rw_ini_path,
-                                           dynamics_->GetAttitude().GetPropStep_s(), compo_step_sec),
+  rw0003_y_ = new Rw0003(InitReactionWheel(clock_generator, power_controller_->GetPowerPort((int)PowerPortIdx::RWY), 2, rw_ini_path, compo_step_sec),
                          1, rw0003_y_hils_port_id, i2c_address_y, aobc_, hils_port_manager_);
 
   const unsigned int rw0003_z_hils_port_id = ini_access.ReadInt("COM_PORT", "rw0003_z_hils_port_id");
   const uint8_t i2c_address_z = (uint8_t)rw_ini_access.ReadInt("I2C_PORT_3", "i2c_address");
-  rw0003_z_ = new Rw0003(InitReactionWheel(clock_generator, power_controller_->GetPowerPort((int)PowerPortIdx::RWZ), 3, rw_ini_path,
-                                           dynamics_->GetAttitude().GetPropStep_s(), compo_step_sec),
+  rw0003_z_ = new Rw0003(InitReactionWheel(clock_generator, power_controller_->GetPowerPort((int)PowerPortIdx::RWZ), 3, rw_ini_path, compo_step_sec),
                          1, rw0003_z_hils_port_id, i2c_address_z, aobc_, hils_port_manager_);
+
+  // Component interference
+  const std::string interference_file_path = ini_access.ReadString("COMPONENTS_FILE", "component_interference_file");
+  configuration_->main_logger_->CopyFileToLogDirectory(interference_file_path);
+  mtq_mpu9250_magnetometer_interference_ = new MtqMagnetometerInterference(interference_file_path, *mpu9250_magnetometer_, *mtq_seiren_, 0);
+  mtq_rm3100_aobc_interference_ = new MtqMagnetometerInterference(interference_file_path, *rm3100_aobc_, *mtq_seiren_, 1);
+  mtq_rm3100_external_interference_ = new MtqMagnetometerInterference(interference_file_path, *rm3100_external_, *mtq_seiren_, 2);
 
   // Thruster
   const std::string thruster_ini_path = ini_access.ReadString("COMPONENTS_FILE", "thruster_file");

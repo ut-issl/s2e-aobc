@@ -16,6 +16,8 @@
 #include "../../component/power/ina260.hpp"
 #include "../../component/power/power_controller.hpp"
 // AOCS
+#include <components/real/aocs/mtq_magnetometer_interference.hpp>
+
 #include "../../component/aocs/mpu9250_gyro_sensor.hpp"
 #include "../../component/aocs/mpu9250_magnetometer.hpp"
 #include "../../component/aocs/mtq_seiren.hpp"
@@ -97,6 +99,10 @@ class AocsModuleComponents : public InstalledComponents {
   Rw0003 *rw0003_x_;                           //!< RW00003 Reaction wheel X axis
   Rw0003 *rw0003_y_;                           //!< RW00003 Reaction wheel Y axis
   Rw0003 *rw0003_z_;                           //!< RW00003 Reaction wheel Z axis
+  // Component Interference
+  MtqMagnetometerInterference *mtq_mpu9250_magnetometer_interference_;  //!< Additional Bias noise by MTQ - MPU9250 Magnetometer interference
+  MtqMagnetometerInterference *mtq_rm3100_aobc_interference_;           //!< Additional Bias noise by MTQ - AOBC RM3100 interference
+  MtqMagnetometerInterference *mtq_rm3100_external_interference_;       //!< Additional Bias noise by MTQ - External RM3100 interference
   // Thruster
   SimpleThruster *thruster_;  //!< Thruster
   // Mission

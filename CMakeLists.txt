@@ -32,9 +32,17 @@ if(NOT DEFINED C2A_NAME)
   set(C2A_NAME "c2a-aobc")
 endif()
 
-if(WIN32)
-elseif(APPLE)
-  set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_CURRENT_LIST_DIR}/out)  #set build path
+## Directory path for ini files
+if(NOT DEFINED INI_FILE_DIR_FROM_EXE)
+  set(INI_FILE_DIR_FROM_EXE ../../data/initialize_files)
+endif()
+
+if(NOT DEFINED EXT_LIB_DIR_FROM_EXE)
+  set(EXT_LIB_DIR_FROM_EXE ../../ExtLibraries)
+endif()
+
+if(NOT DEFINED CORE_DIR_FROM_EXE)
+  set(CORE_DIR_FROM_EXE ../../s2e-core)
 endif()
 
 ## options to use C2A
