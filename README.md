@@ -65,7 +65,7 @@
 
 - Make the `FlightSW` directory at the same directory with `s2e-aobc`
 - Clone the [C2A-AOBC](https://github.com/ut-issl/c2a-aobc) repository into `FlightSW`
-  - Current support version: [v8.0.0](https://github.com/ut-issl/c2a-aobc/release/tag/v8.0.0)
+  - Current support version: [v8.0.0](https://github.com/ut-issl/c2a-aobc/releases/tag/v8.0.0)
 - Directory Construction
   ```
   - s2e-aobc
