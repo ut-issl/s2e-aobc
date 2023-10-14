@@ -17,7 +17,8 @@
 ## Documents
 
 - [s2e-document](https://github.com/ut-issl/s2e-documents)
-
+- We also have manuals to construct SILS test environment. Please visit the [Google Drive](https://drive.google.com/drive/folders/19g8cxltzAX10oCNxCCKT4S8HwTYReHKe) to find the manuals.
+  - Sorry, but we only have manuals written in Japanese now. We need help to translate them.
 
 ## Release style
 
@@ -30,25 +31,8 @@
 ## For general users
 ### How to make a project-specific repository
 
-- We recommend making a project-specific repository named `s2e-aobc-project-name`.
-- Users can refer to the `s2e-aobc/example` directory to make a directory construction of `s2e-aobc-project-name`.
-  - **NOTE** Please change all words like `example, EXAMPLE, or Example` in the files in this directory to suit your project name.
-  ```
-  - s2e-aobc (git submodule)
-    - We recommend to use a released version of s2e-aobc.
-  - data
-  - CMakeLists.txt
-  - CMakeSettings.json
-  - README.md
-  ```
-- To construct the `s2e-aobc` directory, we recommend to use `git submodule` to take in the `s2e-aobc` repository.
-  - Reference: [Git Tools Submodule](https://git-scm.com/book/en/v2/Git-Tools-Submodules).
-- `CMakeLists.txt`
-  - Please change all words `example, EXAMPLE, or Example` in the file to suit your project name.
-
-### How to build and execute the project-specific repository
-
-- Please see the [README.md](./example/README.md) in the `example` directly.
+- Please refer [s2e-aobc-example](https://github.com/ut-issl/s2e-aobc-example) repository.
+- Users can fork or copy of this example directory.
 
 ### How to join the development of this repository
 
@@ -81,7 +65,7 @@
 
 - Make the `FlightSW` directory at the same directory with `s2e-aobc`
 - Clone the [C2A-AOBC](https://github.com/ut-issl/c2a-aobc) repository into `FlightSW`
-  - Current support version: [v7.0.0](https://github.com/ut-issl/c2a-aobc/releases/tag/v7.0.0)
+  - Current support version: [v8.0.0](https://github.com/ut-issl/c2a-aobc/release/tag/v8.0.0)
 - Directory Construction
   ```
   - s2e-aobc
@@ -127,8 +111,14 @@
     - VSCode: [C/C++](https://marketplace.visualstudio.com/items?itemName=ms-vscode.cpptools)
     - Vim: [vim-clang-format](https://github.com/rhysd/vim-clang-format)
 
+## Used Projects
 
-## Brief history of development
+| Project Name          | Developer                             | Launch  | Refs       |
+| ----------------------| ------------------------------------  | ------- | ---------- |
+| SPHERE-1 EYE          | Sony Group Corporation and ISSL, UT   | 2023    | [Sekine 2023](https://archive.ists.ne.jp/upload_pdf/2023-f-6-02.pdf) |
+| ONGLAISAT             | ISSL, UT                              | -       | [Ikari 2022](https://doi.org/10.57350/jesa.63) |
+
+## Brief history of development before GitHub
 ### History
 - 21st Apr. 2020: Development started in a private repository at GitLab.
 - 26th Sep. 2022: Initial development was finished.
@@ -151,4 +141,5 @@
   - Keidai Iiyama: 1 commit
 
 ## Publications
-1. S. Ikari, and et al., "Development of Compact and Highly Capable Integrated AOCS Module for CubeSats", [2022-f-41](https://archive.ists.ne.jp/upload_pdf/F-9-05.pdf), 33rd ISTS, 2022.
+1. S. Ikari, and et al., "Development of Compact and Highly Capable Integrated AOCS Module for CubeSats", Journal of Evolving Space Activities, vol. 1, ID 63, 2023. [Link](https://doi.org/10.57350/jesa.63)
+1. H. Sekine, and et al., "Development of Software-In-the-Loop Simulator and Hardware-In-the-Loop Simulator of AOCS Module for CubeSats", 34th ISTS, Kurume, 2023. [Link](https://archive.ists.ne.jp/upload_pdf/2023-f-6-02.pdf)

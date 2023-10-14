@@ -2,7 +2,7 @@ cmake_policy(SET CMP0048 NEW)
 project(S2E_AOBC
   LANGUAGES CXX
   DESCRIPTION "S2E_AOBC"
-  VERSION 4.0.1
+  VERSION 5.0.0
   )
 
 cmake_minimum_required(VERSION 3.13)
@@ -32,9 +32,17 @@ if(NOT DEFINED C2A_NAME)
   set(C2A_NAME "c2a-aobc")
 endif()
 
-if(WIN32)
-elseif(APPLE)
-  set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_CURRENT_LIST_DIR}/out)  #set build path
+## Directory path for ini files
+if(NOT DEFINED INI_FILE_DIR_FROM_EXE)
+  set(INI_FILE_DIR_FROM_EXE ../../data/initialize_files)
+endif()
+
+if(NOT DEFINED EXT_LIB_DIR_FROM_EXE)
+  set(EXT_LIB_DIR_FROM_EXE ../../ExtLibraries)
+endif()
+
+if(NOT DEFINED CORE_DIR_FROM_EXE)
+  set(CORE_DIR_FROM_EXE ../../s2e-core)
 endif()
 
 ## options to use C2A
@@ -78,7 +86,7 @@ add_subdirectory(${S2E_CORE_DIR}/src/simulation s2e_core/simulation)
 # Add all cpp files as SOURCE_FILES
 file(GLOB_RECURSE SOURCE_FILES ${CMAKE_CURRENT_LIST_DIR}/src/*.cpp)
 # Uncomment the following line to exclude any files that match the REGEX from SOURCE_FILES
-# list(FILTER SOURCE_FILES EXCLUDE REGEX ${CMAKE_CURRENT_LIST_DIR}/src/Example/example.cpp)
+list(FILTER SOURCE_FILES EXCLUDE REGEX ${CMAKE_CURRENT_LIST_DIR}/src/component/aocs/cube_wheel.cpp)
 
 # Create executable file
 add_executable(${PROJECT_NAME} ${SOURCE_FILES})

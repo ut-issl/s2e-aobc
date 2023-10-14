@@ -14,7 +14,7 @@ on:
       - 'src/**'
 
 env:
-  C2A_AOBC_VERSION: v7.0.0
+  C2A_AOBC_VERSION: v8.0.0
 
 jobs:
   build_s2e_win:
@@ -26,16 +26,16 @@ jobs:
         use_c2a: ['USE_C2A=OFF', 'USE_C2A=ON']
 
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
       - name: checkout the submodules
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           submodules: recursive
 
       - name: checkout C2A AOBC
         if: contains(matrix.use_c2a, 'ON')
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           path: c2a-aobc
           repository: ut-issl/c2a-aobc
@@ -109,16 +109,16 @@ jobs:
         use_c2a: ['USE_C2A=OFF', 'USE_C2A=ON']
 
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
       - name: checkout the submodules
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           submodules: recursive
 
       - name: checkout C2A AOBC
         if: contains(matrix.use_c2a, 'ON')
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           path: c2a-aobc
           repository: ut-issl/c2a-aobc

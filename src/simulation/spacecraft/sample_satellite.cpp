@@ -1,6 +1,9 @@
-#include "sample_satellite.h"
+/**
+ * @file sample_satellite.cpp
+ * @brief An example of user side spacecraft class
+ */
 
-#include "aocs_module_components.h"
+#include "sample_satellite.hpp"
 
 SampleSatellite::SampleSatellite(const SimulationConfiguration *simulation_configuration, const GlobalEnvironment *global_environment,
                                  const unsigned int spacecraft_id)

@@ -1,12 +1,15 @@
+/**
+ * @file power_controller.cpp
+ * @brief Class to emulate power controller
+ */
+
 #include "power_controller.hpp"
 
 #include <library/utilities/macros.hpp>
 
-#include "../../simulation/spacecraft/aocs_module_port_config.h"
+#include "../../simulation/spacecraft/aocs_module_port_config.hpp"
 
-PowerController::PowerController(PowerControlUnit pcu,
-                                 const std::vector<int> gpio_ports,              // GPIOのポート番号リスト
-                                 const std::vector<double> output_voltage_list,  // 出力電圧リスト
+PowerController::PowerController(PowerControlUnit pcu, const std::vector<int> gpio_ports, const std::vector<double> output_voltage_list,
                                  OnBoardComputer *obc)
     : PowerControlUnit(pcu), GpioConnectionWithObc(gpio_ports, obc), output_voltage_list_(output_voltage_list) {
   // 初期過電流閾値はテキトウに設定、最小電圧などはコンポ側で設定する
@@ -31,14 +34,13 @@ PowerController::PowerController(PowerControlUnit pcu,
   }
 
   // PICだけ特別に操作する
-  ConnectPort((int)PowerPortIdx::PIC, 1.0, 3.3,
-              0.43);  // TODO: 外で設定できるようにする？
+  ConnectPort((int)PowerPortIdx::PIC, 1.0, 3.3, 0.43);  // TODO: 外で設定できるようにする？
   PowerPort *power_port = GetPowerPort((int)PowerPortIdx::PIC);
   power_port->SetVoltage_V(3.3);
 }
 
-void PowerController::MainRoutine(int count) {
-  UNUSED(count);
+void PowerController::MainRoutine(const int time_count) {
+  UNUSED(time_count);
   // 電源操作
 #ifdef USE_HILS  // TODO GPIO操作もHILSでできるようになったら削除する
   for (int i = 0; i < (int)PowerPortIdx::MAX; i++) {

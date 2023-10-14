@@ -1,3 +1,9 @@
+/**
+ * @file sagitta.cpp
+ * @brief Class to emulate Sagitta star sensor
+ * @note Manual: NA
+ */
+
 #include "sagitta.hpp"
 
 #include <library/utilities/slip.hpp>
@@ -8,7 +14,7 @@ Sagitta::Sagitta(StarSensor stt, const int sils_port_id, OnBoardComputer *obc, c
                  HilsPortManager *hils_port_manager)
     : StarSensor(stt), UartCommunicationWithObc(sils_port_id, obc, hils_port_id, baud_rate, hils_port_manager) {}
 
-void Sagitta::MainRoutine(int count) {
+void Sagitta::MainRoutine(const int time_count) {
   int receive_data_size = ReceiveCommand(0, kMaxCmdSize_);
 
   if (tlm_reply_mode_ == TLM_REPLY_MODE_SYNCHRONOUS && receive_data_size < 1) return;  // テレメ送信コマンドが送られていない場合
@@ -18,7 +24,7 @@ void Sagitta::MainRoutine(int count) {
     return;
   }
   status_ = 0;
-  counter_ += count;  // TODO: 内部カウンタに合わせて修正
+  counter_ += time_count;  // TODO: 内部カウンタに合わせて修正
 
   runtime_ms_ += uint32_t(step_time_s_ * 1000);
   unix_time_us_ += uint64_t(step_time_s_ * 1000000);  // TODO: unix時間にする。simtimeを内部でもつ？
@@ -39,8 +45,8 @@ void Sagitta::MainRoutine(int count) {
   return;
 }
 
-int Sagitta::ParseCommand(const int cmd_size) {
-  if (cmd_size < 1) return -1;
+int Sagitta::ParseCommand(const int command_size) {
+  if (command_size < 1) return -1;
   std::vector<uint8_t> decoded_rx = decode_slip_with_header(rx_buffer_);
   if (decoded_rx.size() < sizeof(kAddress_) + kXxhashSize_) return -1;
 
@@ -54,10 +60,10 @@ int Sagitta::ParseCommand(const int cmd_size) {
 int Sagitta::GenerateTelemetry() {
   tx_buffer_.assign(kMaxTlmSize_, 0);
 
-  uint8_t cmd_reply_tlm;
+  uint8_t command_reply_tlm;
   switch (tlm_reply_mode_) {
     case TLM_REPLY_MODE_SYNCHRONOUS:
-      cmd_reply_tlm = kCmdReplyTelemSync_;
+      command_reply_tlm = kCmdReplyTelemSync_;
       break;
     case TLM_REPLY_MODE_ASYNCHRONOUS:
       if (tlm_counter_ % 10 == 1 && is_subscribed_temperature_ == true)  // 1[Hz]
@@ -70,7 +76,7 @@ int Sagitta::GenerateTelemetry() {
         rec_mode_ = REC_MODE_OTHERS;
       }
       tlm_counter_++;
-      cmd_reply_tlm = kCmdReplyTelemAsync_;
+      command_reply_tlm = kCmdReplyTelemAsync_;
       break;
     default:
       return -1;
@@ -78,11 +84,11 @@ int Sagitta::GenerateTelemetry() {
 
   switch (rec_mode_) {
     case REC_MODE_RUN_TIME:
-      return GenerateTelemetryRunTime(cmd_reply_tlm);
+      return GenerateTelemetryRunTime(command_reply_tlm);
     case REC_MODE_QUATERNION:
-      return GenerateTelemetryQuaternion(cmd_reply_tlm);
+      return GenerateTelemetryQuaternion(command_reply_tlm);
     case REC_MODE_TEMPERATURE:
-      return GenerateTelemetryTemperature(cmd_reply_tlm);
+      return GenerateTelemetryTemperature(command_reply_tlm);
     case REC_MODE_OTHERS:
       return 0;
     default:
@@ -148,13 +154,13 @@ int Sagitta::AnalyzeTlmId(const uint8_t tlm_id) {
   return 1;
 }
 
-int Sagitta::GenerateTelemetryRunTime(const uint8_t cmd_reply_tlm) {
+int Sagitta::GenerateTelemetryRunTime(const uint8_t command_reply_tlm) {
   const int kTlmSize = 32;
   std::vector<uint8_t> tlm(kTlmSize, 0);
   memset(&tlm[0], 0x00, kTlmSize);
 
   memcpy(&tlm[0], &kAddress_, 1);
-  memcpy(&tlm[1], &cmd_reply_tlm, 1);
+  memcpy(&tlm[1], &command_reply_tlm, 1);
   memcpy(&tlm[2], &kTelemIdTime_, 1);
   memcpy(&tlm[3], &status_, 1);
   memcpy(&tlm[4], &counter_, 4);
@@ -169,13 +175,13 @@ int Sagitta::GenerateTelemetryRunTime(const uint8_t cmd_reply_tlm) {
   return (int)encoded_tx.size();
 }
 
-int Sagitta::GenerateTelemetryQuaternion(const uint8_t cmd_reply_tlm) {
+int Sagitta::GenerateTelemetryQuaternion(const uint8_t command_reply_tlm) {
   const int kTlmSize = 87;
   std::vector<uint8_t> tlm(kTlmSize, 0);
   memset(&tlm[0], 0x00, kTlmSize);
 
   memcpy(&tlm[0], &kAddress_, 1);
-  memcpy(&tlm[1], &cmd_reply_tlm, 1);
+  memcpy(&tlm[1], &command_reply_tlm, 1);
   memcpy(&tlm[2], &kTelemIdSolution_, 1);
   memcpy(&tlm[3], &status_, 1);
   memcpy(&tlm[4], &counter_, 4);
@@ -193,13 +199,13 @@ int Sagitta::GenerateTelemetryQuaternion(const uint8_t cmd_reply_tlm) {
   return (int)encoded_tx.size();
 }
 
-int Sagitta::GenerateTelemetryTemperature(const uint8_t cmd_reply_tlm) {
+int Sagitta::GenerateTelemetryTemperature(const uint8_t command_reply_tlm) {
   const int kTlmSize = 32;
   std::vector<uint8_t> tlm(kTlmSize, 0);
   memset(&tlm[0], 0x00, kTlmSize);
 
   memcpy(&tlm[0], &kAddress_, 1);
-  memcpy(&tlm[1], &cmd_reply_tlm, 1);
+  memcpy(&tlm[1], &command_reply_tlm, 1);
   memcpy(&tlm[2], &kTelemIdTemperature_, 1);
   memcpy(&tlm[3], &status_, 1);
   memcpy(&tlm[4], &counter_, 4);

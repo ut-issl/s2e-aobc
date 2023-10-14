@@ -1,24 +1,53 @@
+/**
+ * @file mtq_seiren.hpp
+ * @brief Class to emulate MTQ developed by Seiren
+ * @note Manual: NA
+ */
+
 #ifndef S2E_AOBC_COMPONENT_AOCS_MTQ_SEIREN_HPP_
 #define S2E_AOBC_COMPONENT_AOCS_MTQ_SEIREN_HPP_
 
 #include <components/base/gpio_connection_with_obc.hpp>
 #include <components/real/aocs/magnetorquer.hpp>
 
-/* References
-Manual: NA
-HowToUse: NA
-*/
-
-class MTQseiren : public Magnetorquer, public GpioConnectionWithObc {
+/**
+ * @class MtqSeiren
+ * @brief Class to emulate MTQ developed by Seiren
+ */
+class MtqSeiren : public Magnetorquer, public GpioConnectionWithObc {
  public:
-  MTQseiren(Magnetorquer mag_torquer, std::vector<int> gpio_ports, OnBoardComputer *obc);
-  ~MTQseiren();
+  /**
+   * @fn MtqSeiren
+   * @brief Constructor
+   * @param [in] magnetorquer: Magnetorquer setting
+   * @param [in] gpio_port: Port ID for GPIO
+   * @param [in] obc: Connected OBC
+   */
+  MtqSeiren(Magnetorquer magnetorquer, std::vector<int> gpio_ports, OnBoardComputer *obc);
+  /**
+   * @fn ~MtqSeiren
+   * @brief Destructor
+   */
+  ~MtqSeiren();
 
-  // Override: MagTorquer functions
-  void MainRoutine(int count) override;
+  // Override functions for Component
+  /**
+   * @fn MainRoutine
+   * @brief Main routine for sensor observation
+   */
+  void MainRoutine(const int time_count) override;
+  // Override ILoggable
+  /**
+   * @fn GetLogHeader
+   * @brief Override GetLogHeader function of ILoggable
+   */
   std::string GetLogHeader() const override;
 
  private:
+  /**
+   * @enum MtqGpioIdx
+   * @brief Index of MTQ GPIO
+   */
   typedef enum {
     GPIO_X_POSITIVE = 0,
     GPIO_X_NEGATIVE,
@@ -28,15 +57,22 @@ class MTQseiren : public Magnetorquer, public GpioConnectionWithObc {
     GPIO_Z_NEGATIVE,
   } MtqGpioIdx;
 
-  libra::Vector<kMtqDimension> polarity_;
+  libra::Vector<kMtqDimension> polarity_;  //!< Polarity information of MTQ
 
-  // Read GPIO state and determine MTQ polarity
-  // return:
-  // +1: positive
-  // -1: negative
-  //  0: zero (no output)
+  /**
+   * @fn ConvertGPIOState2Polarity
+   * @brief Read GPIO state and determine MTQ polarity
+   * @param [in] positive_gpio_pin_idx: Positive GPIO port index
+   * @param [in] negative_gpio_pin_idx: Positive GPIO port index
+   * @return +1: positive, -1: negative, 0: zero (no output)
+   */
   int ConvertGPIOState2Polarity(int positive_gpio_pin_idx, int negative_gpio_pin_idx);
 
+  /**
+   * @fn ConvertPolarity2OutputMag
+   * @brief Convert polarity to MTQ output
+   */
   void ConvertPolarity2OutputMag();
 };
+
 #endif  // S2E_AOBC_COMPONENT_AOCS_MTQ_SEIREN_HPP_
