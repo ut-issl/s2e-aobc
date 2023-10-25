@@ -53,7 +53,7 @@ int Sagitta::ParseCommand(const int command_size) {
   if (!is_initialized_) {
     return AnalyzeCmdBoot(decoded_rx);
   } else {
-    return AnalyzeCmdRequestTlm(decoded_rx);
+    return AnalyzeCmd(decoded_rx);
   }
 }
 
@@ -110,10 +110,34 @@ int Sagitta::AnalyzeCmdBoot(std::vector<uint8_t> decoded_rx) {
   return 1;
 }
 
-int Sagitta::AnalyzeCmdRequestTlm(std::vector<uint8_t> decoded_rx) {
+int Sagitta::AnalyzeCmd(std::vector<uint8_t> decoded_rx) {
   if (decoded_rx[0] != kAddress_) return -1;
+  const int cmd_id = decoded_rx[1];
+  
+  switch (cmd_id) {
+    case kCmdSetParam_:
+      AnalyzeCmdRequestTlm(decoded_rx);
+      break;
+    case kCmdAction_:
+      AnalyzeCmdSetTime(decoded_rx);
+      break;
+    default:
+      return -1;
+  }
 
-  if (decoded_rx[1] == kCmdSetParam_ && decoded_rx[2] == kParamSubscription) {
+  return 1;
+}
+
+int Sagitta::AnalyzeCmdSetTime(std::vector<uint8_t> decoded_rx) {
+  if (decoded_rx[2] != kActionIdSetTime_) return -1;
+  
+  memcpy(&unix_time_us_, &decoded_rx[3], sizeof(unix_time_us_)); 
+
+  return 1;
+}
+
+int Sagitta::AnalyzeCmdRequestTlm(std::vector<uint8_t> decoded_rx) {
+  if (decoded_rx[2] == kParamSubscription) {
     tlm_reply_mode_ = TLM_REPLY_MODE_ASYNCHRONOUS;
     // TODO 3種類以上の非同期テレメに対応
     if (decoded_rx[3] == kTelemIdTemperature_ || decoded_rx[4] == kTelemIdTemperature_) {
