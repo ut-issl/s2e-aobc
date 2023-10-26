@@ -110,6 +110,7 @@ class Sagitta : public StarSensor, public UartCommunicationWithObc {
   static const uint8_t kTelemIdSolution_ = 0x18;            //!< Solution telemetry ID
   static const uint8_t kTelemIdTemperature_ = 0x1B;         //!< Temperature telemetry ID
   static const uint8_t kActionIdBoot_ = 0x01;               //!< Boot action ID
+  static const uint8_t kActionIdSetTime_ = 0x0E;            //!< Set Time action ID
   static const uint8_t kParamIdMountingQuaternion_ = 0x06;  //!< Mounting quaternion parameter ID
   static const uint8_t kParamRegion_ = 0x01;                //!< Region parameter ID
   static const uint8_t kParamSubscription = 0x12;           //!< Subscription parameter ID
@@ -133,6 +134,23 @@ class Sagitta : public StarSensor, public UartCommunicationWithObc {
    * @return 1: Success, -1: Error
    */
   int AnalyzeCmdBoot(std::vector<uint8_t> decoded_rx);
+
+  /**
+   * @fn AnalyzeCmd
+   * @brief Analyze command
+   * @param [in] decoded_rx: Decoded command data
+   * @return 1: Success, -1: Error
+   */
+  int AnalyzeCmd(std::vector<uint8_t> decoded_rx);
+
+  /**
+   * @fn AnalyzeCmdSetTime
+   * @brief Analyze Set Time command
+   * @param [in] decoded_rx: Decoded command data
+   * @return 1: Success, -1: Error
+   */
+  int AnalyzeCmdSetTime(std::vector<uint8_t> decoded_rx);
+
   /**
    * @fn AnalyzeCmdRequestTlm
    * @brief Analyze request telemetry command
@@ -140,6 +158,7 @@ class Sagitta : public StarSensor, public UartCommunicationWithObc {
    * @return 1: Success, -1: Error
    */
   int AnalyzeCmdRequestTlm(std::vector<uint8_t> decoded_rx);
+
   /**
    * @fn AnalyzeTlmId
    * @brief Analyze telemetry ID
