@@ -131,7 +131,7 @@ int Sagitta::AnalyzeCmd(std::vector<uint8_t> decoded_rx) {
 int Sagitta::AnalyzeCmdSetTime(std::vector<uint8_t> decoded_rx) {
   if (decoded_rx[2] != kActionIdSetTime_) return -1;
 
-  memcpy(&unix_time_us_, &decoded_rx[3], sizeof(unix_time_us_)); 
+  memcpy(&unix_time_us_, &decoded_rx[3], sizeof(unix_time_us_));
 
   return 1;
 }
