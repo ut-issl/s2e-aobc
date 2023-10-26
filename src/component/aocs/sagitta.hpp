@@ -134,15 +134,31 @@ class Sagitta : public StarSensor, public UartCommunicationWithObc {
    * @return 1: Success, -1: Error
    */
   int AnalyzeCmdBoot(std::vector<uint8_t> decoded_rx);
+
+  /**
+   * @fn AnalyzeCmd
+   * @brief Analyze command
+   * @param [in] decoded_rx: Decoded command data
+   * @return 1: Success, -1: Error
+   */
+  int AnalyzeCmd(std::vector<uint8_t> decoded_rx);
+
+  /**
+   * @fn AnalyzeCmdSetTime
+   * @brief Analyze Set Time command
+   * @param [in] decoded_rx: Decoded command data
+   * @return 1: Success, -1: Error
+   */
+  int AnalyzeCmdSetTime(std::vector<uint8_t> decoded_rx);
+
   /**
    * @fn AnalyzeCmdRequestTlm
    * @brief Analyze request telemetry command
    * @param [in] decoded_rx: Decoded command data
    * @return 1: Success, -1: Error
    */
-  int AnalyzeCmd(std::vector<uint8_t> decoded_rx);
-  int AnalyzeCmdSetTime(std::vector<uint8_t> decoded_rx);
   int AnalyzeCmdRequestTlm(std::vector<uint8_t> decoded_rx);
+
   /**
    * @fn AnalyzeTlmId
    * @brief Analyze telemetry ID
