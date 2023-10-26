@@ -113,7 +113,7 @@ int Sagitta::AnalyzeCmdBoot(std::vector<uint8_t> decoded_rx) {
 int Sagitta::AnalyzeCmd(std::vector<uint8_t> decoded_rx) {
   if (decoded_rx[0] != kAddress_) return -1;
   const int cmd_id = decoded_rx[1];
-  
+
   switch (cmd_id) {
     case kCmdSetParam_:
       AnalyzeCmdRequestTlm(decoded_rx);
@@ -130,7 +130,7 @@ int Sagitta::AnalyzeCmd(std::vector<uint8_t> decoded_rx) {
 
 int Sagitta::AnalyzeCmdSetTime(std::vector<uint8_t> decoded_rx) {
   if (decoded_rx[2] != kActionIdSetTime_) return -1;
-  
+
   memcpy(&unix_time_us_, &decoded_rx[3], sizeof(unix_time_us_)); 
 
   return 1;
