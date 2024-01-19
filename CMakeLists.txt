@@ -2,7 +2,7 @@ cmake_policy(SET CMP0048 NEW)
 project(S2E_AOBC
   LANGUAGES CXX
   DESCRIPTION "S2E_AOBC"
-  VERSION 5.0.2
+  VERSION 5.0.3
   )
 
 cmake_minimum_required(VERSION 3.13)
