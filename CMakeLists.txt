@@ -80,7 +80,11 @@ add_subdirectory(${S2E_CORE_DIR}/src/disturbances s2e_core/disturbances)
 add_subdirectory(${S2E_CORE_DIR}/src/dynamics s2e_core/dynamics)
 add_subdirectory(${S2E_CORE_DIR}/src/environment/global s2e_core/environment/global)
 add_subdirectory(${S2E_CORE_DIR}/src/environment/local s2e_core/environment/local)
-add_subdirectory(${S2E_CORE_DIR}/src/library s2e_core/library)
+add_subdirectory(${S2E_CORE_DIR}/src/math_physics s2e-core/math_physics)
+add_subdirectory(${S2E_CORE_DIR}/src/setting_file_reader s2e-core/setting_file_reader)
+add_subdirectory(${S2E_CORE_DIR}/src/logger s2e-core/logger)
+add_subdirectory(${S2E_CORE_DIR}/src/utilities s2e-core/utilities)
+add_subdirectory(${S2E_CORE_DIR}/ExtLibraries/inih s2e-core/inih)
 add_subdirectory(${S2E_CORE_DIR}/src/simulation s2e_core/simulation)
 
 # Add all cpp files as SOURCE_FILES
