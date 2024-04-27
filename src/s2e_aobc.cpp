@@ -15,7 +15,7 @@
 #include <string>
 
 // Simulator includes
-#include <library/logger/initialize_log.hpp>
+#include <logger/initialize_log.hpp>
 #include <simulation/monte_carlo_simulation/initialize_monte_carlo_simulation.hpp>
 #include <utilities/macros.hpp>
 
