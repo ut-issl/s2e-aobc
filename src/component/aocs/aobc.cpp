@@ -5,7 +5,7 @@
 
 #include "aobc.hpp"
 
-#include <library/utilities/macros.hpp>
+#include <utilities/macros.hpp>
 
 #include "../../simulation/spacecraft/aocs_module_components.hpp"
 

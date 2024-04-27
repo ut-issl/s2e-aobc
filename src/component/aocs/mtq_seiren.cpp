@@ -6,7 +6,7 @@
 
 #include "mtq_seiren.hpp"
 
-#include <library/utilities/macros.hpp>
+#include <utilities/macros.hpp>
 
 MtqSeiren::MtqSeiren(Magnetorquer magnetorquer, std::vector<int> gpio_ports, OnBoardComputer *obc)
     : Magnetorquer(magnetorquer), GpioConnectionWithObc(gpio_ports, obc) {}

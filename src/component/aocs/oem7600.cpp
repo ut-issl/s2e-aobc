@@ -6,7 +6,7 @@
 #include "oem7600.hpp"
 
 #include <algorithm>  // toupper
-#include <library/utilities/macros.hpp>
+#include <utilities/macros.hpp>
 #include <locale>
 
 #define MAX_CMD_LEN 1024                        // TBD

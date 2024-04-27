@@ -5,7 +5,7 @@
 
 #include "power_controller.hpp"
 
-#include <library/utilities/macros.hpp>
+#include <utilities/macros.hpp>
 
 #include "../../simulation/spacecraft/aocs_module_port_config.hpp"
 
