@@ -5,7 +5,7 @@
 
 #include "mpu9250_gyro_sensor.hpp"
 
-#include <math_physics/constants.hpp>
+#include <math_physics/math/constants.hpp>
 #include <utilities/macros.hpp>
 
 Mpu9250GyroSensor::Mpu9250GyroSensor(GyroSensor gyro, const int sils_port_id, const unsigned int hils_port_id, const unsigned char i2c_address,

@@ -9,7 +9,7 @@
 #include <string.h>  // for memcpy
 
 #include <algorithm>
-#include <math_physics/constants.hpp>
+#include <math_physics/math/constants.hpp>
 #include <utilities/macros.hpp>
 
 NanoSsocD60::NanoSsocD60(SunSensor sun_sensor, const int sils_port_id, const unsigned int hils_port_id, const unsigned char i2c_address,

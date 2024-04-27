@@ -7,7 +7,7 @@
 #define S2E_AOBC_SIMULATION_SPACECRAFT_AOCS_MODULE_COMPONENTS_HPP_
 
 #include <dynamics/dynamics.hpp>
-#include <math_physics/vector.hpp>
+#include <math_physics/math/vector.hpp>
 #include <simulation/spacecraft/installed_components.hpp>
 
 // CDH
