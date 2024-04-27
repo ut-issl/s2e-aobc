@@ -66,15 +66,15 @@ void Oem7600::UpdateLocal() {
     // should be modified to add noise in the future
     Vector<3> pos_true_ecef_m = dynamics_->GetOrbit().GetPosition_ecef_m();
     velocity_ecef_m_s_ = dynamics_->GetOrbit().GetVelocity_ecef_m_s();
-    position_llh_ = dynamics_->GetOrbit().GetLatLonAlt();
+    geodetic_position_ = dynamics_->GetOrbit().GetGeodeticPosition();
     AddNoise(pos_true_eci_m, pos_true_ecef_m);
 
     last_position_fix_time_local_ = simulation_time_->GetElapsedTime_s();  // store position fixed time [sec]
     utc_ = simulation_time_->GetCurrentUtc();
-    ConvertJulianDayToGPSTime(simulation_time_->GetCurrentTime_jd());
+    ConvertJulianDayToGpsTime(simulation_time_->GetCurrentTime_jd());
   } else {
     utc_ = simulation_time_->GetCurrentUtc();
-    ConvertJulianDayToGPSTime(simulation_time_->GetCurrentTime_jd());
+    ConvertJulianDayToGpsTime(simulation_time_->GetCurrentTime_jd());
   }
 }
 
@@ -748,10 +748,10 @@ std::string Oem7600::GenerateGpggaTelemetry(void) {
     str_tmp += StringZeroPaddingLocal(str_utc_tmp, 6);
 
     // lat in [ddmm.mm] + indicator "N" or "S"
-    str_tmp += ConvLatLonToNmea(position_llh_[0], "lat");
+    str_tmp += ConvLatLonToNmea(geodetic_position_.GetLatitude_rad(), "lat");
 
     // lon in [dddmm.mm] + indicator "E" or "W"
-    str_tmp += ConvLatLonToNmea(position_llh_[1], "lon");
+    str_tmp += ConvLatLonToNmea(geodetic_position_.GetLongitude_rad(), "lon");
 
     // quality
     if (is_gnss_visible_) {
@@ -767,7 +767,7 @@ std::string Oem7600::GenerateGpggaTelemetry(void) {
     str_tmp += "1.0,";
 
     // alt in [m]
-    str_tmp += WriteScalar(position_llh_[2]);
+    str_tmp += WriteScalar(geodetic_position_.GetAltitude_m());
 
     // units of alt(fix to M in default)
     str_tmp += "M,";
