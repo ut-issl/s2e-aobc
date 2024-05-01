@@ -45,7 +45,7 @@ void PowerController::MainRoutine(const int time_count) {
 #ifdef USE_HILS  // TODO GPIO操作もHILSでできるようになったら削除する
   for (int i = 0; i < (int)PowerPortIdx::MAX; i++) {
     PowerPort *power_port = GetPowerPort(i);
-    power_port->SetVoltage(output_voltage_list_[i]);
+    power_port->SetVoltage_V(output_voltage_list_[i]);
   }
   return;
 #else
