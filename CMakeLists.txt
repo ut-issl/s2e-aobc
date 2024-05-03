@@ -81,13 +81,8 @@ if(USE_C2A)
 endif()
 
 ## options to use HILS
-if(USE_HILS AND WIN32)
+if(USE_HILS)
   add_definitions(-DUSE_HILS)
-  ## winsock2
-  SET (CMAKE_FIND_LIBRARY_SUFFIXES ".lib")
-  find_library(WS2_32_LIB ws2_32.lib)
-  message("path for winsock2 is")
-  message(${WS2_32_LIB})
 endif()
 
 ## include directories of S2E-CORE
