@@ -213,6 +213,7 @@ target_link_libraries(${PROJECT_NAME} COMPONENT)
 # link picocompo-usb
 target_link_libraries(${PROJECT_NAME} picocompo-usb)
 #target_link_libraries(${PROJECT_NAME} udev)
+target_link_libraries(picocompo-usb INTERFACE udev)
 
 ## C2A integration
 if(USE_C2A)
