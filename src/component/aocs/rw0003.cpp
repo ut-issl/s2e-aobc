@@ -10,13 +10,34 @@
 #include <utilities/macros.hpp>
 #include <utilities/slip.hpp>
 
-extern "C" uint32_t PICOCOMPO_rw0003_open(const char *name);
+typedef struct {
+  float torque;
+} InputReport;
+
+extern "C" {
+  uint32_t PICOCOMPO_rw0003_open(const char *name);
+  int32_t PICOCOMPO_rw0003_send(uint32_t handle, float temperature, float speed);
+  int32_t PICOCOMPO_rw0003_recv(uint32_t handle, InputReport *input);
+}
 
 Rw0003::Rw0003(ReactionWheel rw, const int sils_port_id, const unsigned int hils_port_id, const unsigned char i2c_address, OnBoardComputer *obc,
                HilsPortManager *hils_port_manager)
     : ReactionWheel(rw), I2cTargetCommunicationWithObc(sils_port_id, hils_port_id, i2c_address, obc, hils_port_manager) {
-  int h = PICOCOMPO_rw0003_open("Fake RW-0.003 Z-axis");
-  printf("handle: %d\n", h);
+  switch (i2c_address) {
+    case 0x11:
+    case 0x24:
+      picocompo_handle_ = PICOCOMPO_rw0003_open("Fake RW-0.003 X-axis");
+      break;
+    case 0x12:
+    case 0x25:
+      picocompo_handle_ = PICOCOMPO_rw0003_open("Fake RW-0.003 Y-axis");
+      break;
+    case 0x13:
+    case 0x26:
+      picocompo_handle_ = PICOCOMPO_rw0003_open("Fake RW-0.003 Z-axis");
+      break;
+  }
+  printf("i2c_address %02x handle: %d\n", i2c_address, picocompo_handle_);
   Initialize();
 }
 
@@ -32,10 +53,11 @@ void Rw0003::MainRoutine(const int time_count) {
   ReadCmd();
 
   // Generate TLM
-  if (is_rw_initialized_ == true) {
+  if (true || is_rw_initialized_ == true) {
     CalcTorque();
-    WriteFloatTlm(kReadAddressTemperature_, (float)temperature_degC_);
-    WriteFloatTlm(kReadAddressSpeed_, (float)angular_velocity_rad_s_);
+    //WriteFloatTlm(kReadAddressTemperature_, (float)temperature_degC_);
+    //WriteFloatTlm(kReadAddressSpeed_, (float)angular_velocity_rad_s_);
+    PICOCOMPO_rw0003_send(picocompo_handle_, (float)temperature_degC_, (float)angular_velocity_rad_s_);
   }
 
   is_command_written_ = false;
@@ -60,6 +82,7 @@ std::string Rw0003::GetLogHeader() const {
 }
 
 void Rw0003::ReadCmd() {
+  /*
   uint8_t rx_data[kMaxCmdLength_] = {0};
   ReadCommand(rx_data, kMaxCmdLength_);
 
@@ -102,6 +125,11 @@ void Rw0003::ReadCmd() {
     default:
       break;
   }
+  */
+
+  InputReport input;
+  PICOCOMPO_rw0003_recv(picocompo_handle_, &input);
+  SetTargetTorque_rw_Nm(input.torque);
 
   return;
 }
@@ -200,16 +228,6 @@ void Rw0003::WriteFloatTlm(uint8_t address, float value) {
 }
 
 void Rw0003::Initialize() {
-  // HILS用に事前にテレメトリを溜めておく
-  unsigned char rx[1];
-  const int kTlmSize = 15;
-
-  // Set register address to kReadAddressSpeed_
-  ReadRegister(kReadAddressSpeed_, rx, 1);
-  // SLIPを用いたRWでは、ObcI2cTargetCommunicationBaseクラスのstored_frame_counterが機能しない
-  // 最初にkStoredFrameSize分のフレームをUSB-I2C
-  // Target変換器にためておき、ためたフレーム数を維持する方針
-  for (size_t i = 0; i < kStoredFrameSize; i++) {
-    SendTelemetry(kTlmSize);
-  }
+  // HILS用の初期値を設定
+  PICOCOMPO_rw0003_send(picocompo_handle_, 0, 0);
 }

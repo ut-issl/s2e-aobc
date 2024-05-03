@@ -81,6 +81,10 @@ class Rw0003 : public ReactionWheel, public I2cTargetCommunicationWithObc {
   // HILS
   bool is_command_written_ = false;         //!< Command written flag
   const unsigned int kStoredFrameSize = 3;  //!< Stored frame size for HILS
+
+  // Picocompo
+  uint32_t picocompo_handle_ = 0;
+
   /**
    * @fn Initialize
    * @brief Store data before execution for HILS

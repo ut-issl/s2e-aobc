@@ -4,7 +4,7 @@ use std::{collections::HashMap, ffi::CStr, sync::Mutex};
 
 use hidapi::HidDevice;
 use once_cell::sync::Lazy;
-use rw0003::Rw0003;
+use rw0003::{InputReport, Rw0003};
 
 #[derive(Default)]
 struct Picocompo {
@@ -19,9 +19,7 @@ impl Picocompo {
             .device_list()
             .find(|device_info| device_info.product_string() == Some(name));
 
-        let Some(device_info) = device_info else {
-            return None;
-        };
+        let device_info = device_info?;
 
         Some(device_info.open_device(&hidapi).unwrap())
     }
@@ -31,11 +29,27 @@ impl Picocompo {
         self.next_handle
     }
 
-    pub fn open_rw0003(&mut self, name: &str) -> Option<u32> {
+    pub fn rw0003_open(&mut self, name: &str) -> Option<u32> {
         let device = Self::open_device(name)?;
         let handle = self.generate_handle();
         self.rw0003_pool.insert(handle, Rw0003::new(device));
         Some(handle)
+    }
+
+    pub fn rw0003_send(&mut self, handle: u32, temperature: f32, speed: f32) -> Result<(), ()> {
+        let rw0003 = self.rw0003_pool.get_mut(&handle).ok_or(())?;
+        rw0003.send_output(rw0003::OutputReport {
+            temperature: temperature.to_le_bytes(),
+            speed: speed.to_le_bytes(),
+        });
+        Ok(())
+    }
+
+    pub fn rw0003_recv(&mut self, handle: u32, input: &mut InputReport) -> Result<(), ()> {
+        let rw0003 = self.rw0003_pool.get_mut(&handle).ok_or(())?;
+        *input = rw0003.recv_input();
+        Ok(())
+
     }
 }
 
@@ -47,5 +61,27 @@ pub unsafe extern "C" fn PICOCOMPO_rw0003_open(name: *const i8) -> u32 {
 
     let name = CStr::from_ptr(name).to_str().unwrap();
 
-    picocompo.open_rw0003(name).unwrap_or(0)
+    picocompo.rw0003_open(name).unwrap_or(0)
+}
+
+#[no_mangle]
+pub extern "C" fn PICOCOMPO_rw0003_send(handle: u32, temperature: f32, speed: f32) -> i32 {
+    let mut picocompo = PICOCOMPO.lock().unwrap();
+
+    if picocompo.rw0003_send(handle, temperature, speed).is_ok() {
+        0
+    } else {
+        -1
+    }
+}
+
+#[no_mangle]
+pub unsafe extern "C" fn PICOCOMPO_rw0003_recv(handle: u32, input: *mut InputReport) -> i32 {
+    let mut picocompo = PICOCOMPO.lock().unwrap();
+
+    if picocompo.rw0003_recv(handle, &mut *input).is_ok() {
+        0
+    } else {
+        -1
+    }
 }
