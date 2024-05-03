@@ -27,7 +27,7 @@ endif()
 # Use Rust library
 include(FetchContent)
 
-set(Rust_CARGO_TARGET "i686-unknown-linux-gnu")
+#set(Rust_CARGO_TARGET "i686-unknown-linux-gnu")
 FetchContent_Declare(
     Corrosion
     GIT_REPOSITORY https://github.com/corrosion-rs/corrosion.git
@@ -210,6 +210,10 @@ target_link_libraries(${PROJECT_NAME} SIMULATION)
 target_link_libraries(${PROJECT_NAME} GLOBAL_ENVIRONMENT LOCAL_ENVIRONMENT)
 target_link_libraries(${PROJECT_NAME} COMPONENT)
 
+# link picocompo-usb
+target_link_libraries(${PROJECT_NAME} picocompo-usb)
+#target_link_libraries(${PROJECT_NAME} udev)
+
 ## C2A integration
 if(USE_C2A)
   target_link_libraries(${PROJECT_NAME} C2A)
@@ -226,9 +230,6 @@ if(USE_HILS)
   set_target_properties(GLOBAL_ENVIRONMENT PROPERTIES COMMON_LANGUAGE_RUNTIME "")
   set_target_properties(LOCAL_ENVIRONMENT PROPERTIES COMMON_LANGUAGE_RUNTIME "")
 endif()
-
-# link picocompo-usb
-target_link_libraries(${PROJECT_NAME} picocompo-usb)
 
 ## Cmake debug
 message("Cspice_LIB:  " ${CSPICE_LIB})
