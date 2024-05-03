@@ -1,0 +1,31 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "preLaunchTask": "Build picocompo",
+      "type": "probe-rs-debug",
+      "request": "launch",
+      "name": "Run fakerw0003",
+      "cwd": "${workspaceFolder}",
+      "connectUnderReset": false,
+      "chip": "RP2040",
+      "flashingConfig": {
+        "flashingEnabled": true,
+      },
+      "coreConfigs": [
+        {
+          "coreIndex": 0,
+          "programBinary": "./target/thumbv6m-none-eabi/debug/fakerw0003",
+          "rttEnabled": true,
+          "rttChannelFormats": [
+            {
+              "channelNumber": 0,
+              "dataFormat": "Defmt",
+              "showTimestamps": false
+            },
+          ],
+        }
+      ]
+    }
+  ]
+}
