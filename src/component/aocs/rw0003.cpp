@@ -228,6 +228,10 @@ void Rw0003::WriteFloatTlm(uint8_t address, float value) {
 }
 
 void Rw0003::Initialize() {
+
+  is_rw_initialized_ = true;
+  SetDriveFlag(true);
+
   // HILS用の初期値を設定
   PICOCOMPO_rw0003_send(picocompo_handle_, 0, 0);
 }
