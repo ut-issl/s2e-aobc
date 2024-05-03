@@ -12,6 +12,13 @@ option(USE_HILS "Use HILS" OFF)
 option(USE_C2A "Use C2A" ON)
 option(USE_C2A_COMMAND_SENDER "Use command sender to C2A" ON)
 
+# Mac user setting
+option(APPLE_SILICON "Build with Apple Silicon" OFF)
+# Force build with 64bit for APPLE
+if(APPLE)
+  option(BUILD_64BIT "Build 64bit" ON)
+endif()
+
 # preprocessor
 if(WIN32)
   add_definitions(-DWIN32)
@@ -97,41 +104,73 @@ list(FILTER SOURCE_FILES EXCLUDE REGEX ${CMAKE_CURRENT_LIST_DIR}/src/component/a
 add_executable(${PROJECT_NAME} ${SOURCE_FILES})
 
 ## cspice library
-if(CYGWIN)
+if(APPLE)
+  if(APPLE_SILICON)  
+    # APPLE Silicon
+    set(CSPICE_LIB_DIR ${CSPICE_DIR}/cspice_apple_silicon64/lib)
+  else()
+    # APPLE Intel
+    set(CSPICE_LIB_DIR ${CSPICE_DIR}/cspice_apple_intel64/lib)
+  endif()
+elseif(CYGWIN)
   SET (CMAKE_FIND_LIBRARY_SUFFIXES ".so" ".a")
-  find_library(CSPICE_LIB
-    NAMES cspice.a csupport.a
-    PATHS ${CSPICE_DIR}/cspice_cygwin/lib)
+  set(CSPICE_LIB_DIR ${CSPICE_DIR}/cspice_cygwin/lib)
 elseif(UNIX)
+  if(BUILD_64BIT)
+    set(CSPICE_LIB_DIR ${CSPICE_DIR}/cspice_unix64/lib)
+  else()
+    set(CSPICE_LIB_DIR ${CSPICE_DIR}/cspice_unix/lib)
+  endif()
+endif()
+
+if(WIN32)
+  SET (CMAKE_FIND_LIBRARY_SUFFIXES ".lib")
+  if(BUILD_64BIT)
+    find_library(CSPICE_LIB
+      NAMES cspice.lib csupport.lib
+      PATHS ${CSPICE_DIR}/cspice_msvs64/lib)
+  else()
+    find_library(CSPICE_LIB
+      NAMES cspice.lib csupport.lib
+      PATHS ${CSPICE_DIR}/cspice_msvs/lib)
+  endif()
+else()
   find_library(CSPICE_LIB
     NAMES cspice.a csupport.a
-    PATHS ${CSPICE_DIR}/cspice_unix/lib)
-elseif(WIN32)
-  SET (CMAKE_FIND_LIBRARY_SUFFIXES ".lib")
-  find_library(CSPICE_LIB
-    NAMES cspice.lib csupport.lib
-    PATHS ${CSPICE_DIR}/cspice_msvs/lib)
+    PATHS ${CSPICE_LIB_DIR})
 endif()
 if(NOT CSPICE_LIB)
-  message(FATAL_ERROR "cspice not found in ${EXT_LIB_DIR}")
+  message(FATAL_ERROR "cspice not found in ${CSPICE_LIB_DIR}")
 endif()
 #target_link_libraries(${PROJECT_NAME} ${CSPICE_LIB})
 
 ## nrlmsise00 library
 if(CYGWIN)
   SET (CMAKE_FIND_LIBRARY_SUFFIXES ".a")
-  find_library(NRLMSISE00_LIB
+  find_library(NRLMSISE00_LIB 
     NAMES libnrlmsise00.a
     PATHS ${NRLMSISE00_DIR}/lib)
 elseif(UNIX)
-  find_library(NRLMSISE00_LIB
-    NAMES libnrlmsise00.a
-    PATHS ${NRLMSISE00_DIR}/lib)
+  if(BUILD_64BIT)
+    find_library(NRLMSISE00_LIB
+      NAMES libnrlmsise00.a
+      PATHS ${NRLMSISE00_DIR}/lib64)
+  else()
+    find_library(NRLMSISE00_LIB
+      NAMES libnrlmsise00.a
+      PATHS ${NRLMSISE00_DIR}/lib)
+  endif()
 elseif(WIN32)
   SET (CMAKE_FIND_LIBRARY_SUFFIXES ".lib")
-  find_library(NRLMSISE00_LIB
-    NAMES libnrlmsise00.lib
-    PATHS ${NRLMSISE00_DIR}/lib)
+  if(BUILD_64BIT)
+    find_library(NRLMSISE00_LIB 
+      NAMES libnrlmsise00.lib
+      PATHS ${NRLMSISE00_DIR}/lib64)
+  else()
+    find_library(NRLMSISE00_LIB 
+      NAMES libnrlmsise00.lib
+      PATHS ${NRLMSISE00_DIR}/lib)
+  endif()
 endif()
 if(NOT NRLMSISE00_LIB)
   message(FATAL_ERROR "nrlmsise00 not found in ${EXT_LIB_DIR}")
