@@ -24,6 +24,19 @@ if(WIN32)
   add_definitions(-DWIN32)
 endif()
 
+# Use Rust library
+include(FetchContent)
+
+set(Rust_CARGO_TARGET "i686-unknown-linux-gnu")
+FetchContent_Declare(
+    Corrosion
+    GIT_REPOSITORY https://github.com/corrosion-rs/corrosion.git
+    GIT_TAG v0.4.7
+)
+FetchContent_MakeAvailable(Corrosion)
+
+corrosion_import_crate(MANIFEST_PATH picocompo-usb/Cargo.toml CRATE_TYPES staticlib FLAGS --crate-type=staticlib)
+
 ## set directory path
 set(S2E_CORE_DIR ${CMAKE_CURRENT_LIST_DIR}/s2e-core)
 
@@ -213,6 +226,9 @@ if(USE_HILS)
   set_target_properties(GLOBAL_ENVIRONMENT PROPERTIES COMMON_LANGUAGE_RUNTIME "")
   set_target_properties(LOCAL_ENVIRONMENT PROPERTIES COMMON_LANGUAGE_RUNTIME "")
 endif()
+
+# link picocompo-usb
+target_link_libraries(${PROJECT_NAME} picocompo-usb)
 
 ## Cmake debug
 message("Cspice_LIB:  " ${CSPICE_LIB})
