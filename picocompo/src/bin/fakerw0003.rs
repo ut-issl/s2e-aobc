@@ -35,15 +35,13 @@ const RW0003_CRC: crc::Crc<u16> = crc::Crc::<u16>::new(&crc::CRC_16_MCRF4XX);
 
 #[gen_hid_descriptor(
     (collection = APPLICATION, usage_page = VENDOR_DEFINED_START, usage = 0x01) = {
-        temperature=output;
-        speed=output;
-        torque=input;
+        output=output;
+        input=input;
     }
 )]
 struct CustomReport {
-    temperature: [u8; 4],
-    speed: [u8; 4],
-    torque: [u8; 4],
+    output: [u8; 8],
+    input: [u8; 8],
 }
 
 #[derive(FromZeroes, FromBytes)]
@@ -56,12 +54,20 @@ struct OutputReport {
 #[derive(FromZeroes, AsBytes)]
 #[repr(C)]
 struct InputReport {
+    is_initialized: u8,
+    mode: u8,
+    _padding: [u8; 2],
     torque: [u8; 4],
 }
 
 impl InputReport {
-    fn new(torque: [u8; 4]) -> Self {
-        Self { torque }
+    fn new(is_initialized: bool, mode: u8, torque: [u8; 4]) -> Self {
+        Self {
+            is_initialized: is_initialized as u8,
+            mode,
+            _padding: [0; 2],
+            torque,
+        }
     }
 }
 
@@ -76,13 +82,30 @@ pub fn exit() -> ! {
     }
 }
 
-const PRODUCT_NAMES: [&str; 3] = [
-    "Fake RW-0.003 X-axis",
-    "Fake RW-0.003 Y-axis",
-    "Fake RW-0.003 Z-axis",
+struct AxisMetadata {
+    product_name: &'static str,
+    address: u8,
+}
+
+const AXIS_METADATA: [AxisMetadata; 3] = [
+    AxisMetadata {
+        product_name: "Fake RW-0.003 X-axis",
+        address: 0x24,
+    },
+    AxisMetadata {
+        product_name: "Fake RW-0.003 Y-axis",
+        address: 0x25,
+    },
+    AxisMetadata {
+        product_name: "Fake RW-0.003 Z-axis",
+        address: 0x26,
+    },
 ];
 
-const ERROR_PRODUCT_NAME: &str = "Fake RW-0.003 Unknown-axis";
+const DEFAULT_AXIS_METADATA: AxisMetadata = AxisMetadata {
+    product_name: "Fake RW-0.003 Unknown-axis",
+    address: 0x11,
+};
 
 struct AxisSelector {
     x: gpio::Pin<Gpio1, FunctionSioInput, PullUp>,
@@ -135,7 +158,9 @@ fn main() -> ! {
         z: pins.gpio9.into_pull_up_input(),
     };
     let axis = axis_selector.select();
-    let product_name = axis.map(|i| PRODUCT_NAMES[i]).unwrap_or(ERROR_PRODUCT_NAME);
+    let axis_metadata = axis
+        .map(|i| &AXIS_METADATA[i])
+        .unwrap_or(&DEFAULT_AXIS_METADATA);
 
     let bus = UsbBus::new(
         pac.USBCTRL_REGS,
@@ -161,7 +186,7 @@ fn main() -> ! {
         .max_packet_size_0(64)
         .unwrap()
         .strings(&[StringDescriptors::new(LangID::EN_US)
-            .product(product_name)
+            .product(axis_metadata.product_name)
             .manufacturer("ArkEdge Space Inc.")])
         .unwrap()
         .build();
@@ -186,9 +211,10 @@ fn main() -> ! {
 
     let i2c_sda = pins.gpio16.into_function();
     let i2c_scl = pins.gpio17.into_function();
+    let address = axis_metadata.address;
     let i2c0 =
-        I2C::new_peripheral_event_iterator(pac.I2C0, i2c_sda, i2c_scl, &mut pac.RESETS, 0x26u8);
-    let mut rw0003 = Rw0003::new(i2c0, 0x11, 0x26);
+        I2C::new_peripheral_event_iterator(pac.I2C0, i2c_sda, i2c_scl, &mut pac.RESETS, address);
+    let mut rw0003 = Rw0003::new(i2c0, 0x11, address);
     let mut usbbuf = [0x00; 64];
 
     loop {
@@ -197,8 +223,7 @@ fn main() -> ! {
 
         if let Ok(len) = hid.pull_raw_output(&mut usbbuf) {
             if let Some(output_report) = OutputReport::ref_from(&usbbuf[..len]) {
-                rw0003.temperature = output_report.temperature;
-                rw0003.speed = output_report.speed;
+                rw0003.handle_output_report(output_report);
                 defmt::println!(
                     "Received output report: temperature: {=[u8]:02x}, speed: {=[u8]:02x}",
                     rw0003.temperature,
@@ -206,7 +231,7 @@ fn main() -> ! {
                 );
             }
         }
-        let input_report = InputReport::new(rw0003.torque);
+        let input_report = rw0003.build_input_report();
         hid.push_raw_input(input_report.as_bytes()).ok();
     }
 }
@@ -229,12 +254,13 @@ where
     i2c: I2C_PERIPHERAL<I2C, SDA, SCL>,
     ctrl_address: u8,
     self_address: u8,
-    is_initialized: bool,
     recv_end_cursor: usize,
     recv_buffer: [u8; 64],
     send_start_cursor: usize,
     send_buffer: heapless::Vec<u8, 64>,
 
+    is_initialized: bool,
+    mode: u8,
     torque: [u8; 4],
     temperature: [u8; 4],
     speed: [u8; 4],
@@ -251,12 +277,13 @@ where
             i2c,
             ctrl_address,
             self_address,
-            is_initialized: false,
             recv_end_cursor: 0,
             recv_buffer: [0; 64],
             send_start_cursor: 0,
             send_buffer: heapless::Vec::new(),
 
+            is_initialized: false,
+            mode: 0x00, // IDLE
             torque: [0; 4],
             temperature: 12.34f32.to_le_bytes(),
             speed: 345.67f32.to_le_bytes(),
@@ -278,14 +305,14 @@ where
                     defmt::println!("TransferRead: {}", self.send_start_cursor);
                     if self.send_start_cursor >= self.send_buffer.len() {
                         // buffer underflow
-                        defmt::println!("Buffer underflow !!!!!");
+                        //defmt::println!("Buffer underflow !!!!!");
                         self.i2c.write(&[0]);
                         continue;
                     }
                     let buf = &self.send_buffer[self.send_start_cursor..];
                     defmt::println!("Sending {} bytes: {=[u8]:02x}", buf.len(), buf);
                     let sent = self.i2c.write(buf);
-                    defmt::println!("Sent {} bytes", sent);
+                    //defmt::println!("Sent {} bytes", sent);
                     self.send_start_cursor += sent;
                 }
                 Event::Start => {
@@ -405,6 +432,11 @@ where
                             let mode_command_type = body[1];
                             let mode_command_value = &body[2..];
                             match mode_command_type {
+                                0x00 => {
+                                    // Idle
+                                    defmt::println!("Idle");
+                                    self.mode = 0x00;
+                                },
                                 0x12 => {
                                     // Torque
                                     if mode_command_value.len() != 4 {
@@ -415,6 +447,7 @@ where
                                         return;
                                     }
                                     defmt::println!("Torque: {=[u8]:02x}", mode_command_value);
+                                    self.mode = 0x12;
                                     self.torque.copy_from_slice(mode_command_value);
                                 }
                                 _ => {
@@ -456,6 +489,15 @@ where
         slip_encode(&message[2..], &mut self.send_buffer)?;
 
         Ok(())
+    }
+
+    pub fn handle_output_report(&mut self, report: &OutputReport) {
+        self.temperature.copy_from_slice(&report.temperature);
+        self.speed.copy_from_slice(&report.speed);
+    }
+
+    pub fn build_input_report(&mut self) -> InputReport {
+        InputReport::new(self.is_initialized, self.mode, self.torque)
     }
 }
 

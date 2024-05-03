@@ -1,6 +1,6 @@
 use std::mem::size_of;
 
-use zerocopy::{AsBytes, FromBytes, FromZeroes};
+use zerocopy::{little_endian::U32, AsBytes, FromBytes, FromZeroes};
 
 pub struct Rw0003 {
     device: hidapi::HidDevice,
@@ -14,14 +14,13 @@ impl Rw0003 {
     pub fn send_output(&self, output: OutputReport) {
         let mut buf = [0; size_of::<OutputReport>() + 1];
         buf[0] = 0; // Report ID
-        buf[1..].copy_from_slice(&output.as_bytes());
+        buf[1..].copy_from_slice(output.as_bytes());
         self.device.write(&buf).unwrap();
     }
 
     pub fn recv_input(&self) -> InputReport {
         let mut buf = [0; size_of::<InputReport>()];
         self.device.read(&mut buf).unwrap();
-        println!("{:02x?}", buf);
         InputReport::ref_from(&buf).unwrap().clone()
     }
 }
@@ -36,5 +35,8 @@ pub struct OutputReport {
 #[derive(FromZeroes, AsBytes, FromBytes, Clone)]
 #[repr(C)]
 pub struct InputReport {
+    pub is_initialized: u8,
+    pub mode: u8,
+    _padding: [u8; 2],
     pub torque: [u8; 4],
 }
