@@ -9,12 +9,17 @@
 #ifndef S2E_COMPONENTS_PORTS_HILS_UART_PORT_HPP_
 #define S2E_COMPONENTS_PORTS_HILS_UART_PORT_HPP_
 
-#include <msclr/gcroot.h>
-#include <msclr/marshal_cppstd.h>
+#include <stdio.h>
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <sys/ioctl.h>
+#include <fcntl.h>
+#include <termios.h>
+#include <unistd.h>
 
 #include <string>
 
-typedef cli::array<System::Byte> bytearray;  //!< System::Byte: an 8-bit unsigned integer
+//typedef cli::array<System::Byte> bytearray;  //!< System::Byte: an 8-bit unsigned integer
 
 /**
  * @class HilsUartPort
@@ -83,10 +88,7 @@ class HilsUartPort {
 
   // gcroot is the type-safe wrapper template to refer to a CLR object from the c++ heap reference:
   // https://docs.microsoft.com/en-us/cpp/dotnet/how-to-declare-handles-in-native-types?view=msvc-160
-  msclr::gcroot<System::IO::Ports::SerialPort ^> port_;  //!< Port
-  msclr::gcroot<bytearray ^> tx_buffer_;                 //!< TX Buffer
-  msclr::gcroot<bytearray ^> rx_buffer_;                 //!< RX Buffer
-
+  int fd_ = -1;
   /**
    * @fn GetPortName
    * @brief Convert port id to port name
