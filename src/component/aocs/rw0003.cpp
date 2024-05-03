@@ -10,9 +10,13 @@
 #include <utilities/macros.hpp>
 #include <utilities/slip.hpp>
 
+extern "C" uint32_t PICOCOMPO_rw0003_open(const char *name);
+
 Rw0003::Rw0003(ReactionWheel rw, const int sils_port_id, const unsigned int hils_port_id, const unsigned char i2c_address, OnBoardComputer *obc,
                HilsPortManager *hils_port_manager)
     : ReactionWheel(rw), I2cTargetCommunicationWithObc(sils_port_id, hils_port_id, i2c_address, obc, hils_port_manager) {
+  int h = PICOCOMPO_rw0003_open("Fake RW-0.003 Z-axis");
+  printf("handle: %d\n", h);
   Initialize();
 }
 
