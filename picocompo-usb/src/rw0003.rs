@@ -8,9 +8,7 @@ pub struct Rw0003 {
 
 impl Rw0003 {
     pub fn new(device: hidapi::HidDevice) -> Self {
-        Self {
-            device,
-        }
+        Self { device }
     }
 
     pub fn send_output(&self, output: OutputReport) {
@@ -21,9 +19,10 @@ impl Rw0003 {
     }
 
     pub fn recv_input(&self) -> InputReport {
-        let mut buf = [0; size_of::<InputReport>() + 1];
+        let mut buf = [0; size_of::<InputReport>()];
         self.device.read(&mut buf).unwrap();
-        InputReport::ref_from(&buf[1..]).unwrap().clone()
+        println!("{:02x?}", buf);
+        InputReport::ref_from(&buf).unwrap().clone()
     }
 }
 
