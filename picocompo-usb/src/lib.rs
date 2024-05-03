@@ -49,12 +49,13 @@ impl Picocompo {
         let rw0003 = self.rw0003_pool.get_mut(&handle).ok_or(())?;
         *input = rw0003.recv_input();
         Ok(())
-
     }
 }
 
 static PICOCOMPO: Lazy<Mutex<Picocompo>> = Lazy::new(|| Mutex::new(Picocompo::default()));
 
+/// # Safety
+/// `name` は NULL 終端の文字列を指す有効なポインタでなければならない。
 #[no_mangle]
 pub unsafe extern "C" fn PICOCOMPO_rw0003_open(name: *const i8) -> u32 {
     let mut picocompo = PICOCOMPO.lock().unwrap();
@@ -75,6 +76,8 @@ pub extern "C" fn PICOCOMPO_rw0003_send(handle: u32, temperature: f32, speed: f3
     }
 }
 
+/// # Safety
+/// `input` は書き込み可能な InputReport を指すポインタでなければならない。
 #[no_mangle]
 pub unsafe extern "C" fn PICOCOMPO_rw0003_recv(handle: u32, input: *mut InputReport) -> i32 {
     let mut picocompo = PICOCOMPO.lock().unwrap();

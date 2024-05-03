@@ -49,39 +49,6 @@ class Rw0003 : public ReactionWheel, public I2cTargetCommunicationWithObc {
   bool is_rw_initialized_ = false;  //!< Flag to detect initializing operation
   double temperature_degC_ = 30.0;  //!< RW measured temperature [degC] (dummy data)
 
-  // Communication
-  uint16_t crc_;                             //!< Calculated CRC value
-  const uint8_t kSourceAddress_ = 0x11;      //!< Source address
-  static const uint8_t kHeaderSize_ = 2;     //!< Header size
-  static const uint8_t kFooterSize_ = 1;     //!< Footer size
-  static const uint8_t kCrcSize_ = 2;        //!< CRC size
-  static const uint8_t kMaxCmdLength_ = 15;  //!< Command max length
-  static const uint8_t kMaxTlmLength_ = 15;  //!< Telemetry max length
-
-  // Command
-  static const uint8_t kCmdIdInit_ = 0x01;       //!< Command ID for initialize
-  static const uint8_t kCmdIdReadFile_ = 0x07;   //!< Command ID for read file
-  static const uint8_t kCmdIdWriteFile_ = 0x08;  //!< Command ID for write file
-
-  // Write Command
-  static const uint8_t kWriteCmdIdle_ = 0x00;    //!< Idle command ID
-  static const uint8_t kWriteCmdSpeed_ = 0x03;   //!< Rotation speed setting command ID
-  static const uint8_t kWriteCmdTorque_ = 0x12;  //!< Torque setting command ID
-
-  // Register address
-  static const uint8_t kReadAddressTemperature_ = 0x03;  //!< Register address of temperature measurement
-  static const uint8_t kReadAddressSpeed_ = 0x15;        //!< Register address of rotation speed measurement
-  static const uint8_t kReadAddressLimitSpeed1_ = 0x33;  //!< Register address of limit speed 1
-  static const uint8_t kReadAddressLimitSpeed2_ = 0x34;  //!< Register address of limit speed 2
-
-  static const uint8_t kMcfReadEdac_ = 0xa7;    //!< Read EDAC memory MCF value
-  static const uint16_t kCrcInitial_ = 0xffff;  //!< CRC initial value
-  static const bool kCrcReverseFlag_ = false;   //!< CRC reverse flag
-
-  // HILS
-  bool is_command_written_ = false;         //!< Command written flag
-  const unsigned int kStoredFrameSize = 3;  //!< Stored frame size for HILS
-
   // Picocompo
   uint32_t picocompo_handle_ = 0;
 
@@ -90,48 +57,6 @@ class Rw0003 : public ReactionWheel, public I2cTargetCommunicationWithObc {
    * @brief Store data before execution for HILS
    */
   void Initialize();
-
-  // Command
-  /**
-   * @fn ReadCmd
-   * @brief Read and execute command
-   */
-  void ReadCmd();
-  /**
-   * @fn ReadCmdInit
-   * @brief Read and execute initialize command
-   * @param [in] payload: Argument of the command
-   */
-  void ReadCmdInit(std::vector<uint8_t> payload);
-  /**
-   * @fn ReadCmdWriteFile
-   * @brief Read and execute write file command
-   * @param [in] payload: Argument of the command
-   */
-  void ReadCmdWriteFile(const std::vector<uint8_t> payload);
-  /**
-   * @fn ReadCmdReadFile
-   * @brief Read and execute read file command
-   * @param [in] payload: Argument of the command
-   */
-  void ReadCmdReadFile(const std::vector<uint8_t> payload);
-  /**
-   * @fn decode_mcf
-   * @brief Decode MCF to detect reply requirement
-   * @param [in] command_id: Command ID
-   * @param [in] mcf: MCF data
-   * @return 1: with reply, 0: without reply
-   */
-  uint8_t decode_mcf(uint8_t *command_id, const uint8_t mcf);
-
-  // Telemetry
-  /**
-   * @fn WriteFloatTlm
-   * @brief Write float data as telemetry format
-   * @param [in] address: Telemetry address
-   * @param [in] value: Input float value
-   */
-  void WriteFloatTlm(uint8_t address, float value);
 };
 
 #endif  // S2E_AOBC_COMPONENT_AOCS_RW0003_HPP_
