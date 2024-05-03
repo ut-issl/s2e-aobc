@@ -8,8 +8,8 @@ project(S2E_AOBC
 cmake_minimum_required(VERSION 3.13)
 
 # build config
-option(USE_HILS "Use HILS" OFF)
-option(USE_C2A "Use C2A" ON)
+option(USE_HILS "Use HILS" ON)
+option(USE_C2A "Use C2A" OFF)
 option(USE_C2A_COMMAND_SENDER "Use command sender to C2A" ON)
 
 # Mac user setting
