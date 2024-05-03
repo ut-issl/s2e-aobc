@@ -82,47 +82,22 @@ pub fn exit() -> ! {
     }
 }
 
-struct AxisMetadata {
-    product_name: &'static str,
-    address: u8,
-}
-
-const AXIS_METADATA: [AxisMetadata; 3] = [
-    AxisMetadata {
-        product_name: "Fake RW-0.003 X-axis",
-        address: 0x24,
-    },
-    AxisMetadata {
-        product_name: "Fake RW-0.003 Y-axis",
-        address: 0x25,
-    },
-    AxisMetadata {
-        product_name: "Fake RW-0.003 Z-axis",
-        address: 0x26,
-    },
-];
-
-const DEFAULT_AXIS_METADATA: AxisMetadata = AxisMetadata {
-    product_name: "Fake RW-0.003 Unknown-axis",
-    address: 0x11,
-};
-
-struct AxisSelector {
+struct AddressSelector {
     x: gpio::Pin<Gpio1, FunctionSioInput, PullUp>,
     y: gpio::Pin<Gpio5, FunctionSioInput, PullUp>,
     z: gpio::Pin<Gpio9, FunctionSioInput, PullUp>,
 }
 
-impl AxisSelector {
-    pub fn select(&mut self) -> Option<usize> {
+impl AddressSelector {
+    pub fn select(&mut self) -> Option<u8> {
         let x = self.x.is_low().unwrap();
         let y = self.y.is_low().unwrap();
         let z = self.z.is_low().unwrap();
         defmt::println!("x: {}, y: {}, z: {}", x, y, z);
         match (x, y, z) {
-            (true, false, false) => Some(0),
-            (false, true, false) => Some(1),
-            (false, false, true) => Some(2),
+            (true, false, false) => Some(0x24),
+            (false, true, false) => Some(0x25),
+            (false, false, true) => Some(0x26),
             _ => None,
         }
     }
@@ -152,15 +127,19 @@ fn main() -> ! {
         &mut pac.RESETS,
     );
 
-    let mut axis_selector = AxisSelector {
+    let mut address_selector = AddressSelector {
         x: pins.gpio1.into_pull_up_input(),
         y: pins.gpio5.into_pull_up_input(),
         z: pins.gpio9.into_pull_up_input(),
     };
-    let axis = axis_selector.select();
-    let axis_metadata = axis
-        .map(|i| &AXIS_METADATA[i])
-        .unwrap_or(&DEFAULT_AXIS_METADATA);
+    let self_address = address_selector.select().unwrap_or(0x00);
+
+    let product_name = cortex_m::singleton!(: [u8; 18] = [0; 18]).unwrap();
+    product_name.copy_from_slice(b"Fake RW-0.003 0x??");
+    let addr_hex_offset = product_name.len() - 2;
+    product_name[addr_hex_offset..].copy_from_slice(&hex(self_address));
+
+    let product_name = core::str::from_utf8(product_name).unwrap();
 
     let bus = UsbBus::new(
         pac.USBCTRL_REGS,
@@ -186,7 +165,7 @@ fn main() -> ! {
         .max_packet_size_0(64)
         .unwrap()
         .strings(&[StringDescriptors::new(LangID::EN_US)
-            .product(axis_metadata.product_name)
+            .product(product_name)
             .manufacturer("ArkEdge Space Inc.")])
         .unwrap()
         .build();
@@ -211,10 +190,9 @@ fn main() -> ! {
 
     let i2c_sda = pins.gpio16.into_function();
     let i2c_scl = pins.gpio17.into_function();
-    let address = axis_metadata.address;
     let i2c0 =
-        I2C::new_peripheral_event_iterator(pac.I2C0, i2c_sda, i2c_scl, &mut pac.RESETS, address);
-    let mut rw0003 = Rw0003::new(i2c0, 0x11, address);
+        I2C::new_peripheral_event_iterator(pac.I2C0, i2c_sda, i2c_scl, &mut pac.RESETS, self_address);
+    let mut rw0003 = Rw0003::new(i2c0, 0x11, self_address);
     let mut usbbuf = [0x00; 64];
 
     loop {
@@ -558,4 +536,9 @@ fn core1_task(mut i2c: impl embedded_hal::i2c::I2c<Error = hal::i2c::Error>) -> 
         defmt::println!("Controller Read: {=[u8]:02x}", tlm);
         cortex_m::asm::delay(60_000_000);
     }
+}
+
+fn hex(byte: u8) -> [u8; 2] {
+    let hex = b"0123456789ABCDEF";
+    [hex[(byte >> 4) as usize], hex[(byte & 0x0F) as usize]]
 }
