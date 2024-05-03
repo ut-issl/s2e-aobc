@@ -1,0 +1,31 @@
+[package]
+authors = ["Hidekazu Kobayashi <koba789@arkedgespace.com>"]
+name = "fakerm3100"
+edition = "2021"
+version = "0.1.0"
+
+[dependencies]
+
+cortex-m = "0.7.7"
+cortex-m-rt = "0.7.3"
+defmt = "0.3.6"
+defmt-rtt = "0.4.0"
+panic-probe = { version = "0.3.1", features = ["print-defmt"] }
+rp-pico = { version = "0.9.0", features = ["rp2040-e5"] }
+rp2040-hal = { version = "0.10.1", features = ["defmt"]}
+embedded-hal = "1.0.0"
+heapless = "0.8.0"
+pio-proc = "0.2.2"
+pio = "0.2.1"
+usb-device = "0.3.0"
+usbd-hid = "0.7.0"
+crc = "3.2.1"
+slippers = "0.1.3"
+zerocopy = { version = "0.7.32", features = ["derive"] }
+
+[profile.dev]
+opt-level = 3
+
+[profile.release]
+opt-level = 3
+debug = 2
