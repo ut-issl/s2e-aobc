@@ -6,8 +6,14 @@ use bsp::{
     XOSC_CRYSTAL_FREQ,
 };
 use defmt_rtt as _;
+use embedded_hal::digital::InputPin;
 use hal::{
     fugit::RateExtU32 as _,
+    gpio::{
+        self,
+        bank0::{Gpio1, Gpio5, Gpio9},
+        FunctionSioInput, PullUp,
+    },
     i2c::{peripheral::Event, Peripheral},
     multicore::{Multicore, Stack},
     I2C,
@@ -70,6 +76,35 @@ pub fn exit() -> ! {
     }
 }
 
+const PRODUCT_NAMES: [&str; 3] = [
+    "Fake RW-0.003 X-axis",
+    "Fake RW-0.003 Y-axis",
+    "Fake RW-0.003 Z-axis",
+];
+
+const ERROR_PRODUCT_NAME: &str = "Fake RW-0.003 Unknown-axis";
+
+struct AxisSelector {
+    x: gpio::Pin<Gpio1, FunctionSioInput, PullUp>,
+    y: gpio::Pin<Gpio5, FunctionSioInput, PullUp>,
+    z: gpio::Pin<Gpio9, FunctionSioInput, PullUp>,
+}
+
+impl AxisSelector {
+    pub fn select(&mut self) -> Option<usize> {
+        let x = self.x.is_low().unwrap();
+        let y = self.y.is_low().unwrap();
+        let z = self.z.is_low().unwrap();
+        defmt::println!("x: {}, y: {}, z: {}", x, y, z);
+        match (x, y, z) {
+            (true, false, false) => Some(0),
+            (false, true, false) => Some(1),
+            (false, false, true) => Some(2),
+            _ => None,
+        }
+    }
+}
+
 #[bsp::entry]
 fn main() -> ! {
     let mut pac = pac::Peripherals::take().unwrap();
@@ -94,6 +129,14 @@ fn main() -> ! {
         &mut pac.RESETS,
     );
 
+    let mut axis_selector = AxisSelector {
+        x: pins.gpio1.into_pull_up_input(),
+        y: pins.gpio5.into_pull_up_input(),
+        z: pins.gpio9.into_pull_up_input(),
+    };
+    let axis = axis_selector.select();
+    let product_name = axis.map(|i| PRODUCT_NAMES[i]).unwrap_or(ERROR_PRODUCT_NAME);
+
     let bus = UsbBus::new(
         pac.USBCTRL_REGS,
         pac.USBCTRL_DPRAM,
@@ -106,7 +149,7 @@ fn main() -> ! {
     let mut hid = HIDClass::new_with_settings(
         &bus_allocator,
         CustomReport::desc(),
-        16,
+        1,
         HidClassSettings {
             subclass: HidSubClass::NoSubClass,
             protocol: HidProtocol::Generic,
@@ -117,9 +160,9 @@ fn main() -> ! {
     let mut dev = UsbDeviceBuilder::new(&bus_allocator, vid_pid)
         .max_packet_size_0(64)
         .unwrap()
-        .strings(&[StringDescriptors::new(LangID::EN)
-            .manufacturer("ArkEdge Space Inc.")
-            .product("FAKE-RW0003")])
+        .strings(&[StringDescriptors::new(LangID::EN_US)
+            .product(product_name)
+            .manufacturer("ArkEdge Space Inc.")])
         .unwrap()
         .build();
 
@@ -156,6 +199,11 @@ fn main() -> ! {
             if let Some(output_report) = OutputReport::ref_from(&usbbuf[..len]) {
                 rw0003.temperature = output_report.temperature;
                 rw0003.speed = output_report.speed;
+                defmt::println!(
+                    "Received output report: temperature: {=[u8]:02x}, speed: {=[u8]:02x}",
+                    rw0003.temperature,
+                    rw0003.speed
+                );
             }
         }
         let input_report = InputReport::new(rw0003.torque);
