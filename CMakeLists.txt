@@ -35,7 +35,7 @@ FetchContent_Declare(
 )
 FetchContent_MakeAvailable(Corrosion)
 
-corrosion_import_crate(MANIFEST_PATH picocompo-usb/Cargo.toml CRATE_TYPES staticlib FLAGS --crate-type=staticlib)
+corrosion_import_crate(MANIFEST_PATH picompo-usb/Cargo.toml CRATE_TYPES staticlib FLAGS --crate-type=staticlib)
 
 ## set directory path
 set(S2E_CORE_DIR ${CMAKE_CURRENT_LIST_DIR}/s2e-core)
@@ -205,8 +205,8 @@ target_link_libraries(${PROJECT_NAME} SIMULATION)
 target_link_libraries(${PROJECT_NAME} GLOBAL_ENVIRONMENT LOCAL_ENVIRONMENT)
 target_link_libraries(${PROJECT_NAME} COMPONENT)
 
-# link picocompo-usb
-target_link_libraries(${PROJECT_NAME} picocompo-usb)
+# link picompo-usb
+target_link_libraries(${PROJECT_NAME} picompo-usb)
 
 ## C2A integration
 if(USE_C2A)
