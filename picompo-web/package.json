@@ -1,5 +1,5 @@
 {
-  "name": "picocompo-web",
+  "name": "picompo-web",
   "version": "0.0.0",
   "scripts": {
     "dev:vite": "vite --host",

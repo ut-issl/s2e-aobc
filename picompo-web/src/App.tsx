@@ -68,7 +68,7 @@ export const App: React.FC = () => {
     <>
       <Navbar>
         <Navbar.Group>
-          <Navbar.Heading>picocompo</Navbar.Heading>
+          <Navbar.Heading>picompo</Navbar.Heading>
         </Navbar.Group>
       </Navbar>
       <div className="mx-auto my-6 max-w-[960px]">
