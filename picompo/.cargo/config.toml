@@ -13,5 +13,5 @@ rustflags = [
 target = "thumbv6m-none-eabi"    # Cortex-M0 and Cortex-M0+
 
 [alias]
-rb = "run --bin"
-rrb = "run --release --bin"
+run-peri = "run --bin fakerw0003 -- --probe 1209:4853"
+run-ctrl = "run --bin i2c_ctrl -- --probe 6666:4444"

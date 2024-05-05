@@ -639,6 +639,7 @@ dependencies = [
  "defmt-rtt",
  "embedded-hal 1.0.0",
  "heapless",
+ "nb 1.1.0",
  "panic-probe",
  "pio",
  "pio-proc",
