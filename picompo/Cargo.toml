@@ -1,6 +1,6 @@
 [package]
 authors = ["Hidekazu Kobayashi <koba789@arkedgespace.com>"]
-name = "fakerm3100"
+name = "picompo"
 edition = "2021"
 version = "0.1.0"
 

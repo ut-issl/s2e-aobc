@@ -323,28 +323,6 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "5443807d6dff69373d433ab9ef5378ad8df50ca6298caf15de6e52e24aaf54d5"
 
 [[package]]
-name = "fakerm3100"
-version = "0.1.0"
-dependencies = [
- "cortex-m",
- "cortex-m-rt",
- "crc",
- "defmt",
- "defmt-rtt",
- "embedded-hal 1.0.0",
- "heapless",
- "panic-probe",
- "pio",
- "pio-proc",
- "rp-pico",
- "rp2040-hal",
- "slippers",
- "usb-device",
- "usbd-hid",
- "zerocopy",
-]
-
-[[package]]
 name = "fixedbitset"
 version = "0.4.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -648,6 +626,28 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "b6796ad771acdc0123d2a88dc428b5e38ef24456743ddb1744ed628f9815c096"
 dependencies = [
  "siphasher",
+]
+
+[[package]]
+name = "picompo"
+version = "0.1.0"
+dependencies = [
+ "cortex-m",
+ "cortex-m-rt",
+ "crc",
+ "defmt",
+ "defmt-rtt",
+ "embedded-hal 1.0.0",
+ "heapless",
+ "panic-probe",
+ "pio",
+ "pio-proc",
+ "rp-pico",
+ "rp2040-hal",
+ "slippers",
+ "usb-device",
+ "usbd-hid",
+ "zerocopy",
 ]
 
 [[package]]
