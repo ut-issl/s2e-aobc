@@ -1,7 +1,0 @@
--m32
--std=c++14
--Wall
--Wextra
--I./src
--I../ExtLibraries/cspice/include
--I../ExtLibraries/nrlmsise00/src/
