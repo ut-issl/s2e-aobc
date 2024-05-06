@@ -17,15 +17,12 @@ use rp_pico::{
     self as bsp, hal,
     hal::{pac, prelude::*},
 };
-use slippers::{SlipDecoder, SlipEncoder};
 use usb_device::{class_prelude::UsbBusAllocator, prelude::*};
 use usbd_hid::descriptor::generator_prelude::*;
 use usbd_hid::hid_class::{
     HIDClass, HidClassSettings, HidCountryCode, HidProtocol, HidSubClass, ProtocolModeConfig,
 };
-use zerocopy::{AsBytes, FromBytes, FromZeroes, Ref, LE, U16};
-
-const NanoSsocD60_CRC: crc::Crc<u16> = crc::Crc::<u16>::new(&crc::CRC_16_MCRF4XX);
+use zerocopy::{AsBytes, FromBytes, FromZeroes, LE, U16};
 
 #[gen_hid_descriptor(
     (collection = APPLICATION, usage_page = VENDOR_DEFINED_START, usage = 0x01) = {
@@ -78,10 +75,6 @@ struct OutputReport {
 #[derive(FromZeroes, AsBytes)]
 #[repr(C)]
 struct InputReport {
-}
-
-impl InputReport {
-
 }
 
 #[defmt::panic_handler]
@@ -172,7 +165,7 @@ fn main() -> ! {
     let i2c_scl = pins.gpio17.into_function();
     let i2c0 =
         I2C::new_peripheral_event_iterator(pac.I2C0, i2c_sda, i2c_scl, &mut pac.RESETS, 0x11u8);
-    let mut nanossoc = NanoSsocD60::new(i2c0, 0x11, 0x11);
+    let mut nanossoc = NanoSsocD60::new(i2c0);
     let mut usbbuf = [0x00; 64];
 
     loop {
@@ -216,9 +209,6 @@ where
     SCL: hal::gpio::PinId,
 {
     i2c: I2C_PERIPHERAL<I2C, SDA, SCL>,
-    ctrl_address: u8,
-    self_address: u8,
-    is_initialized: bool,
     recv_end_cursor: usize,
     recv_buffer: [u8; 64],
     send_start_cursor: usize,
@@ -244,12 +234,9 @@ where
     SCL: hal::gpio::PinId,
     I2C: core::ops::Deref<Target = pac::i2c0::RegisterBlock>,
 {
-    pub fn new(i2c: I2C_PERIPHERAL<I2C, SDA, SCL>, ctrl_address: u8, self_address: u8) -> Self {
+    pub fn new(i2c: I2C_PERIPHERAL<I2C, SDA, SCL>) -> Self {
         Self {
             i2c,
-            ctrl_address,
-            self_address,
-            is_initialized: false,
             recv_end_cursor: 0,
             recv_buffer: [0; 64],
             send_start_cursor: 0,
@@ -314,29 +301,9 @@ where
     }
 
     pub fn handle_message(&mut self) -> Result<(), ()> {
-        let mut message = heapless::Vec::<u8, 64>::new();
-        // HACK: put the destination address at the front of message
-        message.push(self.self_address).unwrap();
         let src = &self.recv_buffer[..self.recv_end_cursor];
         defmt::println!("Received: {=[u8]:02x}", src);
         let command_code = src[0];
-        // slip_decode(src, &mut message)?;
-        // defmt::println!("Decoded: {=[u8]:02x}", message);
-        // self.recv_end_cursor = 0;
-        // let (header_and_body, footer) =
-        //     Ref::<_, NspFooter>::new_from_suffix(message.as_slice()).ok_or(())?;
-        // // let computed = NanoSsocD60_CRC.checksum(header_and_body);
-        // // if computed != u16::from(footer.crc) {
-        // //     defmt::println!(
-        // //         "CRC mismatch: computed: {:04x} vs footer: {:04x}",
-        // //         computed,
-        // //         u16::from(footer.crc)
-        // //     );
-        // //     return Err(());
-        // // }
-        // let (header, body) = Ref::<_, NspHeader>::new_from_prefix(header_and_body).ok_or(())?;
-        // let poll = header.poll_final();
-        // let command_code = header.command_code();
         self.handle_command(command_code);
         Ok(())
     }
@@ -352,24 +319,24 @@ where
                 defmt::println!("Get unfiltered cells"); 
                 let mut reply_body = [0u8; 18];
                 reply_body[0] = 0x11; // length
-                reply_body[1..].copy_from_slice(&self.unfiltered_cell_uSSA1);
-                reply_body[5..].copy_from_slice(&self.unfiltered_cell_uSSA2);
-                reply_body[9..].copy_from_slice(&self.unfiltered_cell_uSSA3);
-                reply_body[13..].copy_from_slice(&self.unfiltered_cell_uSSA4);
-                reply_body[17] = self.checksum(&reply_body[..16]);
-                self.reply_message(src, &reply_body).unwrap();
+                reply_body[1..][..4].copy_from_slice(&self.unfiltered_cell_uSSA1);
+                reply_body[5..][..4].copy_from_slice(&self.unfiltered_cell_uSSA2);
+                reply_body[9..][..4].copy_from_slice(&self.unfiltered_cell_uSSA3);
+                reply_body[13..][..4].copy_from_slice(&self.unfiltered_cell_uSSA4);
+                reply_body[17] = self.checksum(&reply_body[..=16]);
+                self.reply_message(&reply_body).unwrap();
             }
             0x03 => {
                 // read filtered cells
                 defmt::println!("Get filtered cells"); 
                 let mut reply_body = [0u8; 18];
                 reply_body[0] = 0x11; // length
-                reply_body[1..].copy_from_slice(&self.filtered_cell_uSSA1F);
-                reply_body[5..].copy_from_slice(&self.filtered_cell_uSSA2F);
-                reply_body[9..].copy_from_slice(&self.filtered_cell_uSSA3F);
-                reply_body[13..].copy_from_slice(&self.filtered_cell_uSSA4F);
-                reply_body[17] = self.checksum(&reply_body[..16]);
-                self.reply_message(src, &reply_body).unwrap();
+                reply_body[1..][..4].copy_from_slice(&self.filtered_cell_uSSA1F);
+                reply_body[5..][..4].copy_from_slice(&self.filtered_cell_uSSA2F);
+                reply_body[9..][..4].copy_from_slice(&self.filtered_cell_uSSA3F);
+                reply_body[13..][..4].copy_from_slice(&self.filtered_cell_uSSA4F);
+                reply_body[17] = self.checksum(&reply_body[..=16]);
+                self.reply_message(&reply_body).unwrap();
             }
             0x04 => {
                 // read angular position
@@ -381,7 +348,7 @@ where
                 reply_body[9..][..4].copy_from_slice(&self.angular_position_sun_detection);
                 reply_body[13..][..1].copy_from_slice(&self.angular_position_error_code);
                 reply_body[14] = self.checksum(&reply_body[..=13]);
-                self.reply_message(src, &reply_body).unwrap();         
+                self.reply_message(&reply_body).unwrap();         
             }
             _ => {
                 // Unknown command
@@ -392,45 +359,13 @@ where
     pub fn checksum(&mut self, data: &[u8]) -> u8 {
         data.iter().fold(0, |acc, x| acc.wrapping_add(*x))
     }
-    pub fn reply_message(&mut self, command_code: u8, body: &[u8]) -> Result<(), ()> {
-        let mut message = heapless::Vec::<u8, 64>::new();
-
-        // let header = NspHeader {
-        //     destination_address: self.ctrl_address,
-        //     source_address: self.self_address,
-        //     message_control_field: 0xa0 | command_code,
-        // };
-
-        // message.extend_from_slice(header.as_bytes())?;
-        message.extend_from_slice(body)?;
-
-        // let footer = NspFooter {
-        //     crc: NanoSsocD60_CRC.checksum(message.as_slice()).into(),
-        // };
-        // message.extend_from_slice(footer.as_bytes())?;
-
+    pub fn reply_message(&mut self, body: &[u8]) -> Result<(), ()> {
         self.send_buffer.clear();
         self.send_start_cursor = 0;
-        encode(&message, &mut self.send_buffer)?;
+        self.send_buffer.extend_from_slice(body)?;
 
         Ok(())
     }
-}
-
-fn slip_decode<const N: usize>(src: &[u8], dst: &mut heapless::Vec<u8, N>) -> Result<(), ()> {
-    let dec = SlipDecoder::new(src);
-    for byte in dec.iter() {
-        dst.push(byte).map_err(|_| ())?;
-    }
-    Ok(())
-}
-
-fn encode<const N: usize>(src: &[u8], dst: &mut heapless::Vec<u8, N>) -> Result<(), ()> {
-    // let enc: SlipEncoder = SlipEncoder::new(src);
-    for byte in src.iter() {
-        dst.push(*byte).map_err(|_| ())?;
-    }
-    Ok(())
 }
 
 #[derive(AsBytes, FromZeroes, FromBytes)]
