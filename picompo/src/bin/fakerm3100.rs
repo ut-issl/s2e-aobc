@@ -7,10 +7,7 @@ use bsp::{
 };
 use defmt_rtt as _;
 use hal::{
-    fugit::RateExtU32 as _,
-    i2c::{peripheral::Event, Peripheral},
-    multicore::{Multicore, Stack},
-    I2C,
+    fugit::RateExtU32 as _, i2c::{peripheral::Event, Peripheral}, multicore::{Multicore, Stack}, pac::clocks::fc0_status::FAST_R, I2C
 };
 use panic_probe as _;
 use rp_pico::{
@@ -29,23 +26,23 @@ const Rm3100_CRC: crc::Crc<u16> = crc::Crc::<u16>::new(&crc::CRC_16_MCRF4XX);
 
 #[gen_hid_descriptor(
     (collection = APPLICATION, usage_page = VENDOR_DEFINED_START, usage = 0x01) = {
-        temperature=output;
-        speed=output;
-        torque=input;
+        mx=output;
+        my=output;
+        mz=output;
     }
 )]
 struct CustomReport {
-    mx: [u8; 3],
-    my: [u8; 3],
-    mz: [u8; 3],
+    mx: [u8; 4],
+    my: [u8; 4],
+    mz: [u8; 4],
 }
 
 #[derive(FromZeroes, FromBytes)]
 #[repr(C)]
 struct OutputReport {
-    mx: [u8; 3],
-    my: [u8; 3],
-    mz: [u8; 3],
+    mx: [u8; 4],
+    my: [u8; 4],
+    mz: [u8; 4],
 }
 
 #[derive(FromZeroes, AsBytes)]
@@ -143,8 +140,8 @@ fn main() -> ! {
     let i2c_sda = pins.gpio16.into_function();
     let i2c_scl = pins.gpio17.into_function();
     let i2c0 =
-        I2C::new_peripheral_event_iterator(pac.I2C0, i2c_sda, i2c_scl, &mut pac.RESETS, 0x22u8);
-    let mut rm3100 = Rm3100::new(i2c0, 0x11, 0x22);
+        I2C::new_peripheral_event_iterator(pac.I2C0, i2c_sda, i2c_scl, &mut pac.RESETS, 0x23u8);
+    let mut rm3100 = Rm3100::new(i2c0, 0x11, 0x23);
     let mut usbbuf = [0x00; 64];
 
     loop {
@@ -186,10 +183,11 @@ where
     recv_buffer: [u8; 64],
     send_start_cursor: usize,
     send_buffer: heapless::Vec<u8, 64>,
+    is_TransferWrite: bool,
 
-    mx: [u8; 3],
-    my: [u8; 3],
-    mz: [u8; 3],
+    mx: [u8; 4],
+    my: [u8; 4],
+    mz: [u8; 4],
 }
 
 impl<I2C, SDA, SCL> Rm3100<I2C, SDA, SCL>
@@ -208,10 +206,11 @@ where
             recv_buffer: [0; 64],
             send_start_cursor: 0,
             send_buffer: heapless::Vec::new(),
+            is_TransferWrite: false,
 
-            mx: 1234u24.to_be_bytes(),
-            my: 5678u24.to_be_bytes(),
-            mz: 9012u24.to_be_bytes(),
+            mx: 1234u32.to_be_bytes(),
+            my: 5678u32.to_be_bytes(),
+            mz: 9012u32.to_be_bytes(),
         }
     }
 
@@ -219,15 +218,19 @@ where
         while let Some(event) = self.i2c.next_event() {
             match event {
                 Event::TransferWrite => {
+                    defmt::println!("TransferWrite: {}", self.recv_end_cursor);
+                    self.is_TransferWrite = true;
                     if self.recv_end_cursor >= self.recv_buffer.len() {
                         // wrap around
                         self.recv_end_cursor = 0;
                     }
                     let read = self.i2c.read(&mut self.recv_buffer[self.recv_end_cursor..]);
                     self.recv_end_cursor += read;
+                    
                 }
                 Event::TransferRead => {
                     defmt::println!("TransferRead: {}", self.send_start_cursor);
+                    self.is_TransferWrite = false;
                     if self.send_start_cursor >= self.send_buffer.len() {
                         // buffer underflow
                         defmt::println!("Buffer underflow !!!!!");
@@ -239,19 +242,24 @@ where
                     let sent = self.i2c.write(buf);
                     defmt::println!("Sent {} bytes", sent);
                     self.send_start_cursor += sent;
+                    
                 }
                 Event::Start => {
                     defmt::println!("Start");
-                    // Clear send buffers
-                    self.send_start_cursor = 0;
-                    self.send_buffer.clear();
                 }
                 Event::Restart => {
                     defmt::println!("Restart");
-                    self.handle_message().ok();
                 }
                 Event::Stop => {
                     defmt::println!("Stop");
+                    if self.is_TransferWrite {
+                        self.handle_message().ok();
+                        self.recv_end_cursor = 0;
+                    }else{
+                        self.send_start_cursor = 0;
+                        self.send_buffer.clear();
+                        
+                    }
                 }
             }
         }
@@ -262,150 +270,51 @@ where
         // HACK: put the destination address at the front of message
         message.push(self.self_address).unwrap();
         let src = &self.recv_buffer[..self.recv_end_cursor];
+        
         defmt::println!("Received: {=[u8]:02x}", src);
-        slip_decode(src, &mut message)?;
-        defmt::println!("Decoded: {=[u8]:02x}", message);
-        self.recv_end_cursor = 0;
-        let (header_and_body, footer) =
-            Ref::<_, NspFooter>::new_from_suffix(message.as_slice()).ok_or(())?;
-        let computed = Rm3100_CRC.checksum(header_and_body);
-        if computed != u16::from(footer.crc) {
-            defmt::println!(
-                "CRC mismatch: computed: {:04x} vs footer: {:04x}",
-                computed,
-                u16::from(footer.crc)
-            );
-            return Err(());
+        defmt::println!("buffer: {=[u8]:02x}", self.recv_buffer);
+        match src[0] {
+            0x01 => {
+                if src[1] == 0x7d {
+                    defmt::println!("INIT");
+                    self.is_initialized = true;
+                    // 初期化の処理をここでする
+                }else{
+                    defmt::println!("INIT failed");
+                
+                }
+            }
+            0x24 => {
+                if self.is_initialized {
+                    
+                        defmt::println!("get magnetometer data");
+                        let mut reply_body = [0u8; 9];
+                        reply_body[0..][..3].copy_from_slice(&self.mx[1..]);
+                        reply_body[3..][..3].copy_from_slice(&self.my[1..]);
+                        reply_body[6..][..3].copy_from_slice(&self.mz[1..]);
+                        self.reply_message(&reply_body).unwrap();    
+ 
+                }else{
+                    defmt::println!("Not initialized");
+                }
+                
+            }
+
+            _ => {
+                defmt::println!("Invalid message");
+            }
         }
-        let (header, body) = Ref::<_, NspHeader>::new_from_prefix(header_and_body).ok_or(())?;
-        let poll = header.poll_final();
-        let command_code = header.command_code();
-        self.handle_command(poll, command_code, body);
         Ok(())
     }
 
-    pub fn handle_command(&mut self, poll: bool, command_code: u8, body: &[u8]) {
-        defmt::println!(
-            "Handle command: {}, command_code: {}, body: {=[u8]:02x}",
-            poll,
-            command_code,
-            body
-        );
-        match command_code {
-            0x01 => {
-                // INIT
-                if body == [0x00, 0x10, 0x00, 0x00] {
-                    self.is_initialized = true;
-                    defmt::println!("Initialized");
-                }
-            }
-            0x07 => {
-                // READ FILE
-                if !self.is_initialized {
-                    defmt::println!("READ FILE: Not initialized");
-                    return;
-                }
-                if body.len() != 1 {
-                    defmt::println!("Invalid body length for READ FILE: {}", body.len());
-                    return;
-                }
-                let file_addr = body[0];
-                match file_addr {
-                    0x00 => {
-                        // 0x00 is special
-                        // Unsupported
-                        defmt::println!("Unsupported file address: {}", file_addr);
-                    }
-                    0x03 => {
-                        // Temperature
-                        defmt::println!("Get temperature");
-                        let mut reply_body = [0u8; 5];
-                        reply_body[0] = 0x03; // Temperature
-                        reply_body[1..].copy_from_slice(&self.temperature);
-                        self.reply_message(command_code, &reply_body).unwrap();
-                    }
-                    0x15 => {
-                        // Speed
-                        defmt::println!("Get speed");
-                        let mut reply_body = [0u8; 5];
-                        reply_body[0] = 0x15; // Speed
-                        reply_body[1..].copy_from_slice(&self.speed);
-                        self.reply_message(command_code, &reply_body).unwrap();
-                    }
-                    _ => {
-                        // Unsupported
-                        defmt::println!("Unsupported file address: {}", file_addr);
-                    }
-                }
-            }
-            0x08 => {
-                // WRITE FILE
-                if !self.is_initialized {
-                    defmt::println!("WRITE FILE: Not initialized");
-                    return;
-                }
-                if body.is_empty() {
-                    defmt::println!("Body is required for WRITE FILE: {}", body.len());
-                    return;
-                }
-                let file_addr = body[0];
-                match file_addr {
-                    0x00 => {
-                        // 0x00 is special
-                        // Mode Store
-                        if body.len() >= 2 {
-                            let mode_command_type = body[1];
-                            let mode_command_value = &body[2..];
-                            match mode_command_type {
-                                0x12 => {
-                                    // Torque
-                                    if mode_command_value.len() != 4 {
-                                        defmt::println!(
-                                            "Invalid command value length for torque: {}",
-                                            mode_command_value.len()
-                                        );
-                                        return;
-                                    }
-                                    defmt::println!("Torque: {=[u8]:02x}", mode_command_value);
-                                    self.torque.copy_from_slice(mode_command_value);
-                                }
-                                _ => {
-                                    // Unsupported
-                                }
-                            }
-                        }
-                    }
-                    _ => {
-                        // Unsupported
-                    }
-                }
-            }
-            _ => {
-                // Unknown command
-            }
-        }
-    }
 
-    pub fn reply_message(&mut self, command_code: u8, body: &[u8]) -> Result<(), ()> {
+    pub fn reply_message(&mut self, body: &[u8]) -> Result<(), ()> {
         let mut message = heapless::Vec::<u8, 64>::new();
-
-        let header = NspHeader {
-            destination_address: self.ctrl_address,
-            source_address: self.self_address,
-            message_control_field: 0xa0 | command_code,
-        };
-
-        message.extend_from_slice(header.as_bytes())?;
         message.extend_from_slice(body)?;
-
-        let footer = NspFooter {
-            crc: Rm3100_CRC.checksum(message.as_slice()).into(),
-        };
-        message.extend_from_slice(footer.as_bytes())?;
 
         self.send_buffer.clear();
         self.send_start_cursor = 0;
-        slip_encode(&message[2..], &mut self.send_buffer)?;
+        encode(&message, &mut self.send_buffer)?;
 
         Ok(())
     }
@@ -419,10 +328,10 @@ fn slip_decode<const N: usize>(src: &[u8], dst: &mut heapless::Vec<u8, N>) -> Re
     Ok(())
 }
 
-fn slip_encode<const N: usize>(src: &[u8], dst: &mut heapless::Vec<u8, N>) -> Result<(), ()> {
-    let enc = SlipEncoder::new(src);
-    for byte in enc.iter() {
-        dst.push(byte).map_err(|_| ())?;
+fn encode<const N: usize>(src: &[u8], dst: &mut heapless::Vec<u8, N>) -> Result<(), ()> {
+    // let enc: SlipEncoder = SlipEncoder::new(src);
+    for byte in src.iter() {
+        dst.push(*byte).map_err(|_| ())?;
     }
     Ok(())
 }
