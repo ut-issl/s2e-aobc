@@ -36,6 +36,7 @@ struct OutputReport {
     angular_position_angle_y: [u8; 4],
     angular_position_sun_detection: [u8; 4],
     angular_position_error_code: [u8; 1],
+    _padding: [u8; 3],
 }
 
 #[defmt::panic_handler]
@@ -83,62 +84,72 @@ fn main() -> ! {
         &mut pac.RESETS,
     );
     let bus_allocator = UsbBusAllocator::new(bus);
-    let vid_pid = UsbVidPid(0x6666, 0x6910);
-    let mut bulk = BulkClass::<_, 1, 0>::new(&bus_allocator);
+    let vid_pid = UsbVidPid(0x6666, 0x0101);
+    let mut bulk = BulkClass::<_, 2, 0>::new(&bus_allocator);
     let mut winusb = WinUsbClass;
     let mut dev = UsbDeviceBuilder::new(&bus_allocator, vid_pid)
         .max_packet_size_0(64)
         .unwrap()
-        .strings(&[StringDescriptors::new(LangID::EN)
+        .strings(&[StringDescriptors::new(LangID::EN_US)
             .manufacturer("ArkEdge Space Inc.")
-            .product("FAKE-NanoSsocD60")])
+            .product("FAKE_NANOSSOCD60")
+            .serial_number("FAKE_NANOSSOCD60")])
         .unwrap()
         .build();
 
-    let mut mc = Multicore::new(&mut pac.PSM, &mut pac.PPB, &mut sio.fifo);
-    let cores = mc.cores();
-    let core1 = &mut cores[1];
-    let core1_stack = cortex_m::singleton!(: Stack<4096> = Stack::new()).unwrap();
-    let i2c1 = I2C::new_controller(
-        pac.I2C1,
-        pins.gpio10.into_function(),
-        pins.gpio11.into_function(),
-        10u32.kHz(),
-        &mut pac.RESETS,
-        clocks.system_clock.freq(),
-    );
-    core1
-        .spawn(&mut core1_stack.mem, move || {
-            core1_task(i2c1);
-        })
-        .unwrap();
-
-    let i2c_sda = pins.gpio16.into_function();
-    let i2c_scl = pins.gpio17.into_function();
+    let i2c0_sda = pins.gpio16.into_function();
+    let i2c0_scl = pins.gpio17.into_function();
     let i2c0 =
-        I2C::new_peripheral_event_iterator(pac.I2C0, i2c_sda, i2c_scl, &mut pac.RESETS, 0x11u8);
-    let mut nanossoc = NanoSsocD60::new(i2c0);
+        I2C::new_peripheral_event_iterator(pac.I2C0, i2c0_sda, i2c0_scl, &mut pac.RESETS, 0x11u8);
+    let mut nanossoc0 = NanoSsocD60::new(i2c0);
+
+    let i2c1_sda = pins.gpio14.into_function();
+    let i2c1_scl = pins.gpio15.into_function();
+    let i2c1 =
+        I2C::new_peripheral_event_iterator(pac.I2C1, i2c1_sda, i2c1_scl, &mut pac.RESETS, 0x13u8);
+    let mut nanossoc1 = NanoSsocD60::new(i2c1);
+
     let mut usbbuf = [0x00; 64];
 
     loop {
         // ここでusbとのやりとりと，nanossocの模擬をくりかえす
         dev.poll(&mut [&mut winusb, &mut bulk]);
-        nanossoc.poll();
+        nanossoc0.poll();
+        nanossoc1.poll();
 
         if let Ok(len) = bulk.out_eps[0].read(&mut usbbuf) {
             if let Some(output_report) = OutputReport::ref_from(&usbbuf[..len]) {
-                nanossoc.unfiltered_cell_u_ssa1 = output_report.unfiltered_cell_u_ssa1;
-                nanossoc.unfiltered_cell_u_ssa1 = output_report.unfiltered_cell_u_ssa1;
-                nanossoc.unfiltered_cell_u_ssa3 = output_report.unfiltered_cell_u_ssa3;
-                nanossoc.unfiltered_cell_u_ssa4 = output_report.unfiltered_cell_u_ssa4;
-                nanossoc.filtered_cell_u_ssa1f = output_report.filtered_cell_u_ssa1f;
-                nanossoc.filtered_cell_u_ssa2f = output_report.filtered_cell_u_ssa2f;
-                nanossoc.filtered_cell_u_ssa3f = output_report.filtered_cell_u_ssa3f;
-                nanossoc.filtered_cell_u_ssa4f = output_report.filtered_cell_u_ssa4f;
-                nanossoc.angular_position_angle_x = output_report.angular_position_angle_x;
-                nanossoc.angular_position_angle_y = output_report.angular_position_angle_y;
-                nanossoc.angular_position_sun_detection = output_report.angular_position_sun_detection;
-                nanossoc.angular_position_error_code = output_report.angular_position_error_code;
+                nanossoc0.unfiltered_cell_u_ssa1 = output_report.unfiltered_cell_u_ssa1;
+                nanossoc0.unfiltered_cell_u_ssa1 = output_report.unfiltered_cell_u_ssa1;
+                nanossoc0.unfiltered_cell_u_ssa3 = output_report.unfiltered_cell_u_ssa3;
+                nanossoc0.unfiltered_cell_u_ssa4 = output_report.unfiltered_cell_u_ssa4;
+                nanossoc0.filtered_cell_u_ssa1f = output_report.filtered_cell_u_ssa1f;
+                nanossoc0.filtered_cell_u_ssa2f = output_report.filtered_cell_u_ssa2f;
+                nanossoc0.filtered_cell_u_ssa3f = output_report.filtered_cell_u_ssa3f;
+                nanossoc0.filtered_cell_u_ssa4f = output_report.filtered_cell_u_ssa4f;
+                nanossoc0.angular_position_angle_x = output_report.angular_position_angle_x;
+                nanossoc0.angular_position_angle_y = output_report.angular_position_angle_y;
+                nanossoc0.angular_position_sun_detection =
+                    output_report.angular_position_sun_detection;
+                nanossoc0.angular_position_error_code = output_report.angular_position_error_code;
+            }
+        }
+
+        if let Ok(len) = bulk.out_eps[1].read(&mut usbbuf) {
+            if let Some(output_report) = OutputReport::ref_from(&usbbuf[..len]) {
+                nanossoc1.unfiltered_cell_u_ssa1 = output_report.unfiltered_cell_u_ssa1;
+                nanossoc1.unfiltered_cell_u_ssa1 = output_report.unfiltered_cell_u_ssa1;
+                nanossoc1.unfiltered_cell_u_ssa3 = output_report.unfiltered_cell_u_ssa3;
+                nanossoc1.unfiltered_cell_u_ssa4 = output_report.unfiltered_cell_u_ssa4;
+                nanossoc1.filtered_cell_u_ssa1f = output_report.filtered_cell_u_ssa1f;
+                nanossoc1.filtered_cell_u_ssa2f = output_report.filtered_cell_u_ssa2f;
+                nanossoc1.filtered_cell_u_ssa3f = output_report.filtered_cell_u_ssa3f;
+                nanossoc1.filtered_cell_u_ssa4f = output_report.filtered_cell_u_ssa4f;
+                nanossoc1.angular_position_angle_x = output_report.angular_position_angle_x;
+                nanossoc1.angular_position_angle_y = output_report.angular_position_angle_y;
+                nanossoc1.angular_position_sun_detection =
+                    output_report.angular_position_sun_detection;
+                nanossoc1.angular_position_error_code = output_report.angular_position_error_code;
             }
         }
     }
@@ -260,14 +271,11 @@ where
     }
 
     pub fn handle_command(&mut self, src: u8) {
-        defmt::println!(
-            "src: {}",
-            src
-        );
+        defmt::println!("src: {}", src);
         match src {
             0x01 => {
                 // read unfiltered cells
-                defmt::println!("Get unfiltered cells"); 
+                defmt::println!("Get unfiltered cells");
                 let mut reply_body = [0u8; 18];
                 reply_body[0] = 0x11; // length
                 reply_body[1..][..4].copy_from_slice(&self.unfiltered_cell_u_ssa1);
@@ -279,7 +287,7 @@ where
             }
             0x03 => {
                 // read filtered cells
-                defmt::println!("Get filtered cells"); 
+                defmt::println!("Get filtered cells");
                 let mut reply_body = [0u8; 18];
                 reply_body[0] = 0x11; // length
                 reply_body[1..][..4].copy_from_slice(&self.filtered_cell_u_ssa1f);
@@ -291,7 +299,7 @@ where
             }
             0x04 => {
                 // read angular position
-                defmt::println!("Get angular position"); 
+                defmt::println!("Get angular position");
                 let mut reply_body = [0u8; 15];
                 reply_body[0] = 0x0E; // length
                 reply_body[1..][..4].copy_from_slice(&self.angular_position_angle_x);
@@ -299,7 +307,7 @@ where
                 reply_body[9..][..4].copy_from_slice(&self.angular_position_sun_detection);
                 reply_body[13..][..1].copy_from_slice(&self.angular_position_error_code);
                 reply_body[14] = self.checksum(&reply_body[..=13]);
-                self.reply_message(&reply_body).unwrap();         
+                self.reply_message(&reply_body).unwrap();
             }
             _ => {
                 // Unknown command
@@ -341,23 +349,4 @@ impl NspHeader {
 #[repr(C)]
 pub struct NspFooter {
     crc: U16<LE>,
-}
-
-// AOBC side emulation
-fn core1_task(mut i2c: impl embedded_hal::i2c::I2c<Error = hal::i2c::Error>) -> ! {
-    cortex_m::asm::delay(60_000_000);
-    //let init = [0x11, 0x01, 0x00, 0x10, 0x00, 0x00, 0x8B, 0x80, 0xC0];
-    //let get_temp = [0x11, 0x87, 0x03, 0xFE, 0xEB, 0xC0];
-    let get_angle = [0x04, 0x01, 0x05];
-    loop {
-        defmt::println!("Controller is Writing");
-        let mut tlm = [0u8; 15];
-        if let Err(e) = i2c.write_read(0x11, &get_angle, &mut tlm) {
-            defmt::println!("I2C Controller Write Error: {:?}", e);
-            cortex_m::asm::delay(60_000_000);
-            continue;
-        }
-        defmt::println!("Controller Read: {=[u8]:02x}", tlm);
-        cortex_m::asm::delay(60_000_000);
-    }
 }
