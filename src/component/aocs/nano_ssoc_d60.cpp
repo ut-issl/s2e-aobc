@@ -16,7 +16,12 @@ NanoSsocD60::NanoSsocD60(SunSensor sun_sensor, const int sils_port_id, const uns
                          OnBoardComputer *obc, HilsPortManager *hils_port_manager)
     : SunSensor(sun_sensor),
       I2cTargetCommunicationWithObc(sils_port_id, hils_port_id, i2c_address, obc, hils_port_manager),
-      i2c_address_(i2c_address) {}
+      i2c_address_(i2c_address) {
+  if (i2c_address_ == 0x11) {
+    picompo_handle_ = PICOMPO_open("FAKE_NANOSSOCD60");
+  }
+  printf("i2c_address %02x handle: %d\n", i2c_address, picompo_handle_);
+}
 
 NanoSsocD60::~NanoSsocD60() {}
 
@@ -27,42 +32,27 @@ void NanoSsocD60::MainRoutine(const int time_count) {
 
   GenerateTelemetry();
 
+  /*
   int command_size = ReceiveCommand();
   if (command_size != 1) return;  // length == 1 means setting of read register address
   // これ以降はHILS用に事前にテレメトリを溜めておく
   const int kTlmSize = 15;
   StoreTelemetry(kStoredFrameSize, kTlmSize);
+  */
   return;
 }
 
 int NanoSsocD60::GenerateTelemetry() {
-  const int kByte2Bit = 8;
-
   const int kTlmSize = 15;
-  unsigned char tlm[kTlmSize] = {};
-  tlm[0] = 0x0E;
 
-  int32_t alpha_tlm = ConvertAngle2Tlm(alpha_rad_);
-  for (int i = 0; i < 4; i++) {
-    tlm[1 + i] = (alpha_tlm >> kByte2Bit * i) & 0xFF;
-  }
-  int32_t beta_tlm = ConvertAngle2Tlm(beta_rad_);
-  for (int i = 0; i < 4; i++) {
-    tlm[5 + i] = (beta_tlm >> kByte2Bit * i) & 0xFF;
-  }
-  int32_t sun_detection_rate_tlm = ConvertFloat2FloatingPoint(float(sun_intensity_percent_));
-  for (int i = 0; i < 4; i++) {
-    tlm[9 + i] = (sun_detection_rate_tlm >> kByte2Bit * i) & 0xFF;
-  }
+  NanoSsocOutputReport output = {0};
 
-  tlm[13] = GenerateErrorCode();
-  unsigned char check_sum = 0x00;
-  for (int i = 0; i < 14; i++) {
-    check_sum += tlm[i];
-  }
-  tlm[14] = check_sum & 0xff;
+  output.angular_position_angle_x = ConvertAngle2Tlm(alpha_rad_);
+  output.angular_position_angle_y = ConvertAngle2Tlm(beta_rad_);
+  output.angular_position_sun_detection = ConvertFloat2FloatingPoint(float(sun_intensity_percent_));
+  output.angular_position_error_code = GenerateErrorCode();
+  PICOMPO_send(picompo_handle_, reinterpret_cast<uint8_t *>(&output), sizeof(output) - 3);
 
-  WriteRegister(0x04, tlm, kTlmSize);
   return kTlmSize;
 }
 

@@ -53,6 +53,9 @@ class NanoSsocD60 : public SunSensor, public I2cTargetCommunicationWithObc {
 
   double sun_intensity_percent_ = 0.0;  //!< Measured sun intensity [%]
 
+  // Picompo
+  uint32_t picompo_handle_ = 0;
+
   // General Functions
   /**
    * @fn ConvertFloat2FloatingPoint
@@ -79,5 +82,26 @@ class NanoSsocD60 : public SunSensor, public I2cTargetCommunicationWithObc {
    */
   unsigned char GenerateErrorCode();
 };
+
+extern "C" {
+uint32_t PICOMPO_open(const char *name);
+int32_t PICOMPO_send(uint32_t handle, uint8_t *data, uint32_t data_len);
+int32_t PICOMPO_recv(uint32_t handle, uint8_t *buf, uint32_t buf_len);
+}
+
+typedef struct {
+  float unfiltered_cell_u_ssa1;
+  float unfiltered_cell_u_ssa2;
+  float unfiltered_cell_u_ssa3;
+  float unfiltered_cell_u_ssa4;
+  float filtered_cell_u_ssa1f;
+  float filtered_cell_u_ssa2f;
+  float filtered_cell_u_ssa3f;
+  float filtered_cell_u_ssa4f;
+  int32_t angular_position_angle_x;
+  int32_t angular_position_angle_y;
+  int32_t angular_position_sun_detection;
+  uint8_t angular_position_error_code;
+} NanoSsocOutputReport;
 
 #endif  // S2E_AOBC_COMPONENT_AOCS_NANO_SSOC_D60_HPP_

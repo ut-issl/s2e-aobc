@@ -36,6 +36,7 @@ impl Picompo {
     }
 
     pub fn send(&mut self, handle: u32, data: &[u8]) -> Result<(), ()> {
+        println!("SEND handle: {}, len: {}, data: {:02x?}", handle, data.len(), data);
         let rw0003 = self.pool.get_mut(&handle).ok_or(())?;
         rw0003.send(data);
         Ok(())
