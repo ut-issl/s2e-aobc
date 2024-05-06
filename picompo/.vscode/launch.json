@@ -26,6 +26,32 @@
           ],
         }
       ]
+    },
+    {
+      "preLaunchTask": "Build picocompo",
+      "type": "probe-rs-debug",
+      "request": "launch",
+      "name": "Run fakenanossoc",
+      "cwd": "${workspaceFolder}",
+      "connectUnderReset": false,
+      "chip": "RP2040",
+      "flashingConfig": {
+        "flashingEnabled": true,
+      },
+      "coreConfigs": [
+        {
+          "coreIndex": 0,
+          "programBinary": "./target/thumbv6m-none-eabi/debug/fakenanossoc",
+          "rttEnabled": true,
+          "rttChannelFormats": [
+            {
+              "channelNumber": 0,
+              "dataFormat": "Defmt",
+              "showTimestamps": false
+            },
+          ],
+        }
+      ]
     }
   ]
 }

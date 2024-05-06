@@ -176,7 +176,15 @@ fn main() -> ! {
     let mut usbbuf = [0x00; 64];
 
     loop {
+<<<<<<< HEAD:picompo/src/bin/fakenanossoc.rs
+<<<<<<<< HEAD:picompo/src/bin/fakenanossoc.rs
         // ここでusbとのやりとりと，nanossocの模擬をくりかえす
+========
+        // ここでusbとのやりとりと，rw0003の模擬をくりかえす
+>>>>>>>> 893ab96 (ssoc追加):picocompo/src/bin/fakerw0003.rs
+=======
+        // ここでusbとのやりとりと，nanossocの模擬をくりかえす
+>>>>>>> 893ab96 (ssoc追加):picocompo/src/bin/fakenanossoc.rs
         dev.poll(&mut [&mut hid]);
         nanossoc.poll();
 
