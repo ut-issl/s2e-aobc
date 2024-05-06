@@ -10,26 +10,13 @@
 #include <utilities/macros.hpp>
 #include <utilities/slip.hpp>
 
-typedef struct {
-  uint8_t is_initialized;
-  uint8_t mode;
-  uint8_t _padding[2];
-  float torque;
-} InputReport;
-
-extern "C" {
-  uint32_t PICOCOMPO_rw0003_open(const char *name);
-  int32_t PICOCOMPO_rw0003_send(uint32_t handle, float temperature, float speed);
-  int32_t PICOCOMPO_rw0003_recv(uint32_t handle, InputReport *input);
-}
-
 Rw0003::Rw0003(ReactionWheel rw, const int sils_port_id, const unsigned int hils_port_id, const unsigned char i2c_address, OnBoardComputer *obc,
                HilsPortManager *hils_port_manager)
     : ReactionWheel(rw), I2cTargetCommunicationWithObc(sils_port_id, hils_port_id, i2c_address, obc, hils_port_manager) {
   char buffer[20];
   sprintf(buffer, "FAK_RW-0.003_0X%02X", i2c_address);
-  picocompo_handle_ = PICOCOMPO_rw0003_open(buffer);
-  printf("i2c_address %02x (%s) handle: %d\n", i2c_address, buffer, picocompo_handle_);
+  picompo_handle_ = PICOMPO_open(buffer);
+  printf("i2c_address %02x (%s) handle: %d\n", i2c_address, buffer, picompo_handle_);
   Initialize();
 }
 
@@ -37,7 +24,7 @@ void Rw0003::MainRoutine(const int time_count) {
   UNUSED(time_count);
 
   InputReport input;
-  PICOCOMPO_rw0003_recv(picocompo_handle_, &input);
+  PICOMPO_recv(picompo_handle_, reinterpret_cast<uint8_t*>(&input), sizeof(input));
   is_rw_initialized_ = input.is_initialized;
   SetDriveFlag(input.mode != 0);
   SetTargetTorque_rw_Nm(input.torque);
@@ -45,7 +32,10 @@ void Rw0003::MainRoutine(const int time_count) {
   // Generate TLM
   if (is_rw_initialized_ == true) {
     CalcTorque();
-    PICOCOMPO_rw0003_send(picocompo_handle_, (float)temperature_degC_, (float)angular_velocity_rad_s_);
+    OutputReport output;
+    output.temperature = temperature_degC_;
+    output.speed = angular_velocity_rad_s_;
+    PICOMPO_send(picompo_handle_, reinterpret_cast<uint8_t*>(&output), sizeof(output));
   }
 
   return;
@@ -70,5 +60,8 @@ std::string Rw0003::GetLogHeader() const {
 
 void Rw0003::Initialize() {
   // HILS用の初期値を設定
-  PICOCOMPO_rw0003_send(picocompo_handle_, 0, 0);
+  OutputReport output;
+  output.temperature = 0;
+  output.speed = 0;
+  PICOMPO_send(picompo_handle_, reinterpret_cast<uint8_t*>(&output), sizeof(output));
 }

@@ -1,0 +1,24 @@
+use futures_lite::future::block_on;
+use nusb::transfer::RequestBuffer;
+
+pub struct Pipe {
+    iface: nusb::Interface,
+}
+
+impl Pipe {
+    pub fn new(iface: nusb::Interface) -> Self {
+        Self { iface }
+    }
+
+    pub fn send(&self, bytes: &[u8]) {
+        let completion = block_on(self.iface.bulk_out(1, bytes.to_vec()));
+        completion.status.unwrap();
+    }
+
+    pub fn recv(&self) -> Vec<u8> {
+        let buf = RequestBuffer::new(64);
+        let completion = block_on(self.iface.bulk_in(0x81, buf));
+        completion.status.unwrap();
+        completion.data
+    }
+}
