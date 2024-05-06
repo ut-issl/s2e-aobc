@@ -2,7 +2,6 @@ mod rw0003;
 
 use std::{collections::HashMap, ffi::CStr, sync::Mutex};
 
-use hidapi::HidDevice;
 use once_cell::sync::Lazy;
 use rw0003::{InputReport, Rw0003};
 
@@ -13,15 +12,15 @@ struct Picocompo {
 }
 
 impl Picocompo {
-    fn open_device(name: &str) -> Option<HidDevice> {
-        let hidapi = hidapi::HidApi::new().unwrap();
-        let device_info = hidapi
-            .device_list()
-            .find(|device_info| device_info.product_string() == Some(name));
+    fn open_device(name: &str) -> Option<nusb::Interface> {
+        let device_info = nusb::list_devices()
+            .unwrap()
+            .find(|device_info| device_info.serial_number() == Some(name));
 
         let device_info = device_info?;
-
-        Some(device_info.open_device(&hidapi).unwrap())
+        let device = device_info.open().unwrap();
+        let iface = device.claim_interface(0).unwrap();
+        Some(iface)
     }
 
     fn generate_handle(&mut self) -> u32 {

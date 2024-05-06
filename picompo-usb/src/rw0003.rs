@@ -1,27 +1,26 @@
-use std::mem::size_of;
-
-use zerocopy::{little_endian::U32, AsBytes, FromBytes, FromZeroes};
+use futures_lite::future::block_on;
+use nusb::transfer::RequestBuffer;
+use zerocopy::{AsBytes, FromBytes, FromZeroes};
 
 pub struct Rw0003 {
-    device: hidapi::HidDevice,
+    iface: nusb::Interface,
 }
 
 impl Rw0003 {
-    pub fn new(device: hidapi::HidDevice) -> Self {
-        Self { device }
+    pub fn new(iface: nusb::Interface) -> Self {
+        Self { iface }
     }
 
     pub fn send_output(&self, output: OutputReport) {
-        let mut buf = [0; size_of::<OutputReport>() + 1];
-        buf[0] = 0; // Report ID
-        buf[1..].copy_from_slice(output.as_bytes());
-        self.device.write(&buf).unwrap();
+        let completion = block_on(self.iface.bulk_out(1, output.as_bytes().to_vec()));
+        completion.status.unwrap();
     }
 
     pub fn recv_input(&self) -> InputReport {
-        let mut buf = [0; size_of::<InputReport>()];
-        self.device.read(&mut buf).unwrap();
-        InputReport::ref_from(&buf).unwrap().clone()
+        let buf = RequestBuffer::new(64);
+        let completion = block_on(self.iface.bulk_in(0x81, buf));
+        completion.status.unwrap();
+        InputReport::ref_from(&completion.data).unwrap().clone()
     }
 }
 
