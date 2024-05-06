@@ -89,7 +89,9 @@ fn main() -> ! {
     let self_address = address_selector.select().unwrap_or(0x00);
 
     let product_name = cortex_m::singleton!(: [u8; 18] = [0; 18]).unwrap();
-    product_name.copy_from_slice(b"Fake RW-0.003 0x??");
+    // nusb returns uppercased serial number in Windows
+    // so that we need to use uppercase letters for the product name
+    product_name.copy_from_slice(b"FAKE_RW-0.003_0X??");
     let addr_hex_offset = product_name.len() - 2;
     product_name[addr_hex_offset..].copy_from_slice(&hex(self_address));
 

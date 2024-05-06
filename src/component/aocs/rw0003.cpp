@@ -27,7 +27,7 @@ Rw0003::Rw0003(ReactionWheel rw, const int sils_port_id, const unsigned int hils
                HilsPortManager *hils_port_manager)
     : ReactionWheel(rw), I2cTargetCommunicationWithObc(sils_port_id, hils_port_id, i2c_address, obc, hils_port_manager) {
   char buffer[20];
-  sprintf(buffer, "Fake RW-0.003 0x%02X", i2c_address);
+  sprintf(buffer, "FAK_RW-0.003_0X%02X", i2c_address);
   picocompo_handle_ = PICOCOMPO_rw0003_open(buffer);
   printf("i2c_address %02x (%s) handle: %d\n", i2c_address, buffer, picocompo_handle_);
   Initialize();
