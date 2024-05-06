@@ -14,7 +14,7 @@ Rw0003::Rw0003(ReactionWheel rw, const int sils_port_id, const unsigned int hils
                HilsPortManager *hils_port_manager)
     : ReactionWheel(rw), I2cTargetCommunicationWithObc(sils_port_id, hils_port_id, i2c_address, obc, hils_port_manager) {
   char buffer[20];
-  sprintf(buffer, "FAK_RW-0.003_0X%02X", i2c_address);
+  sprintf(buffer, "FAKE_RW-0.003_0X%02X", i2c_address);
   picompo_handle_ = PICOMPO_open(buffer);
   printf("i2c_address %02x (%s) handle: %d\n", i2c_address, buffer, picompo_handle_);
   Initialize();
@@ -23,18 +23,18 @@ Rw0003::Rw0003(ReactionWheel rw, const int sils_port_id, const unsigned int hils
 void Rw0003::MainRoutine(const int time_count) {
   UNUSED(time_count);
 
-  InputReport input;
+  InputReport input = {0};
   PICOMPO_recv(picompo_handle_, reinterpret_cast<uint8_t*>(&input), sizeof(input));
   is_rw_initialized_ = input.is_initialized;
   SetDriveFlag(input.mode != 0);
-  SetTargetTorque_rw_Nm(input.torque);
+  SetTargetTorque_rw_Nm((double)input.torque);
 
   // Generate TLM
   if (is_rw_initialized_ == true) {
     CalcTorque();
     OutputReport output;
-    output.temperature = temperature_degC_;
-    output.speed = angular_velocity_rad_s_;
+    output.temperature = (float)temperature_degC_;
+    output.speed = (float)angular_velocity_rad_s_;
     PICOMPO_send(picompo_handle_, reinterpret_cast<uint8_t*>(&output), sizeof(output));
   }
 
