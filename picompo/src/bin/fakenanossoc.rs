@@ -13,68 +13,29 @@ use hal::{
     I2C,
 };
 use panic_probe as _;
+use picompo::usb::BulkClass;
 use rp_pico::{
     self as bsp, hal,
     hal::{pac, prelude::*},
 };
 use usb_device::{class_prelude::UsbBusAllocator, prelude::*};
-use usbd_hid::descriptor::generator_prelude::*;
-use usbd_hid::hid_class::{
-    HIDClass, HidClassSettings, HidCountryCode, HidProtocol, HidSubClass, ProtocolModeConfig,
-};
 use zerocopy::{AsBytes, FromBytes, FromZeroes, LE, U16};
-
-#[gen_hid_descriptor(
-    (collection = APPLICATION, usage_page = VENDOR_DEFINED_START, usage = 0x01) = {
-        unfiltered_cell_uSSA1=output;
-        unfiltered_cell_uSSA2=output;
-        unfiltered_cell_uSSA3=output;
-        unfiltered_cell_uSSA4=output;
-        filtered_cell_uSSA1F=output;
-        filtered_cell_uSSA2F=output;
-        filtered_cell_uSSA3F=output;
-        filtered_cell_uSSA4F=output;
-        angular_position_angleX=output;
-        angular_position_angleY=output;
-        angular_position_sun_detection=output;
-        angular_position_error_code=output;
-    }
-)]
-struct CustomReport {
-    unfiltered_cell_uSSA1: [u8; 4],
-    unfiltered_cell_uSSA2: [u8; 4],
-    unfiltered_cell_uSSA3: [u8; 4],
-    unfiltered_cell_uSSA4: [u8; 4],
-    filtered_cell_uSSA1F: [u8; 4],
-    filtered_cell_uSSA2F: [u8; 4],
-    filtered_cell_uSSA3F: [u8; 4],
-    filtered_cell_uSSA4F: [u8; 4],
-    angular_position_angleX: [u8; 4],
-    angular_position_angleY: [u8; 4],
-    angular_position_sun_detection: [u8; 4],
-    angular_position_error_code: [u8; 1],
-}
 
 #[derive(FromZeroes, FromBytes)]
 #[repr(C)]
 struct OutputReport {
-    unfiltered_cell_uSSA1: [u8; 4],
-    unfiltered_cell_uSSA2: [u8; 4],
-    unfiltered_cell_uSSA3: [u8; 4],
-    unfiltered_cell_uSSA4: [u8; 4],
-    filtered_cell_uSSA1F: [u8; 4],
-    filtered_cell_uSSA2F: [u8; 4],
-    filtered_cell_uSSA3F: [u8; 4],
-    filtered_cell_uSSA4F: [u8; 4],
-    angular_position_angleX: [u8; 4],
-    angular_position_angleY: [u8; 4],
+    unfiltered_cell_u_ssa1: [u8; 4],
+    unfiltered_cell_u_ssa2: [u8; 4],
+    unfiltered_cell_u_ssa3: [u8; 4],
+    unfiltered_cell_u_ssa4: [u8; 4],
+    filtered_cell_u_ssa1f: [u8; 4],
+    filtered_cell_u_ssa2f: [u8; 4],
+    filtered_cell_u_ssa3f: [u8; 4],
+    filtered_cell_u_ssa4f: [u8; 4],
+    angular_position_angle_x: [u8; 4],
+    angular_position_angle_y: [u8; 4],
     angular_position_sun_detection: [u8; 4],
     angular_position_error_code: [u8; 1],
-}
-
-#[derive(FromZeroes, AsBytes)]
-#[repr(C)]
-struct InputReport {
 }
 
 #[defmt::panic_handler]
@@ -123,17 +84,7 @@ fn main() -> ! {
     );
     let bus_allocator = UsbBusAllocator::new(bus);
     let vid_pid = UsbVidPid(0x6666, 0x6910);
-    let mut hid = HIDClass::new_with_settings(
-        &bus_allocator,
-        CustomReport::desc(),
-        16,
-        HidClassSettings {
-            subclass: HidSubClass::NoSubClass,
-            protocol: HidProtocol::Generic,
-            config: ProtocolModeConfig::ForceReport,
-            locale: HidCountryCode::NotSupported,
-        },
-    );
+    let mut bulk = BulkClass::<_, 1, 0>::new(&bus_allocator);
     let mut dev = UsbDeviceBuilder::new(&bus_allocator, vid_pid)
         .max_packet_size_0(64)
         .unwrap()
@@ -170,22 +121,21 @@ fn main() -> ! {
 
     loop {
         // ここでusbとのやりとりと，nanossocの模擬をくりかえす
-        dev.poll(&mut [&mut hid]);
+        dev.poll(&mut [&mut bulk]);
         nanossoc.poll();
 
-        // S2Eからのデータを受信して格納
-        if let Ok(len) = hid.pull_raw_output(&mut usbbuf) {
+        if let Ok(len) = bulk.out_eps[0].read(&mut usbbuf) {
             if let Some(output_report) = OutputReport::ref_from(&usbbuf[..len]) {
-                nanossoc.unfiltered_cell_uSSA1 = output_report.unfiltered_cell_uSSA1;
-                nanossoc.unfiltered_cell_uSSA2 = output_report.unfiltered_cell_uSSA2;
-                nanossoc.unfiltered_cell_uSSA3 = output_report.unfiltered_cell_uSSA3;
-                nanossoc.unfiltered_cell_uSSA4 = output_report.unfiltered_cell_uSSA4;
-                nanossoc.filtered_cell_uSSA1F = output_report.filtered_cell_uSSA1F;
-                nanossoc.filtered_cell_uSSA2F = output_report.filtered_cell_uSSA2F;
-                nanossoc.filtered_cell_uSSA3F = output_report.filtered_cell_uSSA3F;
-                nanossoc.filtered_cell_uSSA4F = output_report.filtered_cell_uSSA4F;
-                nanossoc.angular_position_angleX = output_report.angular_position_angleX;
-                nanossoc.angular_position_angleY = output_report.angular_position_angleY;
+                nanossoc.unfiltered_cell_u_ssa1 = output_report.unfiltered_cell_u_ssa1;
+                nanossoc.unfiltered_cell_u_ssa1 = output_report.unfiltered_cell_u_ssa1;
+                nanossoc.unfiltered_cell_u_ssa3 = output_report.unfiltered_cell_u_ssa3;
+                nanossoc.unfiltered_cell_u_ssa4 = output_report.unfiltered_cell_u_ssa4;
+                nanossoc.filtered_cell_u_ssa1f = output_report.filtered_cell_u_ssa1f;
+                nanossoc.filtered_cell_u_ssa2f = output_report.filtered_cell_u_ssa2f;
+                nanossoc.filtered_cell_u_ssa3f = output_report.filtered_cell_u_ssa3f;
+                nanossoc.filtered_cell_u_ssa4f = output_report.filtered_cell_u_ssa4f;
+                nanossoc.angular_position_angle_x = output_report.angular_position_angle_x;
+                nanossoc.angular_position_angle_y = output_report.angular_position_angle_y;
                 nanossoc.angular_position_sun_detection = output_report.angular_position_sun_detection;
                 nanossoc.angular_position_error_code = output_report.angular_position_error_code;
             }
@@ -214,16 +164,16 @@ where
     send_start_cursor: usize,
     send_buffer: heapless::Vec<u8, 64>,
 
-    unfiltered_cell_uSSA1: [u8; 4],
-    unfiltered_cell_uSSA2: [u8; 4],
-    unfiltered_cell_uSSA3: [u8; 4],
-    unfiltered_cell_uSSA4: [u8; 4],
-    filtered_cell_uSSA1F: [u8; 4],
-    filtered_cell_uSSA2F: [u8; 4],
-    filtered_cell_uSSA3F: [u8; 4],
-    filtered_cell_uSSA4F: [u8; 4],
-    angular_position_angleX: [u8; 4],
-    angular_position_angleY: [u8; 4],
+    unfiltered_cell_u_ssa1: [u8; 4],
+    unfiltered_cell_u_ssa2: [u8; 4],
+    unfiltered_cell_u_ssa3: [u8; 4],
+    unfiltered_cell_u_ssa4: [u8; 4],
+    filtered_cell_u_ssa1f: [u8; 4],
+    filtered_cell_u_ssa2f: [u8; 4],
+    filtered_cell_u_ssa3f: [u8; 4],
+    filtered_cell_u_ssa4f: [u8; 4],
+    angular_position_angle_x: [u8; 4],
+    angular_position_angle_y: [u8; 4],
     angular_position_sun_detection: [u8; 4],
     angular_position_error_code: [u8; 1],
 }
@@ -242,16 +192,16 @@ where
             send_start_cursor: 0,
             send_buffer: heapless::Vec::new(),
 
-            unfiltered_cell_uSSA1: 12.34f32.to_le_bytes(),
-            unfiltered_cell_uSSA2: 56.78f32.to_le_bytes(),
-            unfiltered_cell_uSSA3: 91.23f32.to_le_bytes(),
-            unfiltered_cell_uSSA4: 45.67f32.to_le_bytes(),
-            filtered_cell_uSSA1F: 12.34f32.to_le_bytes(),
-            filtered_cell_uSSA2F: 56.78f32.to_le_bytes(),
-            filtered_cell_uSSA3F: 91.23f32.to_le_bytes(),
-            filtered_cell_uSSA4F: 45.67f32.to_le_bytes(),
-            angular_position_angleX: 98.76f32.to_le_bytes(),
-            angular_position_angleY: 54.32f32.to_le_bytes(),
+            unfiltered_cell_u_ssa1: 12.34f32.to_le_bytes(),
+            unfiltered_cell_u_ssa2: 56.78f32.to_le_bytes(),
+            unfiltered_cell_u_ssa3: 91.23f32.to_le_bytes(),
+            unfiltered_cell_u_ssa4: 45.67f32.to_le_bytes(),
+            filtered_cell_u_ssa1f: 12.34f32.to_le_bytes(),
+            filtered_cell_u_ssa2f: 56.78f32.to_le_bytes(),
+            filtered_cell_u_ssa3f: 91.23f32.to_le_bytes(),
+            filtered_cell_u_ssa4f: 45.67f32.to_le_bytes(),
+            angular_position_angle_x: 98.76f32.to_le_bytes(),
+            angular_position_angle_y: 54.32f32.to_le_bytes(),
             angular_position_sun_detection: 11.11f32.to_le_bytes(),
             angular_position_error_code: [0x00],
         }
@@ -319,10 +269,10 @@ where
                 defmt::println!("Get unfiltered cells"); 
                 let mut reply_body = [0u8; 18];
                 reply_body[0] = 0x11; // length
-                reply_body[1..][..4].copy_from_slice(&self.unfiltered_cell_uSSA1);
-                reply_body[5..][..4].copy_from_slice(&self.unfiltered_cell_uSSA2);
-                reply_body[9..][..4].copy_from_slice(&self.unfiltered_cell_uSSA3);
-                reply_body[13..][..4].copy_from_slice(&self.unfiltered_cell_uSSA4);
+                reply_body[1..][..4].copy_from_slice(&self.unfiltered_cell_u_ssa1);
+                reply_body[5..][..4].copy_from_slice(&self.unfiltered_cell_u_ssa2);
+                reply_body[9..][..4].copy_from_slice(&self.unfiltered_cell_u_ssa3);
+                reply_body[13..][..4].copy_from_slice(&self.unfiltered_cell_u_ssa4);
                 reply_body[17] = self.checksum(&reply_body[..=16]);
                 self.reply_message(&reply_body).unwrap();
             }
@@ -331,10 +281,10 @@ where
                 defmt::println!("Get filtered cells"); 
                 let mut reply_body = [0u8; 18];
                 reply_body[0] = 0x11; // length
-                reply_body[1..][..4].copy_from_slice(&self.filtered_cell_uSSA1F);
-                reply_body[5..][..4].copy_from_slice(&self.filtered_cell_uSSA2F);
-                reply_body[9..][..4].copy_from_slice(&self.filtered_cell_uSSA3F);
-                reply_body[13..][..4].copy_from_slice(&self.filtered_cell_uSSA4F);
+                reply_body[1..][..4].copy_from_slice(&self.filtered_cell_u_ssa1f);
+                reply_body[5..][..4].copy_from_slice(&self.filtered_cell_u_ssa2f);
+                reply_body[9..][..4].copy_from_slice(&self.filtered_cell_u_ssa3f);
+                reply_body[13..][..4].copy_from_slice(&self.filtered_cell_u_ssa4f);
                 reply_body[17] = self.checksum(&reply_body[..=16]);
                 self.reply_message(&reply_body).unwrap();
             }
@@ -343,8 +293,8 @@ where
                 defmt::println!("Get angular position"); 
                 let mut reply_body = [0u8; 15];
                 reply_body[0] = 0x0E; // length
-                reply_body[1..][..4].copy_from_slice(&self.angular_position_angleX);
-                reply_body[5..][..4].copy_from_slice(&self.angular_position_angleY);
+                reply_body[1..][..4].copy_from_slice(&self.angular_position_angle_x);
+                reply_body[5..][..4].copy_from_slice(&self.angular_position_angle_y);
                 reply_body[9..][..4].copy_from_slice(&self.angular_position_sun_detection);
                 reply_body[13..][..1].copy_from_slice(&self.angular_position_error_code);
                 reply_body[14] = self.checksum(&reply_body[..=13]);
