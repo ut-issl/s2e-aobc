@@ -9,8 +9,8 @@ where
     B: UsbBus,
 {
     ifn: InterfaceNumber,
-    out_eps: [EndpointOut<'a, B>; O],
-    in_eps: [EndpointIn<'a, B>; I],
+    pub out_eps: [EndpointOut<'a, B>; O],
+    pub in_eps: [EndpointIn<'a, B>; I],
 }
 
 impl<'a, B, const O: usize, const I: usize> BulkClass<'a, B, O, I>

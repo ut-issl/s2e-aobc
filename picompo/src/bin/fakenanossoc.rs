@@ -13,7 +13,7 @@ use hal::{
     I2C,
 };
 use panic_probe as _;
-use picompo::usb::BulkClass;
+use picompo::{usb::BulkClass, WinUsbClass};
 use rp_pico::{
     self as bsp, hal,
     hal::{pac, prelude::*},
@@ -85,6 +85,7 @@ fn main() -> ! {
     let bus_allocator = UsbBusAllocator::new(bus);
     let vid_pid = UsbVidPid(0x6666, 0x6910);
     let mut bulk = BulkClass::<_, 1, 0>::new(&bus_allocator);
+    let mut winusb = WinUsbClass;
     let mut dev = UsbDeviceBuilder::new(&bus_allocator, vid_pid)
         .max_packet_size_0(64)
         .unwrap()
@@ -121,7 +122,7 @@ fn main() -> ! {
 
     loop {
         // ここでusbとのやりとりと，nanossocの模擬をくりかえす
-        dev.poll(&mut [&mut bulk]);
+        dev.poll(&mut [&mut winusb, &mut bulk]);
         nanossoc.poll();
 
         if let Ok(len) = bulk.out_eps[0].read(&mut usbbuf) {
