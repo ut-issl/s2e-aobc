@@ -207,6 +207,7 @@ target_link_libraries(${PROJECT_NAME} COMPONENT)
 
 # link picompo-usb
 target_link_libraries(${PROJECT_NAME} picompo-usb)
+target_link_libraries(picompo-usb INTERFACE winusb cfgmgr32)
 
 ## C2A integration
 if(USE_C2A)
