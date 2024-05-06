@@ -169,13 +169,6 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "bb813b8af86854136c6922af0598d719255ecb2179515e6e7730d468f05c9cae"
 
 [[package]]
-name = "picompo-regfile"
-version = "0.1.0"
-dependencies = [
- "heapless",
-]
-
-[[package]]
 name = "picompo-usb"
 version = "0.1.0"
 dependencies = [
@@ -183,7 +176,6 @@ dependencies = [
  "heapless",
  "nusb",
  "once_cell",
- "picompo-regfile",
  "zerocopy",
 ]
 
