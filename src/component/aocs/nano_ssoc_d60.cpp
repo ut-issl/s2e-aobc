@@ -17,9 +17,9 @@ NanoSsocD60::NanoSsocD60(SunSensor sun_sensor, const int sils_port_id, const uns
     : SunSensor(sun_sensor),
       I2cTargetCommunicationWithObc(sils_port_id, hils_port_id, i2c_address, obc, hils_port_manager),
       i2c_address_(i2c_address) {
-  if (i2c_address_ == 0x11) {
-    picompo_handle_ = PICOMPO_open("FAKE_NANOSSOCD60");
-  }
+        char buffer[20];
+        sprintf(buffer, "FAKE_NANOSSOCD60_0X%02X", i2c_address);
+        picompo_handle_ = PICOMPO_open(buffer);
   printf("i2c_address %02x handle: %d\n", i2c_address, picompo_handle_);
 }
 

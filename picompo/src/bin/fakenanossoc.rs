@@ -6,10 +6,16 @@ use bsp::{
     XOSC_CRYSTAL_FREQ,
 };
 use defmt_rtt as _;
+use embedded_hal::digital::InputPin;
 use hal::{
     fugit::RateExtU32 as _,
     i2c::{peripheral::Event, Peripheral},
     multicore::{Multicore, Stack},
+    gpio::{
+        self,
+        bank0::{Gpio1, Gpio5, Gpio9, Gpio13},
+        FunctionSioInput, PullUp,
+    },
     I2C,
 };
 use panic_probe as _;
@@ -50,6 +56,34 @@ pub fn exit() -> ! {
     }
 }
 
+struct AddressSelector {
+    py: gpio::Pin<Gpio1, FunctionSioInput, PullUp>,
+    my: gpio::Pin<Gpio5, FunctionSioInput, PullUp>,
+    pz: gpio::Pin<Gpio9, FunctionSioInput, PullUp>,
+    mz: gpio::Pin<Gpio13, FunctionSioInput, PullUp>,
+}
+
+impl AddressSelector {
+    pub fn select(&mut self) -> Option<u8> {
+        let py = self.py.is_low().unwrap();
+        let my = self.my.is_low().unwrap();
+        let pz = self.pz.is_low().unwrap();
+        let mz = self.mz.is_low().unwrap();
+        defmt::println!("py: {}, my: {}, pz: {}, mz: {}", py, my, pz, mz);
+        match (py, my, pz, mz) {
+            (true, false, false, false) => Some(0x11),
+            (false, true, false, false) => Some(0x13),
+            (false, false, true, false) => Some(0x50),
+            (false, false, false, true) => Some(0x12),
+            _ => None,
+    }
+}
+}
+fn hex(byte: u8) -> [u8; 2] {
+    let hex = b"0123456789ABCDEF";
+    [hex[(byte >> 4) as usize], hex[(byte & 0x0F) as usize]]
+}
+
 #[bsp::entry]
 fn main() -> ! {
     let mut pac = pac::Peripherals::take().unwrap();
@@ -75,6 +109,23 @@ fn main() -> ! {
         sio.gpio_bank0,
         &mut pac.RESETS,
     );
+    let mut address_selector = AddressSelector {
+        py: pins.gpio1.into_pull_up_input(),
+        my: pins.gpio5.into_pull_up_input(),
+        pz: pins.gpio9.into_pull_up_input(),
+        mz: pins.gpio13.into_pull_up_input(),
+    };
+    let self_address = address_selector.select().unwrap_or(0x00);
+
+    let product_name = cortex_m::singleton!(: [u8; 18] = [0; 18]).unwrap();
+    // nusb returns uppercased serial number in Windows
+    // so that we need to use uppercase letters for the product name
+    product_name.copy_from_slice(b"FAKE_NANOSSOC_0X??");
+    let addr_hex_offset = product_name.len() - 2;
+    product_name[addr_hex_offset..].copy_from_slice(&hex(self_address));
+
+    let product_name = core::str::from_utf8(product_name).unwrap();
+
 
     let bus = UsbBus::new(
         pac.USBCTRL_REGS,
@@ -92,22 +143,16 @@ fn main() -> ! {
         .unwrap()
         .strings(&[StringDescriptors::new(LangID::EN_US)
             .manufacturer("ArkEdge Space Inc.")
-            .product("FAKE_NANOSSOCD60")
-            .serial_number("FAKE_NANOSSOCD60")])
+            .product(product_name)
+            .serial_number(product_name)])
         .unwrap()
         .build();
 
     let i2c0_sda = pins.gpio16.into_function();
     let i2c0_scl = pins.gpio17.into_function();
     let i2c0 =
-        I2C::new_peripheral_event_iterator(pac.I2C0, i2c0_sda, i2c0_scl, &mut pac.RESETS, 0x11u8);
+        I2C::new_peripheral_event_iterator(pac.I2C0, i2c0_sda, i2c0_scl, &mut pac.RESETS, self_address);
     let mut nanossoc0 = NanoSsocD60::new(i2c0);
-
-    let i2c1_sda = pins.gpio14.into_function();
-    let i2c1_scl = pins.gpio15.into_function();
-    let i2c1 =
-        I2C::new_peripheral_event_iterator(pac.I2C1, i2c1_sda, i2c1_scl, &mut pac.RESETS, 0x13u8);
-    let mut nanossoc1 = NanoSsocD60::new(i2c1);
 
     let mut usbbuf = [0x00; 64];
 
@@ -115,7 +160,6 @@ fn main() -> ! {
         // ここでusbとのやりとりと，nanossocの模擬をくりかえす
         dev.poll(&mut [&mut winusb, &mut bulk]);
         nanossoc0.poll();
-        nanossoc1.poll();
 
         if let Ok(len) = bulk.out_eps[0].read(&mut usbbuf) {
             if let Some(output_report) = OutputReport::ref_from(&usbbuf[..len]) {
@@ -135,23 +179,6 @@ fn main() -> ! {
             }
         }
 
-        if let Ok(len) = bulk.out_eps[1].read(&mut usbbuf) {
-            if let Some(output_report) = OutputReport::ref_from(&usbbuf[..len]) {
-                nanossoc1.unfiltered_cell_u_ssa1 = output_report.unfiltered_cell_u_ssa1;
-                nanossoc1.unfiltered_cell_u_ssa1 = output_report.unfiltered_cell_u_ssa1;
-                nanossoc1.unfiltered_cell_u_ssa3 = output_report.unfiltered_cell_u_ssa3;
-                nanossoc1.unfiltered_cell_u_ssa4 = output_report.unfiltered_cell_u_ssa4;
-                nanossoc1.filtered_cell_u_ssa1f = output_report.filtered_cell_u_ssa1f;
-                nanossoc1.filtered_cell_u_ssa2f = output_report.filtered_cell_u_ssa2f;
-                nanossoc1.filtered_cell_u_ssa3f = output_report.filtered_cell_u_ssa3f;
-                nanossoc1.filtered_cell_u_ssa4f = output_report.filtered_cell_u_ssa4f;
-                nanossoc1.angular_position_angle_x = output_report.angular_position_angle_x;
-                nanossoc1.angular_position_angle_y = output_report.angular_position_angle_y;
-                nanossoc1.angular_position_sun_detection =
-                    output_report.angular_position_sun_detection;
-                nanossoc1.angular_position_error_code = output_report.angular_position_error_code;
-            }
-        }
     }
 }
 
