@@ -18,7 +18,7 @@ NanoSsocD60::NanoSsocD60(SunSensor sun_sensor, const int sils_port_id, const uns
       I2cTargetCommunicationWithObc(sils_port_id, hils_port_id, i2c_address, obc, hils_port_manager),
       i2c_address_(i2c_address) {
         char buffer[20];
-        sprintf(buffer, "FAKE_NANOSSOCD60_0X%02X", i2c_address);
+        sprintf(buffer, "FAKE_NANOSSOC_0X%02X", i2c_address);
         picompo_handle_ = PICOMPO_open(buffer);
   printf("i2c_address %02x handle: %d\n", i2c_address, picompo_handle_);
 }
@@ -51,7 +51,7 @@ int NanoSsocD60::GenerateTelemetry() {
   output.angular_position_angle_y = ConvertAngle2Tlm(beta_rad_);
   output.angular_position_sun_detection = ConvertFloat2FloatingPoint(float(sun_intensity_percent_));
   output.angular_position_error_code = GenerateErrorCode();
-  PICOMPO_send(picompo_handle_, reinterpret_cast<uint8_t *>(&output), sizeof(output) - 3);
+  PICOMPO_send(picompo_handle_, reinterpret_cast<uint8_t *>(&output), sizeof(output));
 
   return kTlmSize;
 }

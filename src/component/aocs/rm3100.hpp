@@ -45,7 +45,7 @@ class Rm3100 : public Magnetometer, public I2cTargetCommunicationWithObc {
 
  private:
   // Mode setting
-  unsigned char mode_ = 1;                      //!< Measurement mode 0: CMM, others: Polling
+  unsigned char mode_ = 0;                      //!< Measurement mode 0: CMM, others: Polling
   const unsigned char kModeSetRegId = 0x01;     //!< Register address of mode setting
   const unsigned char kCmmModeSettings = 0x7d;  //!< CMM mode setting command
 

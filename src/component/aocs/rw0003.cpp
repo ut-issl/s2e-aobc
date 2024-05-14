@@ -61,7 +61,7 @@ std::string Rw0003::GetLogHeader() const {
 void Rw0003::Initialize() {
   // HILS用の初期値を設定
   OutputReport output;
-  output.temperature = 0;
+  output.temperature = 30;
   output.speed = 0;
   PICOMPO_send(picompo_handle_, reinterpret_cast<uint8_t*>(&output), sizeof(output));
 }
