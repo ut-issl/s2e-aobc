@@ -6,51 +6,35 @@ use bsp::{
     XOSC_CRYSTAL_FREQ,
 };
 use defmt_rtt as _;
+use embedded_hal::digital::InputPin;
 use hal::{
-    fugit::RateExtU32 as _, i2c::{peripheral::Event, Peripheral}, multicore::{Multicore, Stack}, pac::clocks::fc0_status::FAST_R, I2C
+    fugit::RateExtU32 as _, 
+    i2c::{peripheral::Event, Peripheral}, 
+    multicore::{Multicore, Stack}, 
+    gpio::{
+        self,
+        bank0::{Gpio1, Gpio5},
+        FunctionSioInput, PullUp,
+    },
+    I2C
 };
 use panic_probe as _;
+use picompo::{usb::BulkClass, WinUsbClass};
 use rp_pico::{
     self as bsp, hal,
     hal::{pac, prelude::*},
 };
-use slippers::{SlipDecoder, SlipEncoder};
 use usb_device::{class_prelude::UsbBusAllocator, prelude::*};
-use usbd_hid::descriptor::generator_prelude::*;
-use usbd_hid::hid_class::{
-    HIDClass, HidClassSettings, HidCountryCode, HidProtocol, HidSubClass, ProtocolModeConfig,
-};
 use zerocopy::{AsBytes, FromBytes, FromZeroes, Ref, LE, U16};
-
-const Rm3100_CRC: crc::Crc<u16> = crc::Crc::<u16>::new(&crc::CRC_16_MCRF4XX);
-
-#[gen_hid_descriptor(
-    (collection = APPLICATION, usage_page = VENDOR_DEFINED_START, usage = 0x01) = {
-        mx=output;
-        my=output;
-        mz=output;
-    }
-)]
-struct CustomReport {
-    mx: [u8; 4],
-    my: [u8; 4],
-    mz: [u8; 4],
-}
 
 #[derive(FromZeroes, FromBytes)]
 #[repr(C)]
 struct OutputReport {
-    mx: [u8; 4],
-    my: [u8; 4],
-    mz: [u8; 4],
-}
-
-#[derive(FromZeroes, AsBytes)]
-#[repr(C)]
-struct InputReport {
-}
-
-impl InputReport {
+    // mx: [u8; 4],
+    // my: [u8; 4],
+    // mz: [u8; 4],
+    tlm:[u8; 9],
+    // buffer:[u8; 3],
 }
 
 #[defmt::panic_handler]
@@ -63,7 +47,28 @@ pub fn exit() -> ! {
         cortex_m::asm::bkpt();
     }
 }
+struct AddressSelector {
+    aobc: gpio::Pin<Gpio1, FunctionSioInput, PullUp>,
+    ext: gpio::Pin<Gpio5, FunctionSioInput, PullUp>,
+}
 
+impl AddressSelector {
+    pub fn select(&mut self) -> Option<u8> {
+        let aobc = self.aobc.is_low().unwrap();
+        let ext = self.ext.is_low().unwrap();
+        defmt::println!("aobc: {}, ext: {}", aobc, ext);
+        match (aobc, ext) {
+            (true, false) => Some(0x22),
+            (false, true) => Some(0x23),
+            _ => None,
+        }
+    }
+}
+
+fn hex(byte: u8) -> [u8; 2] {
+    let hex = b"0123456789ABCDEF";
+    [hex[(byte >> 4) as usize], hex[(byte & 0x0F) as usize]]
+}
 #[bsp::entry]
 fn main() -> ! {
     let mut pac = pac::Peripherals::take().unwrap();
@@ -89,6 +94,21 @@ fn main() -> ! {
         sio.gpio_bank0,
         &mut pac.RESETS,
     );
+    let mut address_selector = AddressSelector {
+        aobc: pins.gpio1.into_pull_up_input(),
+        ext: pins.gpio5.into_pull_up_input(),
+    };
+    let self_address = address_selector.select().unwrap_or(0x00);
+
+    let product_name = cortex_m::singleton!(: [u8; 16] = [0; 16]).unwrap();
+    // nusb returns uppercased serial number in Windows
+    // so that we need to use uppercase letters for the product name
+    product_name.copy_from_slice(b"FAKE_RM3100_0X??");
+    let addr_hex_offset = product_name.len() - 2;
+    product_name[addr_hex_offset..].copy_from_slice(&hex(self_address));
+
+    let product_name = core::str::from_utf8(product_name).unwrap();
+
 
     let bus = UsbBus::new(
         pac.USBCTRL_REGS,
@@ -99,62 +119,36 @@ fn main() -> ! {
     );
     let bus_allocator = UsbBusAllocator::new(bus);
     let vid_pid = UsbVidPid(0x6666, 0x6910);
-    let mut hid = HIDClass::new_with_settings(
-        &bus_allocator,
-        CustomReport::desc(),
-        16,
-        HidClassSettings {
-            subclass: HidSubClass::NoSubClass,
-            protocol: HidProtocol::Generic,
-            config: ProtocolModeConfig::ForceReport,
-            locale: HidCountryCode::NotSupported,
-        },
-    );
+    let mut bulk = BulkClass::<_, 2, 0>::new(&bus_allocator);
+    let mut winusb = WinUsbClass;
     let mut dev = UsbDeviceBuilder::new(&bus_allocator, vid_pid)
         .max_packet_size_0(64)
         .unwrap()
-        .strings(&[StringDescriptors::new(LangID::EN)
-            .manufacturer("ArkEdge Space Inc.")
-            .product("FAKE-Rm3100")])
+        .strings(&[StringDescriptors::new(LangID::EN_US)
+            .product(product_name)
+            .serial_number(product_name)
+            .manufacturer("ArkEdge Space Inc.")])
         .unwrap()
         .build();
-
-    let mut mc = Multicore::new(&mut pac.PSM, &mut pac.PPB, &mut sio.fifo);
-    let cores = mc.cores();
-    let core1 = &mut cores[1];
-    let core1_stack = cortex_m::singleton!(: Stack<4096> = Stack::new()).unwrap();
-    let i2c1 = I2C::new_controller(
-        pac.I2C1,
-        pins.gpio10.into_function(),
-        pins.gpio11.into_function(),
-        10u32.kHz(),
-        &mut pac.RESETS,
-        clocks.system_clock.freq(),
-    );
-    core1
-        .spawn(&mut core1_stack.mem, move || {
-            core1_task(i2c1);
-        })
-        .unwrap();
 
     let i2c_sda = pins.gpio16.into_function();
     let i2c_scl = pins.gpio17.into_function();
     let i2c0 =
-        I2C::new_peripheral_event_iterator(pac.I2C0, i2c_sda, i2c_scl, &mut pac.RESETS, 0x23u8);
-    let mut rm3100 = Rm3100::new(i2c0, 0x11, 0x23);
+        I2C::new_peripheral_event_iterator(pac.I2C0, i2c_sda, i2c_scl, &mut pac.RESETS, self_address);
+    let mut rm3100 = Rm3100::new(i2c0);
     let mut usbbuf = [0x00; 64];
 
     loop {
         // ここでusbとのやりとりと，rm3100の模擬をくりかえす
-        dev.poll(&mut [&mut hid]);
+        dev.poll(&mut [&mut winusb, &mut bulk]);
         rm3100.poll();
 
-        // S2Eからのデータを受信して格納
-        if let Ok(len) = hid.pull_raw_output(&mut usbbuf) {
+        if let Ok(len) = bulk.out_eps[0].read(&mut usbbuf) {
             if let Some(output_report) = OutputReport::ref_from(&usbbuf[..len]) {
-                rm3100.mx = output_report.mx;
-                rm3100.my = output_report.my;
-                rm3100.mz = output_report.mz;
+                // rm3100.mx = output_report.mx;
+                // rm3100.my = output_report.my;
+                // rm3100.mz = output_report.mz;
+                rm3100.tlm = output_report.tlm;
             }
         }
     }
@@ -176,18 +170,18 @@ where
     SCL: hal::gpio::PinId,
 {
     i2c: I2C_PERIPHERAL<I2C, SDA, SCL>,
-    ctrl_address: u8,
-    self_address: u8,
+
     is_initialized: bool,
     recv_end_cursor: usize,
     recv_buffer: [u8; 64],
     send_start_cursor: usize,
     send_buffer: heapless::Vec<u8, 64>,
-    is_TransferWrite: bool,
+    is_transfer_write: bool,
 
-    mx: [u8; 4],
-    my: [u8; 4],
-    mz: [u8; 4],
+    // mx: [u8; 4],
+    // my: [u8; 4],
+    // mz: [u8; 4],
+    tlm: [u8; 9],
 }
 
 impl<I2C, SDA, SCL> Rm3100<I2C, SDA, SCL>
@@ -196,21 +190,21 @@ where
     SCL: hal::gpio::PinId,
     I2C: core::ops::Deref<Target = pac::i2c0::RegisterBlock>,
 {
-    pub fn new(i2c: I2C_PERIPHERAL<I2C, SDA, SCL>, ctrl_address: u8, self_address: u8) -> Self {
+    pub fn new(i2c: I2C_PERIPHERAL<I2C, SDA, SCL>) -> Self {
         Self {
             i2c,
-            ctrl_address,
-            self_address,
+            
             is_initialized: false,
             recv_end_cursor: 0,
             recv_buffer: [0; 64],
             send_start_cursor: 0,
             send_buffer: heapless::Vec::new(),
-            is_TransferWrite: false,
+            is_transfer_write: false,
 
-            mx: 1234u32.to_be_bytes(),
-            my: 5678u32.to_be_bytes(),
-            mz: 9012u32.to_be_bytes(),
+            // mx: 1234u32.to_le_bytes(),
+            // my: 5678u32.to_le_bytes(),
+            // mz: 9012u32.to_le_bytes(),
+            tlm: [0; 9],
         }
     }
 
@@ -219,7 +213,7 @@ where
             match event {
                 Event::TransferWrite => {
                     defmt::println!("TransferWrite: {}", self.recv_end_cursor);
-                    self.is_TransferWrite = true;
+                    self.is_transfer_write = true;
                     if self.recv_end_cursor >= self.recv_buffer.len() {
                         // wrap around
                         self.recv_end_cursor = 0;
@@ -230,7 +224,7 @@ where
                 }
                 Event::TransferRead => {
                     defmt::println!("TransferRead: {}", self.send_start_cursor);
-                    self.is_TransferWrite = false;
+                    self.is_transfer_write = false;
                     if self.send_start_cursor >= self.send_buffer.len() {
                         // buffer underflow
                         defmt::println!("Buffer underflow !!!!!");
@@ -252,7 +246,7 @@ where
                 }
                 Event::Stop => {
                     defmt::println!("Stop");
-                    if self.is_TransferWrite {
+                    if self.is_transfer_write {
                         self.handle_message().ok();
                         self.recv_end_cursor = 0;
                     }else{
@@ -266,37 +260,47 @@ where
     }
 
     pub fn handle_message(&mut self) -> Result<(), ()> {
-        let mut message = heapless::Vec::<u8, 64>::new();
-        // HACK: put the destination address at the front of message
-        message.push(self.self_address).unwrap();
+        // let mut message = heapless::Vec::<u8, 64>::new();
+        // // HACK: put the destination address at the front of message
+        // message.push(self.self_address).unwrap();
+        if self.recv_end_cursor == 0 {
+            return Ok(());
+        }
         let src = &self.recv_buffer[..self.recv_end_cursor];
         
         defmt::println!("Received: {=[u8]:02x}", src);
         defmt::println!("buffer: {=[u8]:02x}", self.recv_buffer);
         match src[0] {
-            0x01 => {
-                if src[1] == 0x7d {
-                    defmt::println!("INIT");
-                    self.is_initialized = true;
-                    // 初期化の処理をここでする
-                }else{
-                    defmt::println!("INIT failed");
+            // 0x01 => {
+            //     if src[1] == 0x7d {
+            //         defmt::println!("INIT");
+            //         self.is_initialized = true;
+            //         // 初期化の処理をここでする
+            //     }else{
+            //         defmt::println!("INIT failed");
                 
-                }
-            }
+            //     }
+            // }
             0x24 => {
-                if self.is_initialized {
+                // if self.is_initialized {
                     
                         defmt::println!("get magnetometer data");
                         let mut reply_body = [0u8; 9];
-                        reply_body[0..][..3].copy_from_slice(&self.mx[1..]);
-                        reply_body[3..][..3].copy_from_slice(&self.my[1..]);
-                        reply_body[6..][..3].copy_from_slice(&self.mz[1..]);
+                        // reply_body[0] = self.mx[2];
+                        // reply_body[1] = self.mx[1];
+                        // reply_body[2] = self.mx[0];
+                        // reply_body[3] = self.my[2];
+                        // reply_body[4] = self.my[1];
+                        // reply_body[5] = self.my[0];
+                        // reply_body[6] = self.mz[2];
+                        // reply_body[7] = self.mz[1];
+                        // reply_body[8] = self.mz[0];
+                        reply_body.copy_from_slice(&self.tlm);
                         self.reply_message(&reply_body).unwrap();    
  
-                }else{
-                    defmt::println!("Not initialized");
-                }
+                // }else{
+                //     defmt::println!("Not initialized");
+                // }
                 
             }
 
@@ -309,50 +313,17 @@ where
 
 
     pub fn reply_message(&mut self, body: &[u8]) -> Result<(), ()> {
-        let mut message = heapless::Vec::<u8, 64>::new();
-        message.extend_from_slice(body)?;
+        // let mut message = heapless::Vec::<u8, 64>::new();
+        // message.extend_from_slice(body)?;
 
         self.send_buffer.clear();
         self.send_start_cursor = 0;
-        encode(&message, &mut self.send_buffer)?;
+        self.send_buffer.extend_from_slice(body)?;
 
         Ok(())
     }
 }
 
-fn slip_decode<const N: usize>(src: &[u8], dst: &mut heapless::Vec<u8, N>) -> Result<(), ()> {
-    let dec = SlipDecoder::new(src);
-    for byte in dec.iter() {
-        dst.push(byte).map_err(|_| ())?;
-    }
-    Ok(())
-}
-
-fn encode<const N: usize>(src: &[u8], dst: &mut heapless::Vec<u8, N>) -> Result<(), ()> {
-    // let enc: SlipEncoder = SlipEncoder::new(src);
-    for byte in src.iter() {
-        dst.push(*byte).map_err(|_| ())?;
-    }
-    Ok(())
-}
-
-#[derive(AsBytes, FromZeroes, FromBytes)]
-#[repr(C)]
-pub struct NspHeader {
-    destination_address: u8,
-    source_address: u8,
-    message_control_field: u8,
-}
-
-impl NspHeader {
-    pub fn poll_final(&self) -> bool {
-        self.message_control_field & (1 << 7) != 0
-    }
-
-    pub fn command_code(&self) -> u8 {
-        self.message_control_field & 0x0F
-    }
-}
 
 #[derive(AsBytes, FromZeroes, FromBytes)]
 #[repr(C)]
@@ -360,21 +331,4 @@ pub struct NspFooter {
     crc: U16<LE>,
 }
 
-// AOBC side emulation
-fn core1_task(mut i2c: impl embedded_hal::i2c::I2c<Error = hal::i2c::Error>) -> ! {
-    cortex_m::asm::delay(60_000_000);
-    //let init = [0x11, 0x01, 0x00, 0x10, 0x00, 0x00, 0x8B, 0x80, 0xC0];
-    //let get_temp = [0x11, 0x87, 0x03, 0xFE, 0xEB, 0xC0];
-    let get_speed = [0x11, 0x87, 0x15, 0x49, 0x9E, 0xC0];
-    loop {
-        defmt::println!("Controller is Writing");
-        let mut tlm = [0u8; 15];
-        if let Err(e) = i2c.write_read(0x26, &get_speed, &mut tlm) {
-            defmt::println!("I2C Controller Write Error: {:?}", e);
-            cortex_m::asm::delay(60_000_000);
-            continue;
-        }
-        defmt::println!("Controller Read: {=[u8]:02x}", tlm);
-        cortex_m::asm::delay(60_000_000);
-    }
-}
+
