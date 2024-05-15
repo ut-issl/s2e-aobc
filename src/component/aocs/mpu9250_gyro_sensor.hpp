@@ -46,6 +46,8 @@ class Mpu9250GyroSensor : public GyroSensor, public I2cTargetCommunicationWithOb
   inline const bool *GetIsMagOn(void) const { return &is_magnetometer_on_; }
 
  private:
+  const unsigned char i2c_address_;         //!< I2C Address
+
   bool is_gyro_on_ = false;          //!< Gyro sensor enable status
   bool is_magnetometer_on_ = false;  //!< Magnetometer enable status
 
@@ -78,6 +80,8 @@ class Mpu9250GyroSensor : public GyroSensor, public I2cTargetCommunicationWithOb
   // HILS
   const unsigned int kStoredFrameSize = 3;  //!< Stored frame size
 
+  // Picompo
+  uint32_t picompo_handle_ = 0;
   // Command
   /**
    * @fn ReadCmdGyroEnable
@@ -134,5 +138,31 @@ class Mpu9250GyroSensor : public GyroSensor, public I2cTargetCommunicationWithOb
    */
   void Convert2Tlm(unsigned char tlm[kMpuTlmSize_], const double value);
 };
+
+extern "C" {
+uint32_t PICOMPO_open(const char *name);
+int32_t PICOMPO_send(uint32_t handle, uint8_t *data, uint32_t data_len);
+int32_t PICOMPO_recv(uint32_t handle, uint8_t *buf, uint32_t buf_len);
+}
+
+typedef struct {
+  uint8_t accel_x_h;
+  uint8_t accel_x_l;
+  uint8_t accel_y_h;
+  uint8_t accel_y_l;
+  uint8_t accel_z_h;
+  uint8_t accel_z_l;
+  uint8_t temp_h;
+  uint8_t temp_l;
+  uint8_t gyro_x_h;
+  uint8_t gyro_x_l;
+  uint8_t gyro_y_h;
+  uint8_t gyro_y_l;
+  uint8_t gyro_z_h;
+  uint8_t gyro_z_l;
+
+} Mpu9250GyroOutputReport;
+
+
 
 #endif  // S2E_AOBC_COMPONENT_AOCS_MPU9250_GYRO_SENSOR_HPP_
