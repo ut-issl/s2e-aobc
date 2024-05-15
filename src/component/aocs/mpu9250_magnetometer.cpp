@@ -12,26 +12,30 @@ Mpu9250Magnetometer::Mpu9250Magnetometer(Magnetometer magnetometer, const int si
                                          const bool *is_mag_on)
     : Magnetometer(magnetometer),
       I2cTargetCommunicationWithObc(sils_port_id, hils_port_id, i2c_address, obc, hils_port_manager),
-      is_magnetometer_on_(is_mag_on) {}
+      is_magnetometer_on_(is_mag_on),
+      i2c_address_(i2c_address) {
+        picompo_handle_ = PICOMPO_open("FAKE_MPU9250_MAG");
+  printf("i2c_address %02x handle: %d\n", i2c_address, picompo_handle_);
+      }
 
 void Mpu9250Magnetometer::MainRoutine(const int time_count) {
   UNUSED(time_count);
   // Read Registers
-  ReadCmdConfig();
+  // ReadCmdConfig();
 
   // Generate TLM
-  if (*is_magnetometer_on_ == true && configuration_ == 0x16)  // Power ON and 100Hz Continuous Measurement Mode
-  {
+  // if (*is_magnetometer_on_ == true && configuration_ == 0x16)  // Power ON and 100Hz Continuous Measurement Mode
+  // {
     magnetic_field_c_nT_ = quaternion_b2c_.FrameConversion(geomagnetic_field_->GetGeomagneticField_b_nT());  // Convert frame
     magnetic_field_c_nT_ = Measure(magnetic_field_c_nT_);                                                    // Add noises
     WriteMagTlm();
-  }
+  // }
 
-  int command_size = ReceiveCommand();
-  if (command_size != 1) return;  // length == 1 means setting of read register address
-  // これ以降はHILS用に事前にテレメトリを溜めておく
-  const int kTlmSize = 8;
-  StoreTelemetry(kStoredFrameSize, kTlmSize);
+  // int command_size = ReceiveCommand();
+  // if (command_size != 1) return;  // length == 1 means setting of read register address
+  // // これ以降はHILS用に事前にテレメトリを溜めておく
+  // const int kTlmSize = 8;
+  // StoreTelemetry(kStoredFrameSize, kTlmSize);
   return;
 }
 
@@ -47,19 +51,37 @@ void Mpu9250Magnetometer::ReadCmdConfig() {
 
 void Mpu9250Magnetometer::WriteMagTlm() {
   unsigned char tlm[] = {0, 0};
-  unsigned char reg_id = kRegObsMag_;
+  // unsigned char reg_id = kRegObsMag_;
+  Mpu9250MagOutputReport output = {0};
 
-  // Status
-  WriteRegister(reg_id, &status_, 1);
-  reg_id++;
+  // // Status
+  // WriteRegister(reg_id, &status_, 1);
+  // reg_id++;
 
   // MAG
   for (size_t i = 0; i < kMagnetometerDimension; i++) {
     double mag_c_uT = magnetic_field_c_nT_[i] / 1000.0;
     Convert2Tlm(tlm, mag_c_uT * magnetometer_convert_uT_to_raw_);
-    WriteRegister(reg_id, tlm, kTlmSize_);
-    reg_id += kTlmSize_;
+
+    if (i == 0) {
+      output.x_l = tlm[0];
+      output.x_h = tlm[1];
+    }else if (i == 1) {
+      output.y_l = tlm[0];
+      output.y_h = tlm[1];
+    }else if (i == 2) {
+      output.z_l = tlm[0];
+      output.z_h = tlm[1];
+    }
+    // WriteRegister(reg_id, tlm, kTlmSize_);
+    // reg_id += kTlmSize_;
   }
+  output.st1 = 0x01;
+  output.st2 = 0x10;
+  PICOMPO_send(picompo_handle_, reinterpret_cast<uint8_t *>(&output), sizeof(output));
+
+
+
 
   return;
 }

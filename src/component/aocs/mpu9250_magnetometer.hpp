@@ -39,6 +39,8 @@ class Mpu9250Magnetometer : public Magnetometer, public I2cTargetCommunicationWi
   void MainRoutine(const int time_count) override;
 
  private:
+  const unsigned char i2c_address_;         //!< I2C Address
+
   // Status
   const bool *is_magnetometer_on_;      //!< Magnetometer ON/OFF flag which is managed by Mpu9250GyroSensor
   unsigned char configuration_ = 0x00;  //!< Configuration infomation
@@ -61,6 +63,9 @@ class Mpu9250Magnetometer : public Magnetometer, public I2cTargetCommunicationWi
   // HILS
   const unsigned int kStoredFrameSize = 3;  //!< Stored frame size
 
+  // Picompo
+  uint32_t picompo_handle_ = 0;
+  
   // Cmd
   /**
    * @fn ReadCmdConfig
@@ -88,5 +93,24 @@ class Mpu9250Magnetometer : public Magnetometer, public I2cTargetCommunicationWi
    */
   void Convert2Tlm(unsigned char tlm[2], const double value);
 };
+
+extern "C" {
+uint32_t PICOMPO_open(const char *name);
+int32_t PICOMPO_send(uint32_t handle, uint8_t *data, uint32_t data_len);
+int32_t PICOMPO_recv(uint32_t handle, uint8_t *buf, uint32_t buf_len);
+}
+
+typedef struct {
+  uint8_t st1;
+  uint8_t x_l;
+  uint8_t x_h;
+  uint8_t y_l;
+  uint8_t y_h;
+  uint8_t z_l;
+  uint8_t z_h;
+  uint8_t st2;
+} Mpu9250MagOutputReport;
+
+
 
 #endif  // S2E_AOBC_COMPONENT_AOCS_MPU9250_MAGNETOMETER_HPP_
