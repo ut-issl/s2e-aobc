@@ -44,6 +44,8 @@ class Rm3100 : public Magnetometer, public I2cTargetCommunicationWithObc {
   std::string GetLogHeader() const override;
 
  private:
+  const unsigned char i2c_address_;         //!< I2C Address
+
   // Mode setting
   unsigned char mode_ = 0;                      //!< Measurement mode 0: CMM, others: Polling
   const unsigned char kModeSetRegId = 0x01;     //!< Register address of mode setting
@@ -51,6 +53,9 @@ class Rm3100 : public Magnetometer, public I2cTargetCommunicationWithObc {
 
   const double kLsb2nT_ = 13.0;             //!< Convert coefficient raw to nT
   const unsigned int kStoredFrameSize = 3;  //!< Stored frame size for HILS
+
+  // Picompo
+  uint32_t picompo_handle_ = 0;
 
   /**
    * @fn ConvertMag2Tlm
@@ -66,5 +71,16 @@ class Rm3100 : public Magnetometer, public I2cTargetCommunicationWithObc {
    */
   int GenerateTelemetry();
 };
+
+extern "C" {
+uint32_t PICOMPO_open(const char *name);
+int32_t PICOMPO_send(uint32_t handle, uint8_t *data, uint32_t data_len);
+int32_t PICOMPO_recv(uint32_t handle, uint8_t *buf, uint32_t buf_len);
+}
+
+typedef struct {
+  uint8_t tlm[9];
+} Rm3100OutputReport;
+
 
 #endif  // S2E_AOBC_COMPONENT_AOCS_RM3100_HPP_

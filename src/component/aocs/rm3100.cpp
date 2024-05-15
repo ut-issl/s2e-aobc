@@ -9,7 +9,14 @@
 
 Rm3100::Rm3100(Magnetometer magnetometer, const int sils_port_id, const unsigned int hils_port_id, const unsigned char i2c_address,
                OnBoardComputer *obc, HilsPortManager *hils_port_manager)
-    : Magnetometer(magnetometer), I2cTargetCommunicationWithObc(sils_port_id, hils_port_id, i2c_address, obc, hils_port_manager) {}
+    : Magnetometer(magnetometer), 
+      I2cTargetCommunicationWithObc(sils_port_id, hils_port_id, i2c_address, obc, hils_port_manager),
+      i2c_address_(i2c_address) {
+        char buffer[20];
+        sprintf(buffer, "FAKE_RM3100_0X%02X", i2c_address);
+        picompo_handle_ = PICOMPO_open(buffer);
+  printf("i2c_address %02x handle: %d\n", i2c_address, picompo_handle_);
+      }
 
 void Rm3100::MainRoutine(const int time_count) {
   UNUSED(time_count);
@@ -24,12 +31,12 @@ void Rm3100::MainRoutine(const int time_count) {
     GenerateTelemetry();
   }
 
-  int command_size = ReceiveCommand();
-  if (command_size != 1) return;  // length == 1 means setting of read register address
+  // int command_size = ReceiveCommand();
+  // if (command_size != 1) return;  // length == 1 means setting of read register address
 
   //  これ以降はHILS用に事前にテレメトリを溜めておく
-  const int kTlmSize = 9;  //(24bit = 3 Byte) * 3 axis
-  StoreTelemetry(kStoredFrameSize, kTlmSize);
+  // const int kTlmSize = 9;  //(24bit = 3 Byte) * 3 axis
+  // StoreTelemetry(kStoredFrameSize, kTlmSize);
   return;
 }
 
@@ -45,6 +52,9 @@ int Rm3100::GenerateTelemetry() {
   const int kTlmSize = 9;  //(24bit = 3 Byte) * 3 axis
   const int kByte2Bit = 8;
   unsigned char tlm[kTlmSize] = {1, 2, 3, 0, 0, 0, 0, 0, 4};
+
+  
+  Rm3100OutputReport output = {0};
   int mag_c_tlm[kMagnetometerDimension] = {0, 0, 0};
   for (size_t i = 0; i < kMagnetometerDimension; i++) {
     mag_c_tlm[i] = ConvertMag2Tlm(magnetic_field_c_nT_[i]);
@@ -52,7 +62,17 @@ int Rm3100::GenerateTelemetry() {
       tlm[i * 3 + j] = (unsigned char)(mag_c_tlm[i] >> kByte2Bit * (3 - j - 1));
     }
   }
-  WriteRegister(0x24, tlm, kTlmSize);
+  // WriteRegister(0x24, tlm, kTlmSize);
+  for (int i = 0; i<kTlmSize; i++){
+    output.tlm[i] = tlm[i];
+  }
+
+
+  // output.mx = mag_c_tlm[0]/kLsb2nT_;
+  // output.my = mag_c_tlm[1]/kLsb2nT_;
+  // output.mz = mag_c_tlm[2]/kLsb2nT_;
+  PICOMPO_send(picompo_handle_, reinterpret_cast<uint8_t *>(&output), sizeof(output));
+
 
   return kTlmSize;
 }
