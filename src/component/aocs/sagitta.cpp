@@ -17,7 +17,7 @@ Sagitta::Sagitta(StarSensor stt, const int sils_port_id, OnBoardComputer *obc, c
 void Sagitta::MainRoutine(const int time_count) {
   int receive_data_size = ReceiveCommand(0, kMaxCmdSize_);
 
-  if (tlm_reply_mode_ == TLM_REPLY_MODE_SYNCHRONOUS && receive_data_size < 1) return;  // テレメ送信コマンドが送られていない場合
+  // if (tlm_reply_mode_ == TLM_REPLY_MODE_SYNCHRONOUS && receive_data_size < 1) return;  // テレメ送信コマンドが送られていない場合
   if (!is_initialized_) {
     runtime_ms_ = 0;
     unix_time_us_ = 0;
@@ -86,6 +86,7 @@ int Sagitta::GenerateTelemetry() {
     case REC_MODE_RUN_TIME:
       return GenerateTelemetryRunTime(command_reply_tlm);
     case REC_MODE_QUATERNION:
+      printf("quaternion\n");
       return GenerateTelemetryQuaternion(command_reply_tlm);
     case REC_MODE_TEMPERATURE:
       return GenerateTelemetryTemperature(command_reply_tlm);

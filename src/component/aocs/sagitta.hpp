@@ -69,11 +69,11 @@ class Sagitta : public StarSensor, public UartCommunicationWithObc {
     TLM_REPLY_MODE_MAX,
   } TLM_REPLY_MODE;
 
-  bool is_initialized_ = 0;                                     //!< Initialized flag
+  bool is_initialized_ = 1;                                     //!< Initialized flag
   uint32_t runtime_ms_ = 0;                                     //!< Total running time [ms]
   double compo_step_sec_ = 0.0;                                 //!< Component execution step [s]
-  REC_MODE rec_mode_ = REC_MODE_OTHERS;                         //!< Recode mode
-  TLM_REPLY_MODE tlm_reply_mode_ = TLM_REPLY_MODE_SYNCHRONOUS;  //!< Telemetry reply mode
+  REC_MODE rec_mode_ = REC_MODE_QUATERNION;                         //!< Recode mode
+  TLM_REPLY_MODE tlm_reply_mode_ = TLM_REPLY_MODE_ASYNCHRONOUS;  //!< Telemetry reply mode
   float q_tlm_i2c_[4] = {1.0f, 0.0f, 0.0f, 0.0f};               //!< Measured quaternion
   float mcu_temperature_degC_ = 25.0f;                          //!< Temperature of the micro controller
   float cmos_temperature_degC_ = 23.0f;                         //!< Temperature of the image sensor
@@ -92,8 +92,8 @@ class Sagitta : public StarSensor, public UartCommunicationWithObc {
   static const unsigned int kXxhashSeed_ = 1425;    //!< xxhash seed
   static const uint8_t kHeader_ = 0xc0;             //!< Header
   static const uint8_t kFooter_ = 0xc0;             //!< Footer
-  bool is_subscribed_temperature_ = 0;              //!< Flag to send temperature telemetry in asynchronous mode
-  bool is_subscribed_quaternion_ = 0;               //!< Flag to send quaternion telemetry in asynchronous mode
+  bool is_subscribed_temperature_ = 1;              //!< Flag to send temperature telemetry in asynchronous mode
+  bool is_subscribed_quaternion_ = 1;               //!< Flag to send quaternion telemetry in asynchronous mode
   uint8_t tlm_counter_ = 0;                         //!< Counter to send asynchronous telemetry
   static const uint8_t kAddress_ = 0x21;            //!< RS-485 Address of STT
 
