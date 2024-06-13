@@ -184,7 +184,8 @@ AocsModuleComponents::AocsModuleComponents(const Dynamics *dynamics, Structure *
   // Mission
   const std::string telescope_ini_path = ini_access.ReadString("COMPONENTS_FILE", "telescope_file");
   telescope_ = new Telescope(InitTelescope(clock_generator, 1, telescope_ini_path, &(dynamics_->GetAttitude()),
-                                           &(global_environment_->GetHipparcosCatalog()), &(local_environment_->GetCelestialInformation())));
+                                           &(global_environment_->GetHipparcosCatalog()), &(local_environment_->GetCelestialInformation()),
+                                           &(global_environment_->GetSimulationTime()), &(dynamics_->GetOrbit())));
 
   // Communication
   const std::string command_sender_ini_path = ini_access.ReadString("COMPONENTS_FILE", "command_sender_file");
