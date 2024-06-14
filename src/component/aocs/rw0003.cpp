@@ -32,6 +32,7 @@ void Rw0003::MainRoutine(const int time_count) {
     CalcTorque();
     WriteFloatTlm(kReadAddressTemperature_, (float)temperature_degC_);
     WriteFloatTlm(kReadAddressSpeed_, (float)angular_velocity_rad_s_);
+    WriteFloatTlm(kReadAddressFaultState_, (float)fault_state_);
   }
 
   is_command_written_ = false;

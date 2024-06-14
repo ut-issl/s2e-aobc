@@ -48,6 +48,7 @@ class Rw0003 : public ReactionWheel, public I2cTargetCommunicationWithObc {
  private:
   bool is_rw_initialized_ = false;  //!< Flag to detect initializing operation
   double temperature_degC_ = 30.0;  //!< RW measured temperature [degC] (dummy data)
+  float fault_state_ = 0.0;         //!< 1.0: wheel is in an fault, 0.0: otherwise
 
   // Communication
   uint16_t crc_;                             //!< Calculated CRC value
@@ -71,6 +72,7 @@ class Rw0003 : public ReactionWheel, public I2cTargetCommunicationWithObc {
   // Register address
   static const uint8_t kReadAddressTemperature_ = 0x03;  //!< Register address of temperature measurement
   static const uint8_t kReadAddressSpeed_ = 0x15;        //!< Register address of rotation speed measurement
+  static const uint8_t kReadAddressFaultState_ = 0x19;   //!< Register address of fault state
   static const uint8_t kReadAddressLimitSpeed1_ = 0x33;  //!< Register address of limit speed 1
   static const uint8_t kReadAddressLimitSpeed2_ = 0x34;  //!< Register address of limit speed 2
 
