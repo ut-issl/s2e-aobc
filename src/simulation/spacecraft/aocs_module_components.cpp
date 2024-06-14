@@ -6,7 +6,7 @@
 #include "aocs_module_components.hpp"
 
 #include <components/real/power/csv_scenario_interface.hpp>
-#include <library/initialize/initialize_file_access.hpp>
+#include <setting_file_reader/initialize_file_access.hpp>
 #include <vector>
 
 #include "../../component/aocs/aobc.hpp"

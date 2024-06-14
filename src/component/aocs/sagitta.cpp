@@ -6,7 +6,7 @@
 
 #include "sagitta.hpp"
 
-#include <library/utilities/slip.hpp>
+#include <utilities/slip.hpp>
 
 Sagitta::Sagitta(StarSensor stt, const int sils_port_id, OnBoardComputer *obc) : StarSensor(stt), UartCommunicationWithObc(sils_port_id, obc) {}
 

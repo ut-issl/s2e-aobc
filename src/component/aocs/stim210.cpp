@@ -5,7 +5,7 @@
 
 #include "stim210.hpp"
 
-#include <library/utilities/macros.hpp>
+#include <utilities/macros.hpp>
 
 Stim210::Stim210(GyroSensor gyro, double compo_step_sec, const int sils_port_id, OnBoardComputer *obc)
     : GyroSensor(gyro), UartCommunicationWithObc(sils_port_id, obc), counter_(0), compo_step_sec_(compo_step_sec) {}

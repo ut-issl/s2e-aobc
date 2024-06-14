@@ -7,8 +7,8 @@
 
 #include <math.h>
 
-#include <library/utilities/macros.hpp>
-#include <library/utilities/slip.hpp>
+#include <utilities/macros.hpp>
+#include <utilities/slip.hpp>
 
 Rw0003::Rw0003(ReactionWheel rw, const int sils_port_id, const unsigned int hils_port_id, const unsigned char i2c_address, OnBoardComputer *obc,
                HilsPortManager *hils_port_manager)

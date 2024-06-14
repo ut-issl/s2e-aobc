@@ -5,7 +5,7 @@
 
 #include "mpu9250_magnetometer.hpp"
 
-#include <library/utilities/macros.hpp>
+#include <utilities/macros.hpp>
 
 Mpu9250Magnetometer::Mpu9250Magnetometer(Magnetometer magnetometer, const int sils_port_id, const unsigned int hils_port_id,
                                          const unsigned char i2c_address, OnBoardComputer *obc, HilsPortManager *hils_port_manager,

@@ -5,7 +5,7 @@
 
 #include "hils_if_driver.hpp"
 
-#include <library/utilities/macros.hpp>
+#include <utilities/macros.hpp>
 
 HilsIfDriver::HilsIfDriver(const int prescaler, ClockGenerator *clock_generator, const unsigned int hils_port_id, const unsigned int baud_rate,
                            HilsPortManager *hils_port_manager, std::vector<int> gpio_ports, OnBoardComputer *obc)
