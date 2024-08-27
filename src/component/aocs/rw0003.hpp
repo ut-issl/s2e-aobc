@@ -48,6 +48,7 @@ class Rw0003 : public ReactionWheel, public I2cTargetCommunicationWithObc {
  private:
   bool is_rw_initialized_ = false;  //!< Flag to detect initializing operation
   double temperature_degC_ = 30.0;  //!< RW measured temperature [degC] (dummy data)
+  float fault_state_ = 0.0;         //!< 1.0: wheel is in an fault, 0.0: otherwise
 
   // Picompo
   uint32_t picompo_handle_ = 0;
