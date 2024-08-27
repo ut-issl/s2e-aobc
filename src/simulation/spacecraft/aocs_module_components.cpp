@@ -138,7 +138,7 @@ AocsModuleComponents::AocsModuleComponents(const Dynamics *dynamics, Structure *
   const unsigned char sagitta_uart_sils_port = (unsigned char)sagitta_ini_file.ReadInt("UART_PORT", "uart_port_sils");
   const unsigned int sagitta_hils_port_id = ini_access.ReadInt("COM_PORT", "sagitta_hils_port_id");
   const unsigned int sagitta_baud_rate = ini_access.ReadInt("COM_PORT", "sagitta_baud_rate");
-  sagitta_ = new Sagitta(InitStarSensor(clock_generator, power_controller_->GetPowerPort((int)PowerPortIdx::STT), 0, sagitta_ini_path,
+  sagitta_ = new Sagitta(InitStarSensor(clock_generator, power_controller_->GetPowerPort((int)PowerPortIdx::STT), 1, sagitta_ini_path,
                                         global_environment_->GetSimulationTime().GetSimulationStep_s(), dynamics_, local_environment_),
                          sagitta_uart_sils_port, aobc_, sagitta_hils_port_id, sagitta_baud_rate, hils_port_manager_);
 
