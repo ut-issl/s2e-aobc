@@ -2,25 +2,23 @@ mod pipe;
 
 use std::{collections::HashMap, ffi::CStr, sync::Mutex};
 
+use nusb::DeviceId;
 use once_cell::sync::Lazy;
 use pipe::Pipe;
 
 #[derive(Default)]
 struct Picompo {
     next_handle: u32,
-    pool: HashMap<u32, Pipe>,
+    id_map: HashMap<u32, DeviceId>,
+    pool: HashMap<DeviceId, Pipe>,
 }
 
 impl Picompo {
-    fn open_device(name: &str) -> Option<nusb::Interface> {
+    fn find_device(name: &str) -> Option<nusb::DeviceInfo> {
         let device_info = nusb::list_devices()
             .unwrap()
             .find(|device_info| device_info.serial_number() == Some(name));
-
-        let device_info = device_info?;
-        let device = device_info.open().unwrap();
-        let iface = device.claim_interface(0).unwrap();
-        Some(iface)
+        Some(device_info?)
     }
 
     fn generate_handle(&mut self) -> u32 {
@@ -29,22 +27,31 @@ impl Picompo {
     }
 
     pub fn open(&mut self, name: &str) -> Option<u32> {
-        let device = Self::open_device(name)?;
+        let device_info = Self::find_device(name)?;
+        let device_id = device_info.id();
+        if self.pool.contains_key(&device_id) {
+            return self.pool.get(&device_id).map(|pipe| pipe.handle());
+        }
+        let device = device_info.open().unwrap();
+        let iface = device.claim_interface(0).unwrap();
         let handle = self.generate_handle();
-        self.pool.insert(handle, Pipe::new(device));
+        self.pool.insert(device_id, Pipe::new(iface, handle));
+        self.id_map.insert(handle, device_id);
         Some(handle)
     }
 
     pub fn send(&mut self, handle: u32, data: &[u8]) -> Result<(), ()> {
         println!("SEND handle: {}, len: {}, data: {:02x?}", handle, data.len(), data);
-        let rw0003 = self.pool.get_mut(&handle).ok_or(())?;
-        rw0003.send(data);
+        let device_id = *self.id_map.get(&handle).ok_or(())?;
+        let pipe = self.pool.get_mut(&device_id).ok_or(())?;
+        pipe.send(data);
         Ok(())
     }
 
     pub fn recv(&mut self, handle: u32, data: &mut [u8]) -> Result<(), ()> {
-        let rw0003 = self.pool.get_mut(&handle).ok_or(())?;
-        let input = rw0003.recv();
+        let device_id = *self.id_map.get(&handle).ok_or(())?;
+        let pipe = self.pool.get_mut(&device_id).ok_or(())?;
+        let input = pipe.recv();
         let len = data.len().min(input.len());
         data[..len].copy_from_slice(&input[..len]);
         Ok(())

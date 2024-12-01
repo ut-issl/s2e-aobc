@@ -3,11 +3,12 @@ use nusb::transfer::RequestBuffer;
 
 pub struct Pipe {
     iface: nusb::Interface,
+    handle: u32,
 }
 
 impl Pipe {
-    pub fn new(iface: nusb::Interface) -> Self {
-        Self { iface }
+    pub fn new(iface: nusb::Interface, handle: u32,) -> Self {
+        Self { iface, handle }
     }
 
     pub fn send(&self, bytes: &[u8]) {
@@ -20,5 +21,9 @@ impl Pipe {
         let completion = block_on(self.iface.bulk_in(0x81, buf));
         completion.status.unwrap();
         completion.data
+    }
+
+    pub fn handle(&self) -> u32 {
+        self.handle
     }
 }
