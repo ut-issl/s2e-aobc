@@ -40,18 +40,18 @@ impl Picompo {
         Some(handle)
     }
 
-    pub fn send(&mut self, handle: u32, data: &[u8]) -> Result<(), ()> {
+    pub fn send(&mut self, handle: u32, ep: u8, data: &[u8]) -> Result<(), ()> {
         println!("SEND handle: {}, len: {}, data: {:02x?}", handle, data.len(), data);
         let device_id = *self.id_map.get(&handle).ok_or(())?;
         let pipe = self.pool.get_mut(&device_id).ok_or(())?;
-        pipe.send(data);
+        pipe.send(ep, data);
         Ok(())
     }
 
-    pub fn recv(&mut self, handle: u32, data: &mut [u8]) -> Result<(), ()> {
+    pub fn recv(&mut self, handle: u32, ep: u8, data: &mut [u8]) -> Result<(), ()> {
         let device_id = *self.id_map.get(&handle).ok_or(())?;
         let pipe = self.pool.get_mut(&device_id).ok_or(())?;
-        let input = pipe.recv();
+        let input = pipe.recv(ep);
         let len = data.len().min(input.len());
         data[..len].copy_from_slice(&input[..len]);
         Ok(())
@@ -74,12 +74,12 @@ pub unsafe extern "C" fn PICOMPO_open(name: *const i8) -> u32 {
 /// # Safety
 /// `data` は読み取り可能な `data_len` バイトのバッファを指すポインタでなければならない。
 #[no_mangle]
-pub unsafe extern "C" fn PICOMPO_send(handle: u32, data: *const u8, data_len: u32) -> i32 {
+pub unsafe extern "C" fn PICOMPO_send(handle: u32, ep: u8, data: *const u8, data_len: u32) -> i32 {
     let mut picompo = PICOMPO.lock().unwrap();
 
     let data = std::slice::from_raw_parts(data, data_len as usize);
 
-    if picompo.send(handle, data).is_ok() {
+    if picompo.send(handle, ep, data).is_ok() {
         0
     } else {
         -1
@@ -89,12 +89,12 @@ pub unsafe extern "C" fn PICOMPO_send(handle: u32, data: *const u8, data_len: u3
 /// # Safety
 /// `buf` は書き込み可能な `buf_len` バイトのバッファを指すポインタでなければならない。
 #[no_mangle]
-pub unsafe extern "C" fn PICOMPO_recv(handle: u32, buf: *mut u8, buf_len: u32) -> i32 {
+pub unsafe extern "C" fn PICOMPO_recv(handle: u32, ep: u8, buf: *mut u8, buf_len: u32) -> i32 {
     let mut picompo = PICOMPO.lock().unwrap();
 
     let buf = std::slice::from_raw_parts_mut(buf, buf_len as usize);
 
-    if picompo.recv(handle, &mut *buf).is_ok() {
+    if picompo.recv(handle, ep, &mut *buf).is_ok() {
         0
     } else {
         -1
