@@ -10,6 +10,14 @@ cmake_minimum_required(VERSION 3.13)
 # build config
 option(USE_HILS "Use HILS" OFF)
 option(USE_C2A "Use C2A" ON)
+option(USE_C2A_COMMAND_SENDER "Use command sender to C2A" OFF)
+
+# Mac user setting
+option(APPLE_SILICON "Build with Apple Silicon" OFF)
+# Force build with 64bit for APPLE
+if(APPLE)
+  option(BUILD_64BIT "Build 64bit" ON)
+endif()
 
 # preprocessor
 if(WIN32)
@@ -33,8 +41,8 @@ if(NOT DEFINED C2A_NAME)
 endif()
 
 ## Directory path for ini files
-if(NOT DEFINED INI_FILE_DIR_FROM_EXE)
-  set(INI_FILE_DIR_FROM_EXE ../../data/initialize_files)
+if(NOT DEFINED SETTINGS_DIR_FROM_EXE)
+  set(SETTINGS_DIR_FROM_EXE ../../settings)
 endif()
 
 if(NOT DEFINED EXT_LIB_DIR_FROM_EXE)
@@ -80,8 +88,12 @@ add_subdirectory(${S2E_CORE_DIR}/src/disturbances s2e_core/disturbances)
 add_subdirectory(${S2E_CORE_DIR}/src/dynamics s2e_core/dynamics)
 add_subdirectory(${S2E_CORE_DIR}/src/environment/global s2e_core/environment/global)
 add_subdirectory(${S2E_CORE_DIR}/src/environment/local s2e_core/environment/local)
-add_subdirectory(${S2E_CORE_DIR}/src/library s2e_core/library)
+add_subdirectory(${S2E_CORE_DIR}/src/logger s2e_core/logger)
+add_subdirectory(${S2E_CORE_DIR}/src/math_physics s2e_core/math_physics)
+add_subdirectory(${S2E_CORE_DIR}/src/setting_file_reader s2e_core/setting_file_reader)
 add_subdirectory(${S2E_CORE_DIR}/src/simulation s2e_core/simulation)
+add_subdirectory(${S2E_CORE_DIR}/src/utilities s2e_core/utilities)
+add_subdirectory(${S2E_CORE_DIR}/ExtLibraries/inih)
 
 # Add all cpp files as SOURCE_FILES
 file(GLOB_RECURSE SOURCE_FILES ${CMAKE_CURRENT_LIST_DIR}/src/*.cpp)
@@ -92,25 +104,44 @@ list(FILTER SOURCE_FILES EXCLUDE REGEX ${CMAKE_CURRENT_LIST_DIR}/src/component/a
 add_executable(${PROJECT_NAME} ${SOURCE_FILES})
 
 ## cspice library
-if(CYGWIN)
+if(APPLE)
+  if(APPLE_SILICON)
+    # APPLE Silicon
+    set(CSPICE_LIB_DIR ${CSPICE_DIR}/cspice_apple_silicon64/lib)
+  else()
+    # APPLE Intel
+    set(CSPICE_LIB_DIR ${CSPICE_DIR}/cspice_apple_intel64/lib)
+  endif()
+  elseif(CYGWIN)
   SET (CMAKE_FIND_LIBRARY_SUFFIXES ".so" ".a")
-  find_library(CSPICE_LIB
-    NAMES cspice.a csupport.a
-    PATHS ${CSPICE_DIR}/cspice_cygwin/lib)
+  set(CSPICE_LIB_DIR ${CSPICE_DIR}/cspice_cygwin/lib)
 elseif(UNIX)
+  if(BUILD_64BIT)
+    set(CSPICE_LIB_DIR ${CSPICE_DIR}/cspice_unix64/lib)
+  else()
+    set(CSPICE_LIB_DIR ${CSPICE_DIR}/cspice_unix/lib)
+  endif()
+endif()
+
+if(WIN32)
+  SET (CMAKE_FIND_LIBRARY_SUFFIXES ".lib")
+  if(BUILD_64BIT)
+    find_library(CSPICE_LIB
+      NAMES cspice.lib csupport.lib
+      PATHS ${CSPICE_DIR}/cspice_msvs64/lib)
+  else()
+    find_library(CSPICE_LIB
+      NAMES cspice.lib csupport.lib
+      PATHS ${CSPICE_DIR}/cspice_msvs/lib)
+  endif()
+else()
   find_library(CSPICE_LIB
     NAMES cspice.a csupport.a
-    PATHS ${CSPICE_DIR}/cspice_unix/lib)
-elseif(WIN32)
-  SET (CMAKE_FIND_LIBRARY_SUFFIXES ".lib")
-  find_library(CSPICE_LIB
-    NAMES cspice.lib csupport.lib
-    PATHS ${CSPICE_DIR}/cspice_msvs/lib)
+    PATHS ${CSPICE_LIB_DIR})
 endif()
 if(NOT CSPICE_LIB)
-  message(FATAL_ERROR "cspice not found in ${EXT_LIB_DIR}")
+  message(FATAL_ERROR "cspice not found in ${CSPICE_LIB_DIR}")
 endif()
-#target_link_libraries(${PROJECT_NAME} ${CSPICE_LIB})
 
 ## nrlmsise00 library
 if(CYGWIN)
@@ -131,20 +162,20 @@ endif()
 if(NOT NRLMSISE00_LIB)
   message(FATAL_ERROR "nrlmsise00 not found in ${EXT_LIB_DIR}")
 endif()
-#target_link_libraries(${PROJECT_NAME} ${NRLMSISE00_LIB})
 
 ## Linking libraries
 set(S2E_LIBRARIES
   IGRF WRAPPER_NRLMSISE00 INIH SGP4 UTIL OPTICS RELATIVE_ORBIT_MODELS ORBIT_MODELS GEODESY MATH
 )
 # Initialize link
-target_link_libraries(COMPONENT DYNAMICS GLOBAL_ENVIRONMENT LOCAL_ENVIRONMENT LIBRARY)
-target_link_libraries(DYNAMICS GLOBAL_ENVIRONMENT LOCAL_ENVIRONMENT SIMULATION LIBRARY)
-target_link_libraries(DISTURBANCE DYNAMICS GLOBAL_ENVIRONMENT LOCAL_ENVIRONMENT LIBRARY)
-target_link_libraries(SIMULATION DYNAMICS GLOBAL_ENVIRONMENT LOCAL_ENVIRONMENT DISTURBANCE LIBRARY)
-target_link_libraries(GLOBAL_ENVIRONMENT ${CSPICE_LIB} LIBRARY)
-target_link_libraries(LOCAL_ENVIRONMENT GLOBAL_ENVIRONMENT ${CSPICE_LIB} LIBRARY)
-target_link_libraries(LIBRARY ${NRLMSISE00_LIB})
+target_link_libraries(COMPONENT DYNAMICS GLOBAL_ENVIRONMENT LOCAL_ENVIRONMENT MATH_PHYSICS SETTING_FILE_READER LOGGER UTILITIES)
+target_link_libraries(DYNAMICS GLOBAL_ENVIRONMENT LOCAL_ENVIRONMENT SIMULATION MATH_PHYSICS)
+target_link_libraries(DISTURBANCE DYNAMICS GLOBAL_ENVIRONMENT LOCAL_ENVIRONMENT MATH_PHYSICS)
+target_link_libraries(SIMULATION DYNAMICS GLOBAL_ENVIRONMENT LOCAL_ENVIRONMENT DISTURBANCE MATH_PHYSICS)
+target_link_libraries(GLOBAL_ENVIRONMENT ${CSPICE_LIB} MATH_PHYSICS)
+target_link_libraries(LOCAL_ENVIRONMENT GLOBAL_ENVIRONMENT ${CSPICE_LIB} MATH_PHYSICS)
+target_link_libraries(MATH_PHYSICS ${NRLMSISE00_LIB})
+target_link_libraries(SETTING_FILE_READER INIH)
 
 target_link_libraries(${PROJECT_NAME} DYNAMICS)
 target_link_libraries(${PROJECT_NAME} DISTURBANCE)
