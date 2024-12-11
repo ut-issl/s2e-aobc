@@ -24,7 +24,7 @@ class SampleCase : public s2e::simulation::SimulationCase {
    * @param [in] monte_carlo_simulator: Monte Carlo simulator
    * @param [in] log_path: Log file path
    */
-  SampleCase(const std::string initialize_base_file, s2e::simulation::MonteCarloSimulationExecutor &monte_carlo_simulator,
+  SampleCase(const std::string initialize_base_file, const s2e::simulation::MonteCarloSimulationExecutor &monte_carlo_simulator,
              const std::string log_path);
 
   /**
