@@ -14,7 +14,7 @@
  * @class PowerController
  * @brief Class to emulate power controller
  */
-class PowerController : public PowerControlUnit, public GpioConnectionWithObc {
+class PowerController : public s2e::components::PowerControlUnit, public s2e::components::GpioConnectionWithObc {
  public:
   /**
    * @fn PowerController
@@ -24,7 +24,7 @@ class PowerController : public PowerControlUnit, public GpioConnectionWithObc {
    * @param [in] output_voltage_list: Output voltage list
    * @param [in] obc: Connected OBC information
    */
-  PowerController(PowerControlUnit pcu, const std::vector<int> gpio_ports, const std::vector<double> output_voltage_list, OnBoardComputer *obc);
+  PowerController(s2e::components::PowerControlUnit pcu, const std::vector<int> gpio_ports, const std::vector<double> output_voltage_list, s2e::components::OnBoardComputer *obc);
 
   // Override functions for Component
   /**

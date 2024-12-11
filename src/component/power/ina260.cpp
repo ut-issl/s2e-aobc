@@ -5,18 +5,18 @@
 
 #include "ina260.hpp"
 
-Ina260::Ina260(int prescaler, ClockGenerator *clock_generator, PowerPort *ina_power_port, const double ina_minimum_voltage,
-               const double ina_assumed_power_consumption, PowerPort *observation_power_port, const int i2c_port_id, const unsigned char i2c_address,
-               OnBoardComputer *obc)
-    : Component(prescaler, clock_generator, ina_power_port),
-      I2cTargetCommunicationWithObc(i2c_port_id, i2c_address, obc),
+Ina260::Ina260(int prescaler, s2e::environment::ClockGenerator *clock_generator, s2e::components::PowerPort *ina_power_port, const double ina_minimum_voltage,
+               const double ina_assumed_power_consumption, s2e::components::PowerPort *observation_power_port, const int i2c_port_id, const unsigned char i2c_address,
+               s2e::components::OnBoardComputer *obc)
+    : s2e::components::Component(prescaler, clock_generator, ina_power_port),
+      s2e::components::I2cTargetCommunicationWithObc(i2c_port_id, i2c_address, obc),
       observation_power_port_(observation_power_port) {
   power_port_->SetMinimumVoltage_V(ina_minimum_voltage);
   power_port_->SetAssumedPowerConsumption_W(ina_assumed_power_consumption);
 }
 
 Ina260::Ina260(Ina260 &&obj) noexcept
-    : Component(obj), I2cTargetCommunicationWithObc(std::move(obj)), observation_power_port_(obj.observation_power_port_) {
+    : s2e::components::Component(obj), s2e::components::I2cTargetCommunicationWithObc(std::move(obj)), observation_power_port_(obj.observation_power_port_) {
   obj.observation_power_port_ = nullptr;
 }
 
