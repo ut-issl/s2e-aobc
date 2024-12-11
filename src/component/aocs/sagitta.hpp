@@ -16,7 +16,7 @@
  * @class Sagitta
  * @brief Class to emulate Sagitta star sensor
  */
-class Sagitta : public StarSensor, public UartCommunicationWithObc {
+class Sagitta : public s2e::components::StarSensor, public s2e::components::UartCommunicationWithObc {
  public:
   /**
    * @fn Sagitta
@@ -25,7 +25,7 @@ class Sagitta : public StarSensor, public UartCommunicationWithObc {
    * @param [in] sils_port_id: Port ID for SILS
    * @param [in] obc: Connected OBC
    */
-  Sagitta(StarSensor stt, const int sils_port_id, OnBoardComputer *obc);
+  Sagitta(s2e::components::StarSensor stt, const int sils_port_id, s2e::components::OnBoardComputer *obc);
   /**
    * @fn Sagitta
    * @brief Constructor with HILS
@@ -36,8 +36,8 @@ class Sagitta : public StarSensor, public UartCommunicationWithObc {
    * @param [in] baud_rate: UART baud rate
    * @param [in] hils_port_manager: HILS port manager
    */
-  Sagitta(StarSensor stt, const int sils_port_id, OnBoardComputer *obc, const unsigned int hils_port_id, const unsigned int baud_rate,
-          HilsPortManager *hils_port_manager);
+  Sagitta(s2e::components::StarSensor stt, const int sils_port_id, s2e::components::OnBoardComputer *obc, const unsigned int hils_port_id, const unsigned int baud_rate,
+          s2e::simulation::HilsPortManager *hils_port_manager);
 
   // Override functions for Component
   /**

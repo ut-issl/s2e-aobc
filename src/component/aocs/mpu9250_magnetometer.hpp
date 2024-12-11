@@ -15,7 +15,7 @@
  * @class Mpu9250Magnetometer
  * @brief Class to emulate magnetometer in MPU9250 9 axis sensor
  */
-class Mpu9250Magnetometer : public Magnetometer, public I2cTargetCommunicationWithObc {
+class Mpu9250Magnetometer : public s2e::components::Magnetometer, public s2e::components::I2cTargetCommunicationWithObc {
  public:
   /**
    * @fn Mpu9250Magnetometer
@@ -28,8 +28,8 @@ class Mpu9250Magnetometer : public Magnetometer, public I2cTargetCommunicationWi
    * @param [in] hils_port_manager: HILS port manager
    * @param [in] is_mag_on: Magnetometer ON/OFF flag
    */
-  Mpu9250Magnetometer(Magnetometer magnetometer, const int sils_port_id, const unsigned int hils_port_id, const unsigned char i2c_address,
-                      OnBoardComputer *obc, HilsPortManager *hils_port_manager, const bool *is_mag_on);
+  Mpu9250Magnetometer(s2e::components::Magnetometer magnetometer, const int sils_port_id, const unsigned int hils_port_id, const unsigned char i2c_address,
+                      s2e::components::OnBoardComputer *obc, s2e::simulation::HilsPortManager *hils_port_manager, const bool *is_mag_on);
 
   // Override functions for Component
   /**
