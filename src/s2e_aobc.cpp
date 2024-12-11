@@ -15,8 +15,8 @@
 #include <string>
 
 // Simulator includes
-#include <library/logger/initialize_log.hpp>
-#include <library/utilities/macros.hpp>
+#include <logger/initialize_log.hpp>
+#include <utilities/macros.hpp>
 #include <simulation/monte_carlo_simulation/initialize_monte_carlo_simulation.hpp>
 
 // Add custom include files
@@ -39,8 +39,8 @@ int main(int argc, char *argv[]) {
   UNUSED(argv);
 
   std::string ini_file = "../../data/initialize_files/simulation_base.ini";
-  MonteCarloSimulationExecutor *monte_carlo_simulator = InitMonteCarloSimulation(ini_file);
-  Logger *log_monte_carlo_simulator = InitMonteCarloLog(ini_file, monte_carlo_simulator->IsEnabled());
+  s2e::simulation::MonteCarloSimulationExecutor *monte_carlo_simulator = s2e::simulation::InitMonteCarloSimulation(ini_file);
+  s2e::logger::Logger *log_monte_carlo_simulator = s2e::logger::InitMonteCarloLog(ini_file, monte_carlo_simulator->IsEnabled());
 
   std::cout << "Starting simulation..." << std::endl;
   std::cout << "\tIni file: ";
