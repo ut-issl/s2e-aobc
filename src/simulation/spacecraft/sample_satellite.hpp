@@ -14,7 +14,7 @@
  * @class SampleSatellite
  * @brief An example of user side spacecraft class
  */
-class SampleSatellite : public Spacecraft {
+class SampleSatellite : public s2e::spacecraft::Spacecraft {
  public:
   /**
    * @fn SampleSatellite
@@ -23,7 +23,7 @@ class SampleSatellite : public Spacecraft {
    * @param [in] global_environment: Global environment information
    * @param [in] spacecraft_id: Spacecraft ID number
    */
-  SampleSatellite(const SimulationConfiguration *simulation_configuration, const GlobalEnvironment *global_environment,
+  SampleSatellite(const s2e::simulation::SimulationConfiguration *simulation_configuration, const s2e::environment::GlobalEnvironment *global_environment,
                   const unsigned int spacecraft_id);
 };
 
