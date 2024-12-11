@@ -9,7 +9,8 @@
 
 Rm3100::Rm3100(s2e::components::Magnetometer magnetometer, const int sils_port_id, const unsigned int hils_port_id, const unsigned char i2c_address,
                s2e::components::OnBoardComputer *obc, s2e::simulation::HilsPortManager *hils_port_manager)
-    : s2e::components::Magnetometer(magnetometer), s2e::components::I2cTargetCommunicationWithObc(sils_port_id, hils_port_id, i2c_address, obc, hils_port_manager) {}
+    : s2e::components::Magnetometer(magnetometer),
+      s2e::components::I2cTargetCommunicationWithObc(sils_port_id, hils_port_id, i2c_address, obc, hils_port_manager) {}
 
 void Rm3100::MainRoutine(const int time_count) {
   UNUSED(time_count);

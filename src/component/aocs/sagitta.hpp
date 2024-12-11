@@ -36,8 +36,8 @@ class Sagitta : public s2e::components::StarSensor, public s2e::components::Uart
    * @param [in] baud_rate: UART baud rate
    * @param [in] hils_port_manager: HILS port manager
    */
-  Sagitta(s2e::components::StarSensor stt, const int sils_port_id, s2e::components::OnBoardComputer *obc, const unsigned int hils_port_id, const unsigned int baud_rate,
-          s2e::simulation::HilsPortManager *hils_port_manager);
+  Sagitta(s2e::components::StarSensor stt, const int sils_port_id, s2e::components::OnBoardComputer *obc, const unsigned int hils_port_id,
+          const unsigned int baud_rate, s2e::simulation::HilsPortManager *hils_port_manager);
 
   // Override functions for Component
   /**

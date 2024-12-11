@@ -17,7 +17,9 @@
  * @note HILS configuration
  *       AOBC - MTQ communication port --GPIO-- PIC board --UART-- PC COM port - S2E
  */
-class HilsIfDriver : public s2e::components::Component, public s2e::components::UartCommunicationWithObc, public s2e::components::GpioConnectionWithObc {
+class HilsIfDriver : public s2e::components::Component,
+                     public s2e::components::UartCommunicationWithObc,
+                     public s2e::components::GpioConnectionWithObc {
  public:
   /**
    * @fn HilsIfDriver

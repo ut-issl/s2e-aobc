@@ -29,8 +29,8 @@ class Rw0003 : public s2e::components::ReactionWheel, public s2e::components::I2
    * @param [in] obc: Connected OBC
    * @param [in] hils_port_manager: HILS port manager
    */
-  Rw0003(s2e::components::ReactionWheel rw, const int sils_port_id, const unsigned int hils_port_id, const unsigned char i2c_address, s2e::components::OnBoardComputer *obc,
-         s2e::simulation::HilsPortManager *hils_port_manager);
+  Rw0003(s2e::components::ReactionWheel rw, const int sils_port_id, const unsigned int hils_port_id, const unsigned char i2c_address,
+         s2e::components::OnBoardComputer *obc, s2e::simulation::HilsPortManager *hils_port_manager);
 
   // Override functions for Component
   /**

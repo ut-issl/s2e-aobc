@@ -8,10 +8,11 @@
 
 #include <utilities/slip.hpp>
 
-Sagitta::Sagitta(s2e::components::StarSensor stt, const int sils_port_id, s2e::components::OnBoardComputer *obc) : s2e::components::StarSensor(stt), s2e::components::UartCommunicationWithObc(sils_port_id, obc) {}
+Sagitta::Sagitta(s2e::components::StarSensor stt, const int sils_port_id, s2e::components::OnBoardComputer *obc)
+    : s2e::components::StarSensor(stt), s2e::components::UartCommunicationWithObc(sils_port_id, obc) {}
 
-Sagitta::Sagitta(s2e::components::StarSensor stt, const int sils_port_id, s2e::components::OnBoardComputer *obc, const unsigned int hils_port_id, const unsigned int baud_rate,
-                 s2e::simulation::HilsPortManager *hils_port_manager)
+Sagitta::Sagitta(s2e::components::StarSensor stt, const int sils_port_id, s2e::components::OnBoardComputer *obc, const unsigned int hils_port_id,
+                 const unsigned int baud_rate, s2e::simulation::HilsPortManager *hils_port_manager)
     : s2e::components::StarSensor(stt), s2e::components::UartCommunicationWithObc(sils_port_id, obc, hils_port_id, baud_rate, hils_port_manager) {}
 
 void Sagitta::MainRoutine(const int time_count) {

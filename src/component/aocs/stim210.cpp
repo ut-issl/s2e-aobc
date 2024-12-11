@@ -10,8 +10,8 @@
 Stim210::Stim210(s2e::components::GyroSensor gyro, double compo_step_sec, const int sils_port_id, s2e::components::OnBoardComputer *obc)
     : s2e::components::GyroSensor(gyro), s2e::components::UartCommunicationWithObc(sils_port_id, obc), counter_(0), compo_step_sec_(compo_step_sec) {}
 
-Stim210::Stim210(s2e::components::GyroSensor gyro, double compo_step_sec, const int sils_port_id, s2e::components::OnBoardComputer *obc, const unsigned int hils_port_id,
-                 const unsigned int baud_rate, s2e::simulation::HilsPortManager *hils_port_manager)
+Stim210::Stim210(s2e::components::GyroSensor gyro, double compo_step_sec, const int sils_port_id, s2e::components::OnBoardComputer *obc,
+                 const unsigned int hils_port_id, const unsigned int baud_rate, s2e::simulation::HilsPortManager *hils_port_manager)
     : s2e::components::GyroSensor(gyro),
       s2e::components::UartCommunicationWithObc(sils_port_id, obc, hils_port_id, baud_rate, hils_port_manager),
       counter_(0),

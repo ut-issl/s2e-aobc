@@ -6,8 +6,8 @@
 #include "oem7600.hpp"
 
 #include <algorithm>  // toupper
-#include <utilities/macros.hpp>
 #include <locale>
+#include <utilities/macros.hpp>
 
 #define MAX_CMD_LEN 1024                        // TBD
 #define MAX_TLM_LEN 1024                        // TBD
@@ -18,11 +18,15 @@
 #define _USE_MATH_DEFINES
 // #define TLM_FUNCTION_DEBUG_MODE
 
-Oem7600::Oem7600(s2e::components::GnssReceiver gnss_receiver, const int sils_port_id, s2e::components::OnBoardComputer *obc, const unsigned char telemetry_channel)
-    : s2e::components::GnssReceiver(gnss_receiver), s2e::components::UartCommunicationWithObc(sils_port_id, obc), telemetry_channel_(telemetry_channel) {}
+Oem7600::Oem7600(s2e::components::GnssReceiver gnss_receiver, const int sils_port_id, s2e::components::OnBoardComputer *obc,
+                 const unsigned char telemetry_channel)
+    : s2e::components::GnssReceiver(gnss_receiver),
+      s2e::components::UartCommunicationWithObc(sils_port_id, obc),
+      telemetry_channel_(telemetry_channel) {}
 
-Oem7600::Oem7600(s2e::components::GnssReceiver gnss_receiver, const int sils_port_id, s2e::components::OnBoardComputer *obc, const unsigned char telemetry_channel,
-                 const unsigned int hils_port_id, const unsigned int baud_rate, s2e::simulation::HilsPortManager *hils_port_manager)
+Oem7600::Oem7600(s2e::components::GnssReceiver gnss_receiver, const int sils_port_id, s2e::components::OnBoardComputer *obc,
+                 const unsigned char telemetry_channel, const unsigned int hils_port_id, const unsigned int baud_rate,
+                 s2e::simulation::HilsPortManager *hils_port_manager)
     : s2e::components::GnssReceiver(gnss_receiver),
       s2e::components::UartCommunicationWithObc(sils_port_id, obc, hils_port_id, baud_rate, hils_port_manager),
       telemetry_channel_(telemetry_channel) {}
@@ -261,10 +265,10 @@ std::string Oem7600::GenerateTelemetryPacket(const std::string telemetry_name) {
     if (tlm_length > 0) {
       const char *tlm_data_char = str_tmp.c_str();
       unsigned int crc32 = CalculateCrc32(tlm_data_char, tlm_length);
-      str_tmp += "*";                 // separator before CRC for ASCII format;
+      str_tmp += "*";                              // separator before CRC for ASCII format;
       str_tmp += s2e::logger::WriteScalar(crc32);  // CRC in string format
-      str_tmp.pop_back();             // erase unnecessary comma
-      str_tmp += "\r\n";              // footer for ASCII format;
+      str_tmp.pop_back();                          // erase unnecessary comma
+      str_tmp += "\r\n";                           // footer for ASCII format;
     }
 
     return str_tmp;
@@ -312,9 +316,9 @@ std::string Oem7600::GenerateTelemetryHeaderAscii(const std::string telemetry_na
   std::transform(telemetry_name.begin(), telemetry_name.end(), (str_tmp.begin() + 1), [loc](char c) { return std::toupper(c, loc); });
 
   std::string port = "COM" + s2e::logger::WriteScalar((int)(telemetry_channel_), 1);  // Port
-  str_tmp += "," + port;                                                 // after port, "," is already added (s2e::logger::WriteScalar did it)
-  str_tmp += "0";                                                        // Sequence number
-  str_tmp += ",90.5";                                                    // CPU idle time (currently dummy data is padded)
+  str_tmp += "," + port;  // after port, "," is already added (s2e::logger::WriteScalar did it)
+  str_tmp += "0";         // Sequence number
+  str_tmp += ",90.5";     // CPU idle time (currently dummy data is padded)
 
   // Time status
   if (is_gnss_visible_) {
@@ -380,8 +384,8 @@ std::string Oem7600::GenerateTelemetryHeaderBinary(const std::string telemetry_n
   }
 
   // week(uint16), msec(uint32)
-  tlm[tlm_parse_pointer++] = (unsigned char)(((unsigned short)(gps_time_week_)&0x00ff));
-  tlm[tlm_parse_pointer++] = (unsigned char)(((unsigned short)(gps_time_week_)&0xff00) >> 8);
+  tlm[tlm_parse_pointer++] = (unsigned char)(((unsigned short)(gps_time_week_) & 0x00ff));
+  tlm[tlm_parse_pointer++] = (unsigned char)(((unsigned short)(gps_time_week_) & 0xff00) >> 8);
 
   unsigned int gps_time_msec = (unsigned int)(gps_time_s_ * 1000.0);
   tlm[tlm_parse_pointer++] = (unsigned char)((gps_time_msec & 0x000000ff));
@@ -420,15 +424,15 @@ std::string Oem7600::GenerateBestxyzTelemetryAscii(void) {
     sol_status = "INSUFFICIENT_OBS";
   }
 
-  str_tmp += sol_status + ",SINGLE,";             // position solution status
+  str_tmp += sol_status + ",SINGLE,";                          // position solution status
   str_tmp += s2e::logger::WriteVector(position_ecef_m_, 11);   // postion computed
-  str_tmp += "72.5816,61.3924,159.6638,";         // std 1-sigma of computed position(currently dummy data is padded)
-  str_tmp += sol_status + ",DOPPLER_VELOCITY,";   // velocity solution status
+  str_tmp += "72.5816,61.3924,159.6638,";                      // std 1-sigma of computed position(currently dummy data is padded)
+  str_tmp += sol_status + ",DOPPLER_VELOCITY,";                // velocity solution status
   str_tmp += s2e::logger::WriteVector(velocity_ecef_m_s_, 8);  // velocity computed
-  str_tmp += "0.5747,0.4413,1.4830,";             // std 1-sigma of computed velocity(currently dummy data is padded)
-  str_tmp += " ,";                                // base station ID of differential positioning (ignored in this model)
-  str_tmp += "0.000,";                            // V-latency (velocity measurement time delay, currently dummy data is padded)
-  str_tmp += "0.000,";                            // diff_age (differential age in seconds, basically the ouput value is fixed to zero)
+  str_tmp += "0.5747,0.4413,1.4830,";                          // std 1-sigma of computed velocity(currently dummy data is padded)
+  str_tmp += " ,";                                             // base station ID of differential positioning (ignored in this model)
+  str_tmp += "0.000,";                                         // V-latency (velocity measurement time delay, currently dummy data is padded)
+  str_tmp += "0.000,";                                         // diff_age (differential age in seconds, basically the ouput value is fixed to zero)
 
   // sol_age (solution age in seconds)
   double sol_age = simulation_time_->GetElapsedTime_s() - last_position_fix_time_local_;
@@ -436,7 +440,8 @@ std::string Oem7600::GenerateBestxyzTelemetryAscii(void) {
 
   str_tmp += s2e::logger::WriteScalar(visible_satellite_number_);  // number of satellites tracked
   str_tmp += s2e::logger::WriteScalar(visible_satellite_number_);  // number of satellites used in solution (currently dummy data is padded)
-  str_tmp += s2e::logger::WriteScalar(visible_satellite_number_);  // number of satellites with L1/E1/B1 signals used in solution (currently dummy data is padded)
+  str_tmp += s2e::logger::WriteScalar(
+      visible_satellite_number_);  // number of satellites with L1/E1/B1 signals used in solution (currently dummy data is padded)
 
   str_tmp += "0,";   // number of satellites with multi-frequency signals used in solution (currently dummy data is padded)
   str_tmp += "0,";   // reserved

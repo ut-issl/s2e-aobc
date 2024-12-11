@@ -34,9 +34,9 @@ class Ina260 : public s2e::components::Component, public s2e::components::I2cTar
    * @param [in] i2c_address: I2C address of the Ina260
    * @param [in] obc: Connected OBC information
    */
-  Ina260(int prescaler, s2e::environment::ClockGenerator *clock_generator, s2e::components::PowerPort *ina_power_port, const double ina_minimum_voltage,
-         const double ina_assumed_power_consumption, s2e::components::PowerPort *observation_power_port, const int i2c_port_id, const unsigned char i2c_address,
-         s2e::components::OnBoardComputer *obc);
+  Ina260(int prescaler, s2e::environment::ClockGenerator *clock_generator, s2e::components::PowerPort *ina_power_port,
+         const double ina_minimum_voltage, const double ina_assumed_power_consumption, s2e::components::PowerPort *observation_power_port,
+         const int i2c_port_id, const unsigned char i2c_address, s2e::components::OnBoardComputer *obc);
   /**
    * @fn Ina260
    * @brief Copy constructor
@@ -58,8 +58,8 @@ class Ina260 : public s2e::components::Component, public s2e::components::I2cTar
 
  private:
   s2e::components::PowerPort *observation_power_port_;  //!< Power port to measure the current, voltage by the Ina260
-  unsigned char mode_ = 1;             //!< 0: Continuous mode, others: triggered (Not emulated yet)
-  double over_current_threshold_mA;    //!< Over current threshold [mA]
+  unsigned char mode_ = 1;                              //!< 0: Continuous mode, others: triggered (Not emulated yet)
+  double over_current_threshold_mA;                     //!< Over current threshold [mA]
 
   /**
    * @enum Ina260Register

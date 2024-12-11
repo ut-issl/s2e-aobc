@@ -9,8 +9,8 @@
 
 #include "../../simulation/spacecraft/aocs_module_port_config.hpp"
 
-PowerController::PowerController(s2e::components::PowerControlUnit pcu, const std::vector<int> gpio_ports, const std::vector<double> output_voltage_list,
-                                 s2e::components::OnBoardComputer *obc)
+PowerController::PowerController(s2e::components::PowerControlUnit pcu, const std::vector<int> gpio_ports,
+                                 const std::vector<double> output_voltage_list, s2e::components::OnBoardComputer *obc)
     : s2e::components::PowerControlUnit(pcu), s2e::components::GpioConnectionWithObc(gpio_ports, obc), output_voltage_list_(output_voltage_list) {
   // 初期過電流閾値はテキトウに設定、最小電圧などはコンポ側で設定する
   // 5V系列

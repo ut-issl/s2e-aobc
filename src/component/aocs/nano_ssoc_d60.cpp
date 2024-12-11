@@ -12,8 +12,8 @@
 #include <math_physics/math/constants.hpp>
 #include <utilities/macros.hpp>
 
-NanoSsocD60::NanoSsocD60(s2e::components::SunSensor sun_sensor, const int sils_port_id, const unsigned int hils_port_id, const unsigned char i2c_address,
-                         s2e::components::OnBoardComputer *obc, s2e::simulation::HilsPortManager *hils_port_manager)
+NanoSsocD60::NanoSsocD60(s2e::components::SunSensor sun_sensor, const int sils_port_id, const unsigned int hils_port_id,
+                         const unsigned char i2c_address, s2e::components::OnBoardComputer *obc, s2e::simulation::HilsPortManager *hils_port_manager)
     : s2e::components::SunSensor(sun_sensor),
       s2e::components::I2cTargetCommunicationWithObc(sils_port_id, hils_port_id, i2c_address, obc, hils_port_manager),
       i2c_address_(i2c_address) {}

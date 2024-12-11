@@ -23,8 +23,8 @@ class SampleSatellite : public s2e::spacecraft::Spacecraft {
    * @param [in] global_environment: Global environment information
    * @param [in] spacecraft_id: Spacecraft ID number
    */
-  SampleSatellite(const s2e::simulation::SimulationConfiguration *simulation_configuration, const s2e::environment::GlobalEnvironment *global_environment,
-                  const unsigned int spacecraft_id);
+  SampleSatellite(const s2e::simulation::SimulationConfiguration *simulation_configuration,
+                  const s2e::environment::GlobalEnvironment *global_environment, const unsigned int spacecraft_id);
 };
 
 #endif  // S2E_AOBC_SIMULATION_SPACECRAFT_SAMPLE_SATELLITE_HPP_

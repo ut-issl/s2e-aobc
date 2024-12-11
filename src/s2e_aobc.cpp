@@ -16,8 +16,8 @@
 
 // Simulator includes
 #include <logger/initialize_log.hpp>
-#include <utilities/macros.hpp>
 #include <simulation/monte_carlo_simulation/initialize_monte_carlo_simulation.hpp>
+#include <utilities/macros.hpp>
 
 // Add custom include files
 #include "./simulation/case/sample_case.hpp"

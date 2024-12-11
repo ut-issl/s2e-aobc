@@ -28,8 +28,9 @@ class Mpu9250Magnetometer : public s2e::components::Magnetometer, public s2e::co
    * @param [in] hils_port_manager: HILS port manager
    * @param [in] is_mag_on: Magnetometer ON/OFF flag
    */
-  Mpu9250Magnetometer(s2e::components::Magnetometer magnetometer, const int sils_port_id, const unsigned int hils_port_id, const unsigned char i2c_address,
-                      s2e::components::OnBoardComputer *obc, s2e::simulation::HilsPortManager *hils_port_manager, const bool *is_mag_on);
+  Mpu9250Magnetometer(s2e::components::Magnetometer magnetometer, const int sils_port_id, const unsigned int hils_port_id,
+                      const unsigned char i2c_address, s2e::components::OnBoardComputer *obc, s2e::simulation::HilsPortManager *hils_port_manager,
+                      const bool *is_mag_on);
 
   // Override functions for Component
   /**

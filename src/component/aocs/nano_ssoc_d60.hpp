@@ -26,8 +26,8 @@ class NanoSsocD60 : public s2e::components::SunSensor, public s2e::components::I
    * @param [in] obc: Connected OBC
    * @param [in] hils_port_manager: HILS port manager
    */
-  NanoSsocD60(s2e::components::SunSensor sun_sensor, const int sils_port_id, const unsigned int hils_port_id, const unsigned char i2c_address, s2e::components::OnBoardComputer *obc,
-              s2e::simulation::HilsPortManager *hils_port_manager);
+  NanoSsocD60(s2e::components::SunSensor sun_sensor, const int sils_port_id, const unsigned int hils_port_id, const unsigned char i2c_address,
+              s2e::components::OnBoardComputer *obc, s2e::simulation::HilsPortManager *hils_port_manager);
   /**
    * @fn ~NanoSsocD60
    * @brief Destructor

@@ -8,9 +8,11 @@
 #include <math_physics/math/constants.hpp>
 #include <utilities/macros.hpp>
 
-Mpu9250GyroSensor::Mpu9250GyroSensor(s2e::components::GyroSensor gyro, const int sils_port_id, const unsigned int hils_port_id, const unsigned char i2c_address,
-                                     s2e::components::OnBoardComputer *obc, s2e::simulation::HilsPortManager *hils_port_manager)
-    : s2e::components::GyroSensor(gyro), s2e::components::I2cTargetCommunicationWithObc(sils_port_id, hils_port_id, i2c_address, obc, hils_port_manager) {
+Mpu9250GyroSensor::Mpu9250GyroSensor(s2e::components::GyroSensor gyro, const int sils_port_id, const unsigned int hils_port_id,
+                                     const unsigned char i2c_address, s2e::components::OnBoardComputer *obc,
+                                     s2e::simulation::HilsPortManager *hils_port_manager)
+    : s2e::components::GyroSensor(gyro),
+      s2e::components::I2cTargetCommunicationWithObc(sils_port_id, hils_port_id, i2c_address, obc, hils_port_manager) {
   unsigned char tmp = 0xff;
   WriteRegister(kCmdGyroEnable_, &tmp, 1);  // 初期値としてはGyro OFF
 

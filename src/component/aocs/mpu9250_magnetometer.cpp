@@ -8,8 +8,8 @@
 #include <utilities/macros.hpp>
 
 Mpu9250Magnetometer::Mpu9250Magnetometer(s2e::components::Magnetometer magnetometer, const int sils_port_id, const unsigned int hils_port_id,
-                                         const unsigned char i2c_address, s2e::components::OnBoardComputer *obc, s2e::simulation::HilsPortManager *hils_port_manager,
-                                         const bool *is_mag_on)
+                                         const unsigned char i2c_address, s2e::components::OnBoardComputer *obc,
+                                         s2e::simulation::HilsPortManager *hils_port_manager, const bool *is_mag_on)
     : s2e::components::Magnetometer(magnetometer),
       s2e::components::I2cTargetCommunicationWithObc(sils_port_id, hils_port_id, i2c_address, obc, hils_port_manager),
       is_magnetometer_on_(is_mag_on) {}

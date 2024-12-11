@@ -38,8 +38,8 @@ class Stim210 : public s2e::components::GyroSensor, public s2e::components::Uart
    * @param [in] baud_rate: UART baud rate
    * @param [in] hils_port_manager: HILS port manager
    */
-  Stim210(s2e::components::GyroSensor gyro, double compo_step_sec, const int sils_port_id, s2e::components::OnBoardComputer *obc, const unsigned int hils_port_id,
-          const unsigned int baud_rate, s2e::simulation::HilsPortManager *hils_port_manager);
+  Stim210(s2e::components::GyroSensor gyro, double compo_step_sec, const int sils_port_id, s2e::components::OnBoardComputer *obc,
+          const unsigned int hils_port_id, const unsigned int baud_rate, s2e::simulation::HilsPortManager *hils_port_manager);
 
   // Override functions for Component
   /**
@@ -58,10 +58,10 @@ class Stim210 : public s2e::components::GyroSensor, public s2e::components::Uart
   s2e::math::Vector<s2e::components::kGyroDimension> temperature_c_degC_{30.0};      //!< Measured temperature for each component axis [degC]
   s2e::math::Vector<s2e::components::kGyroDimension> angular_velocity_c_rads_{0.0};  //!< Measured angular velocity at component frame [rad/s]
   s2e::math::Vector<s2e::components::kGyroDimension> angle_c_rad_{0.0};              //!< Accumulated angle at component frame [rad]
-  unsigned char status_ = 0;                                    //!< Status
-  unsigned char counter_ = 0;                                   //!< Internal counter increment by 2000Hz
-  unsigned char latency_ = 0;                                   //!< Latency information
-  double compo_step_sec_ = 5.0e-4;                              //!< Internal component update frequency 2000Hz
+  unsigned char status_ = 0;                                                         //!< Status
+  unsigned char counter_ = 0;                                                        //!< Internal counter increment by 2000Hz
+  unsigned char latency_ = 0;                                                        //!< Latency information
+  double compo_step_sec_ = 5.0e-4;                                                   //!< Internal component update frequency 2000Hz
 
   /**
    * @enum   OPERATION_MODE

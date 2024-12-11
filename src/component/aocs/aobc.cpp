@@ -9,7 +9,8 @@
 
 #include "../../simulation/spacecraft/aocs_module_components.hpp"
 
-Aobc::Aobc(s2e::environment::ClockGenerator *clock_generator, AocsModuleComponents *components) : s2e::components::Component(100, clock_generator), components_(components) {
+Aobc::Aobc(s2e::environment::ClockGenerator *clock_generator, AocsModuleComponents *components)
+    : s2e::components::Component(100, clock_generator), components_(components) {
   Initialize();
 }
 

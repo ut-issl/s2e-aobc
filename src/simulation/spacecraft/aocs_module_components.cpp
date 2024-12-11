@@ -12,8 +12,10 @@
 #include "../../component/aocs/aobc.hpp"
 #include "aocs_module_port_config.hpp"
 
-AocsModuleComponents::AocsModuleComponents(const s2e::dynamics::Dynamics *dynamics, s2e::spacecraft::Structure *structure, const s2e::environment::LocalEnvironment *local_environment,
-                                           const s2e::environment::GlobalEnvironment *global_environment, const s2e::simulation::SimulationConfiguration *configuration,
+AocsModuleComponents::AocsModuleComponents(const s2e::dynamics::Dynamics *dynamics, s2e::spacecraft::Structure *structure,
+                                           const s2e::environment::LocalEnvironment *local_environment,
+                                           const s2e::environment::GlobalEnvironment *global_environment,
+                                           const s2e::simulation::SimulationConfiguration *configuration,
                                            s2e::environment::ClockGenerator *clock_generator, const unsigned int spacecraft_id)
     : dynamics_(dynamics),
       structure_(structure),
@@ -82,17 +84,19 @@ AocsModuleComponents::AocsModuleComponents(const s2e::dynamics::Dynamics *dynami
   const unsigned int rm3100_aobc_hils_port_id = ini_access.ReadInt("COM_PORT", "rm3100_aobc_hils_port_id");
   s2e::setting_file_reader::IniAccess rm3100_aobc_ini_access = s2e::setting_file_reader::IniAccess(rm3100_aobc_ini_path);
   const uint8_t rm3100_aobc_i2c_address = (uint8_t)rm3100_aobc_ini_access.ReadInt("I2C_PORT_1", "i2c_address");
-  rm3100_aobc_ = new Rm3100(s2e::components::Magnetometer(InitMagnetometer(clock_generator, power_controller_->GetPowerPort((int)PowerPortIdx::RM), 1,
-                                                          rm3100_aobc_ini_path, compo_step_sec, &local_environment_->GetGeomagneticField())),
-                            0, rm3100_aobc_hils_port_id, rm3100_aobc_i2c_address, aobc_, hils_port_manager_);
+  rm3100_aobc_ =
+      new Rm3100(s2e::components::Magnetometer(InitMagnetometer(clock_generator, power_controller_->GetPowerPort((int)PowerPortIdx::RM), 1,
+                                                                rm3100_aobc_ini_path, compo_step_sec, &local_environment_->GetGeomagneticField())),
+                 0, rm3100_aobc_hils_port_id, rm3100_aobc_i2c_address, aobc_, hils_port_manager_);
 
   const std::string rm3100_ext_ini_path = ini_access.ReadString("COMPONENTS_FILE", "external_fine_magnetometer_file");
   const unsigned int rm3100_ext_hils_port_id = ini_access.ReadInt("COM_PORT", "rm3100_ext_hils_port_id");
   s2e::setting_file_reader::IniAccess rm3100_ext_ini_access = s2e::setting_file_reader::IniAccess(rm3100_ext_ini_path);
   const uint8_t rm3100_ext_i2c_address = (uint8_t)rm3100_ext_ini_access.ReadInt("I2C_PORT_2", "i2c_address");
-  rm3100_external_ = new Rm3100(s2e::components::Magnetometer(InitMagnetometer(clock_generator, power_controller_->GetPowerPort((int)PowerPortIdx::RM), 2,
-                                                              rm3100_ext_ini_path, compo_step_sec, &local_environment_->GetGeomagneticField())),
-                                0, rm3100_ext_hils_port_id, rm3100_ext_i2c_address, aobc_, hils_port_manager_);
+  rm3100_external_ =
+      new Rm3100(s2e::components::Magnetometer(InitMagnetometer(clock_generator, power_controller_->GetPowerPort((int)PowerPortIdx::RM), 2,
+                                                                rm3100_ext_ini_path, compo_step_sec, &local_environment_->GetGeomagneticField())),
+                 0, rm3100_ext_hils_port_id, rm3100_ext_i2c_address, aobc_, hils_port_manager_);
 
   // Sun sensors
   const std::string nanoSSOC_D60_ini_path = ini_access.ReadString("COMPONENTS_FILE", "sun_sensor_file");
@@ -127,10 +131,10 @@ AocsModuleComponents::AocsModuleComponents(const s2e::dynamics::Dynamics *dynami
   const unsigned char oem7600_com_port = (unsigned char)oem7600_ini_file.ReadInt("UART_PORT", "oem_com_port");
   const unsigned int oem7600_hils_port_id = ini_access.ReadInt("COM_PORT", "oem7600_hils_port_id");
   const unsigned int oem7600_baud_rate = ini_access.ReadInt("COM_PORT", "oem7600_baud_rate");
-  oem7600_ =
-      new Oem7600(s2e::components::GnssReceiver(InitGnssReceiver(clock_generator, power_controller_->GetPowerPort((int)PowerPortIdx::OEM), 1, oem7600_ini_path,
-                                                dynamics_, &(global_environment_->GetGnssSatellites()), &(global_environment_->GetSimulationTime()))),
-                  oem7600_uart_sils_port, aobc_, oem7600_com_port, oem7600_hils_port_id, oem7600_baud_rate, hils_port_manager_);
+  oem7600_ = new Oem7600(s2e::components::GnssReceiver(InitGnssReceiver(clock_generator, power_controller_->GetPowerPort((int)PowerPortIdx::OEM), 1,
+                                                                        oem7600_ini_path, dynamics_, &(global_environment_->GetGnssSatellites()),
+                                                                        &(global_environment_->GetSimulationTime()))),
+                         oem7600_uart_sils_port, aobc_, oem7600_com_port, oem7600_hils_port_id, oem7600_baud_rate, hils_port_manager_);
 
   // STT
   const std::string sagitta_ini_path = ini_access.ReadString("COMPONENTS_FILE", "star_sensor_file");
@@ -173,7 +177,8 @@ AocsModuleComponents::AocsModuleComponents(const s2e::dynamics::Dynamics *dynami
   // Component interference
   const std::string interference_file_path = ini_access.ReadString("COMPONENTS_FILE", "component_interference_file");
   configuration_->main_logger_->CopyFileToLogDirectory(interference_file_path);
-  mtq_mpu9250_magnetometer_interference_ = new s2e::components::MtqMagnetometerInterference(interference_file_path, *mpu9250_magnetometer_, *mtq_seiren_, 0);
+  mtq_mpu9250_magnetometer_interference_ =
+      new s2e::components::MtqMagnetometerInterference(interference_file_path, *mpu9250_magnetometer_, *mtq_seiren_, 0);
   mtq_rm3100_aobc_interference_ = new s2e::components::MtqMagnetometerInterference(interference_file_path, *rm3100_aobc_, *mtq_seiren_, 1);
   mtq_rm3100_external_interference_ = new s2e::components::MtqMagnetometerInterference(interference_file_path, *rm3100_external_, *mtq_seiren_, 2);
 
@@ -184,11 +189,13 @@ AocsModuleComponents::AocsModuleComponents(const s2e::dynamics::Dynamics *dynami
   // Mission
   const std::string telescope_ini_path = ini_access.ReadString("COMPONENTS_FILE", "telescope_file");
   telescope_ = new s2e::components::Telescope(s2e::components::InitTelescope(clock_generator, 1, telescope_ini_path, &(dynamics_->GetAttitude()),
-                                           &(global_environment_->GetHipparcosCatalog()), &(local_environment_->GetCelestialInformation())));
+                                                                             &(global_environment_->GetHipparcosCatalog()),
+                                                                             &(local_environment_->GetCelestialInformation())));
 
   // Communication
   const std::string command_sender_ini_path = ini_access.ReadString("COMPONENTS_FILE", "command_sender_file");
-  wings_command_sender_to_c2a_ = new s2e::components::WingsCommandSenderToC2a(s2e::components::InitWingsCommandSenderToC2a(clock_generator, compo_step_sec, command_sender_ini_path));
+  wings_command_sender_to_c2a_ = new s2e::components::WingsCommandSenderToC2a(
+      s2e::components::InitWingsCommandSenderToC2a(clock_generator, compo_step_sec, command_sender_ini_path));
 
 // HILS IF Board
 #ifdef USE_HILS

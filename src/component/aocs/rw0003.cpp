@@ -10,9 +10,10 @@
 #include <utilities/macros.hpp>
 #include <utilities/slip.hpp>
 
-Rw0003::Rw0003(s2e::components::ReactionWheel rw, const int sils_port_id, const unsigned int hils_port_id, const unsigned char i2c_address, s2e::components::OnBoardComputer *obc,
-               s2e::simulation::HilsPortManager *hils_port_manager)
-    : s2e::components::ReactionWheel(rw), s2e::components::I2cTargetCommunicationWithObc(sils_port_id, hils_port_id, i2c_address, obc, hils_port_manager) {
+Rw0003::Rw0003(s2e::components::ReactionWheel rw, const int sils_port_id, const unsigned int hils_port_id, const unsigned char i2c_address,
+               s2e::components::OnBoardComputer *obc, s2e::simulation::HilsPortManager *hils_port_manager)
+    : s2e::components::ReactionWheel(rw),
+      s2e::components::I2cTargetCommunicationWithObc(sils_port_id, hils_port_id, i2c_address, obc, hils_port_manager) {
   Initialize();
 }
 

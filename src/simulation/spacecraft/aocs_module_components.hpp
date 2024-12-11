@@ -53,8 +53,9 @@ class AocsModuleComponents : public s2e::spacecraft::InstalledComponents {
    * @param [in] clock_generator: Clock generator
    * @param [in] spacecraft_id: Spacecraft ID number
    */
-  AocsModuleComponents(const s2e::dynamics::Dynamics *dynamics, s2e::spacecraft::Structure *structure, const s2e::environment::LocalEnvironment *local_environment,
-                       const s2e::environment::GlobalEnvironment *global_environment, const s2e::simulation::SimulationConfiguration *configuration, s2e::environment::ClockGenerator *clock_generator,
+  AocsModuleComponents(const s2e::dynamics::Dynamics *dynamics, s2e::spacecraft::Structure *structure,
+                       const s2e::environment::LocalEnvironment *local_environment, const s2e::environment::GlobalEnvironment *global_environment,
+                       const s2e::simulation::SimulationConfiguration *configuration, s2e::environment::ClockGenerator *clock_generator,
                        const unsigned int spacecraft_id);
   /**
    * @fn ~AocsModuleComponents
@@ -100,9 +101,10 @@ class AocsModuleComponents : public s2e::spacecraft::InstalledComponents {
   Rw0003 *rw0003_y_;                           //!< RW00003 Reaction wheel Y axis
   Rw0003 *rw0003_z_;                           //!< RW00003 Reaction wheel Z axis
   // Component Interference
-  s2e::components::MtqMagnetometerInterference *mtq_mpu9250_magnetometer_interference_;  //!< Additional Bias noise by MTQ - MPU9250 Magnetometer interference
-  s2e::components::MtqMagnetometerInterference *mtq_rm3100_aobc_interference_;           //!< Additional Bias noise by MTQ - AOBC RM3100 interference
-  s2e::components::MtqMagnetometerInterference *mtq_rm3100_external_interference_;       //!< Additional Bias noise by MTQ - External RM3100 interference
+  s2e::components::MtqMagnetometerInterference
+      *mtq_mpu9250_magnetometer_interference_;                                  //!< Additional Bias noise by MTQ - MPU9250 Magnetometer interference
+  s2e::components::MtqMagnetometerInterference *mtq_rm3100_aobc_interference_;  //!< Additional Bias noise by MTQ - AOBC RM3100 interference
+  s2e::components::MtqMagnetometerInterference *mtq_rm3100_external_interference_;  //!< Additional Bias noise by MTQ - External RM3100 interference
   // Thruster
   s2e::components::SimpleThruster *thruster_;  //!< Thruster
   // Mission
@@ -114,10 +116,10 @@ class AocsModuleComponents : public s2e::spacecraft::InstalledComponents {
   s2e::components::WingsCommandSenderToC2a *wings_command_sender_to_c2a_;
 
   // States
-  const s2e::dynamics::Dynamics *dynamics_;                      //!< Dynamics information of the spacecraft
+  const s2e::dynamics::Dynamics *dynamics_;                        //!< Dynamics information of the spacecraft
   s2e::spacecraft::Structure *structure_;                          //!< Structure information of the spacecraft
-  const s2e::environment::LocalEnvironment *local_environment_;     //!< Local environment information around the spacecraft
-  const s2e::environment::GlobalEnvironment *global_environment_;   //!< Global environment information
+  const s2e::environment::LocalEnvironment *local_environment_;    //!< Local environment information around the spacecraft
+  const s2e::environment::GlobalEnvironment *global_environment_;  //!< Global environment information
   const s2e::simulation::SimulationConfiguration *configuration_;  //!< Simulation settings
 };
 
