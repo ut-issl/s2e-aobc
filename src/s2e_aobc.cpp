@@ -50,7 +50,7 @@ int main(int argc, char *argv[]) {
     std::chrono::system_clock::time_point start, end;
     start = std::chrono::system_clock::now();
 
-    SampleCase simulation_case = SampleCase(ini_file, *monte_carlo_simulator, log_monte_carlo_simulator->GetLogPath());
+    auto simulation_case = SampleCase(ini_file, *monte_carlo_simulator, log_monte_carlo_simulator->GetLogPath());
     // Initialize
     log_monte_carlo_simulator->AddLogList(&simulation_case);
     if (monte_carlo_simulator->GetNumberOfExecutionsDone() == 0) {
