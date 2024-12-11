@@ -17,7 +17,7 @@
  * @note HILS configuration
  *       AOBC - MTQ communication port --GPIO-- PIC board --UART-- PC COM port - S2E
  */
-class HilsIfDriver : public Component, public UartCommunicationWithObc, public GpioConnectionWithObc {
+class HilsIfDriver : public s2e::components::Component, public s2e::components::UartCommunicationWithObc, public s2e::components::GpioConnectionWithObc {
  public:
   /**
    * @fn HilsIfDriver
@@ -30,8 +30,8 @@ class HilsIfDriver : public Component, public UartCommunicationWithObc, public G
    * @param [in] gpio_ports: GPIO port information
    * @param [in] obc: On Board Computer
    */
-  HilsIfDriver(const int prescaler, ClockGenerator *clock_generator, const unsigned int hils_port_id, const unsigned int baud_rate,
-               HilsPortManager *hils_port_manager, std::vector<int> gpio_ports, OnBoardComputer *obc);
+  HilsIfDriver(const int prescaler, s2e::environment::ClockGenerator *clock_generator, const unsigned int hils_port_id, const unsigned int baud_rate,
+               s2e::simulation::HilsPortManager *hils_port_manager, std::vector<int> gpio_ports, s2e::components::OnBoardComputer *obc);
   /**
    * @fn ~HilsIfDriver
    * @brief Destructor
