@@ -3,7 +3,7 @@ CMakeBuilds/
 .vs/
 
 # Log files
-data/logs/
+**/logs/
 
 # ExtLibraries
 ExtLibraries/
@@ -30,3 +30,9 @@ build/
 # Files that might appear on external disk
 .Spotlight-V100
 .Trashes
+
+# Setting files
+settings/environment/cspice
+settings/environment/space_weather
+settings/environment/gravity_field
+settings/environment/star_catalogue

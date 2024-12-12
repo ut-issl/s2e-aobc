@@ -6,10 +6,10 @@
 
 #include "mtq_seiren.hpp"
 
-#include <library/utilities/macros.hpp>
+#include <utilities/macros.hpp>
 
-MtqSeiren::MtqSeiren(Magnetorquer magnetorquer, std::vector<int> gpio_ports, OnBoardComputer *obc)
-    : Magnetorquer(magnetorquer), GpioConnectionWithObc(gpio_ports, obc) {}
+MtqSeiren::MtqSeiren(s2e::components::Magnetorquer magnetorquer, std::vector<int> gpio_ports, s2e::components::OnBoardComputer *obc)
+    : s2e::components::Magnetorquer(magnetorquer), s2e::components::GpioConnectionWithObc(gpio_ports, obc) {}
 
 MtqSeiren::~MtqSeiren() {}
 
@@ -51,7 +51,7 @@ int MtqSeiren::ConvertGPIOState2Polarity(int positive_gpio_pin_idx, int negative
 }
 
 void MtqSeiren::ConvertPolarity2OutputMag() {
-  for (size_t i = 0; i < kMtqDimension; i++) {
+  for (size_t i = 0; i < s2e::components::kMtqDimension; i++) {
     if (polarity_[i] == 1) {
       output_magnetic_moment_c_Am2_[i] = max_magnetic_moment_c_Am2_[i];
     } else if (polarity_[i] == -1) {
@@ -68,8 +68,8 @@ std::string MtqSeiren::GetLogHeader() const {
   const char *cs = st_sensor_id.data();
   std::string section = "MTQ_seiren";
 
-  str_tmp += WriteVector(section + cs, "b", "Am2", kMtqDimension);
-  str_tmp += WriteVector(section + cs, "b", "Nm", kMtqDimension);
+  str_tmp += s2e::logger::WriteVector(section + cs, "b", "Am2", s2e::components::kMtqDimension);
+  str_tmp += s2e::logger::WriteVector(section + cs, "b", "Nm", s2e::components::kMtqDimension);
 
   return str_tmp;
 }

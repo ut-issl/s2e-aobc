@@ -15,7 +15,7 @@
  * @class Rm3100
  * @brief Class to emulate RM3100 magnetometer
  */
-class Rm3100 : public Magnetometer, public I2cTargetCommunicationWithObc {
+class Rm3100 : public s2e::components::Magnetometer, public s2e::components::I2cTargetCommunicationWithObc {
  public:
   /**
    * @fn Rm3100
@@ -27,8 +27,8 @@ class Rm3100 : public Magnetometer, public I2cTargetCommunicationWithObc {
    * @param [in] obc: Connected OBC
    * @param [in] hils_port_manager: HILS port manager
    */
-  Rm3100(Magnetometer magnetometer, const int sils_port_id, const unsigned int hils_port_id, const unsigned char i2c_address, OnBoardComputer *obc,
-         HilsPortManager *hils_port_manager);
+  Rm3100(s2e::components::Magnetometer magnetometer, const int sils_port_id, const unsigned int hils_port_id, const unsigned char i2c_address,
+         s2e::components::OnBoardComputer *obc, s2e::simulation::HilsPortManager *hils_port_manager);
 
   // Override functions for Component
   /**

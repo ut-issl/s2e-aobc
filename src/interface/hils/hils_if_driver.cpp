@@ -5,13 +5,14 @@
 
 #include "hils_if_driver.hpp"
 
-#include <library/utilities/macros.hpp>
+#include <utilities/macros.hpp>
 
-HilsIfDriver::HilsIfDriver(const int prescaler, ClockGenerator *clock_generator, const unsigned int hils_port_id, const unsigned int baud_rate,
-                           HilsPortManager *hils_port_manager, std::vector<int> gpio_ports, OnBoardComputer *obc)
-    : Component(prescaler, clock_generator),
-      UartCommunicationWithObc(hils_port_id, baud_rate, hils_port_manager),
-      GpioConnectionWithObc(gpio_ports, obc) {}
+HilsIfDriver::HilsIfDriver(const int prescaler, s2e::environment::ClockGenerator *clock_generator, const unsigned int hils_port_id,
+                           const unsigned int baud_rate, s2e::simulation::HilsPortManager *hils_port_manager, std::vector<int> gpio_ports,
+                           s2e::components::OnBoardComputer *obc)
+    : s2e::components::Component(prescaler, clock_generator),
+      s2e::components::UartCommunicationWithObc(hils_port_id, baud_rate, hils_port_manager),
+      s2e::components::GpioConnectionWithObc(gpio_ports, obc) {}
 
 HilsIfDriver::~HilsIfDriver() {}
 

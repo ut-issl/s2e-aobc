@@ -9,13 +9,13 @@
 #include <string.h>  // for memcpy
 
 #include <algorithm>
-#include <library/math/constants.hpp>
-#include <library/utilities/macros.hpp>
+#include <math_physics/math/constants.hpp>
+#include <utilities/macros.hpp>
 
-NanoSsocD60::NanoSsocD60(SunSensor sun_sensor, const int sils_port_id, const unsigned int hils_port_id, const unsigned char i2c_address,
-                         OnBoardComputer *obc, HilsPortManager *hils_port_manager)
-    : SunSensor(sun_sensor),
-      I2cTargetCommunicationWithObc(sils_port_id, hils_port_id, i2c_address, obc, hils_port_manager),
+NanoSsocD60::NanoSsocD60(s2e::components::SunSensor sun_sensor, const int sils_port_id, const unsigned int hils_port_id,
+                         const unsigned char i2c_address, s2e::components::OnBoardComputer *obc, s2e::simulation::HilsPortManager *hils_port_manager)
+    : s2e::components::SunSensor(sun_sensor),
+      s2e::components::I2cTargetCommunicationWithObc(sils_port_id, hils_port_id, i2c_address, obc, hils_port_manager),
       i2c_address_(i2c_address) {}
 
 NanoSsocD60::~NanoSsocD60() {}
@@ -72,7 +72,7 @@ int32_t NanoSsocD60::ConvertFloat2FloatingPoint(float data) {
 }
 
 int32_t NanoSsocD60::ConvertAngle2Tlm(double angle_rad) {
-  double angle_deg = angle_rad * libra::rad_to_deg;
+  double angle_deg = angle_rad * s2e::math::rad_to_deg;
 
   int32_t angle_tlm_data = ConvertFloat2FloatingPoint((float)angle_deg);
   return angle_tlm_data;
@@ -104,8 +104,8 @@ std::string NanoSsocD60::GetLogHeader() const {
   std::string str_tmp = "";
   const std::string st_id = std::to_string(static_cast<long long>(component_id_));
 
-  str_tmp += WriteVector("NanoSSOC_D60" + st_id, "c", "-", 3);
-  str_tmp += WriteScalar("sun_detected_flag" + st_id, "-");
+  str_tmp += s2e::logger::WriteVector("NanoSSOC_D60" + st_id, "c", "-", 3);
+  str_tmp += s2e::logger::WriteScalar("sun_detected_flag" + st_id, "-");
 
   return str_tmp;
 }

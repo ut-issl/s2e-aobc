@@ -5,11 +5,12 @@
 
 #include "aobc.hpp"
 
-#include <library/utilities/macros.hpp>
+#include <utilities/macros.hpp>
 
 #include "../../simulation/spacecraft/aocs_module_components.hpp"
 
-Aobc::Aobc(ClockGenerator *clock_generator, AocsModuleComponents *components) : Component(100, clock_generator), components_(components) {
+Aobc::Aobc(s2e::environment::ClockGenerator *clock_generator, AocsModuleComponents *components)
+    : s2e::components::Component(100, clock_generator), components_(components) {
   Initialize();
 }
 

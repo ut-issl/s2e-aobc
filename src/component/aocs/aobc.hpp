@@ -14,7 +14,7 @@ class AocsModuleComponents;
  * @class Aobc
  * @brief Class to emulate AOBC
  */
-class Aobc : public Component {
+class Aobc : public s2e::components::Component {
  public:
   /**
    * @fn Aobc
@@ -22,7 +22,7 @@ class Aobc : public Component {
    * @param [in] clock_generator: Clock generator
    * @param [in] components: Components connected to the AOBC
    */
-  Aobc(ClockGenerator *clock_generator, AocsModuleComponents *components);
+  Aobc(s2e::environment::ClockGenerator *clock_generator, AocsModuleComponents *components);
   /**
    * @fn ~Aobc
    * @brief Destructor
