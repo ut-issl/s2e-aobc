@@ -5,15 +5,15 @@
 
 #include "stim210.hpp"
 
-#include <library/utilities/macros.hpp>
+#include <utilities/macros.hpp>
 
-Stim210::Stim210(GyroSensor gyro, double compo_step_sec, const int sils_port_id, OnBoardComputer *obc)
-    : GyroSensor(gyro), UartCommunicationWithObc(sils_port_id, obc), counter_(0), compo_step_sec_(compo_step_sec) {}
+Stim210::Stim210(s2e::components::GyroSensor gyro, double compo_step_sec, const int sils_port_id, s2e::components::OnBoardComputer *obc)
+    : s2e::components::GyroSensor(gyro), s2e::components::UartCommunicationWithObc(sils_port_id, obc), counter_(0), compo_step_sec_(compo_step_sec) {}
 
-Stim210::Stim210(GyroSensor gyro, double compo_step_sec, const int sils_port_id, OnBoardComputer *obc, const unsigned int hils_port_id,
-                 const unsigned int baud_rate, HilsPortManager *hils_port_manager)
-    : GyroSensor(gyro),
-      UartCommunicationWithObc(sils_port_id, obc, hils_port_id, baud_rate, hils_port_manager),
+Stim210::Stim210(s2e::components::GyroSensor gyro, double compo_step_sec, const int sils_port_id, s2e::components::OnBoardComputer *obc,
+                 const unsigned int hils_port_id, const unsigned int baud_rate, s2e::simulation::HilsPortManager *hils_port_manager)
+    : s2e::components::GyroSensor(gyro),
+      s2e::components::UartCommunicationWithObc(sils_port_id, obc, hils_port_id, baud_rate, hils_port_manager),
       counter_(0),
       compo_step_sec_(compo_step_sec) {}
 
@@ -25,7 +25,7 @@ void Stim210::MainRoutine(const int time_count) {
 
   counter_ += (unsigned char)(prescaler_ * compo_step_sec_ * sample_rate_hz_[SAMPLE_RATE_2000HZ]);  // 2000Hzでインクリメントされる
 
-  for (size_t i = 0; i < kGyroDimension; i++) {
+  for (size_t i = 0; i < s2e::components::kGyroDimension; i++) {
     temperature_c_degC_[i] = 30.0 + ((double)i) * 0.1;  // TODO: 温度の反映
   }
   // Send Telemetry
@@ -37,7 +37,7 @@ void Stim210::MainRoutine(const int time_count) {
 std::string Stim210::GetLogHeader() const {
   std::string str_tmp = "";
   std::string section = "Stim210";
-  str_tmp += WriteVector(section, "c", "deg/s", 3);
+  str_tmp += s2e::logger::WriteVector(section, "c", "deg/s", 3);
 
   return str_tmp;
 }
@@ -156,13 +156,13 @@ void Stim210::GenerateFormatTlm(int &offset) {
 void Stim210::GenerateOmegaTlm(int &offset) {
   const int kByte2Bit = 8;
   const int kOmegaByte = 3;  // 1軸当たりのバイト数
-  const int kTlmSize = kOmegaByte * kGyroDimension;
+  const int kTlmSize = kOmegaByte * s2e::components::kGyroDimension;
   std::vector<unsigned char> tlm(kTlmSize, 0);
-  int angular_velocity_c_tlm[kGyroDimension] = {0, 0, 0};
+  int angular_velocity_c_tlm[s2e::components::kGyroDimension] = {0, 0, 0};
 
   // TODO: LPFの実装
 
-  for (size_t i = 0; i < kGyroDimension; i++) {
+  for (size_t i = 0; i < s2e::components::kGyroDimension; i++) {
     angular_velocity_c_tlm[i] = ConvertOmega2Tlm(angular_velocity_c_rad_s_[i]);
     for (size_t j = 0; j < kOmegaByte; j++) {
       tlm[i * kOmegaByte + j] = (unsigned char)(angular_velocity_c_tlm[i] >> kByte2Bit * (kOmegaByte - j - 1)) & 0xff;
@@ -189,10 +189,10 @@ void Stim210::GenerateBufferTlm(int &offset) {
 void Stim210::GenerateTemperatureTlm(int &offset) {
   const int kByte2Bit = 8;
   const int kTempByte = 2;  // 1軸当たりのバイト数
-  const int kTlmSize = kTempByte * kGyroDimension;
+  const int kTlmSize = kTempByte * s2e::components::kGyroDimension;
   std::vector<unsigned char> tlm(kTlmSize, 0);
-  int temperature_c_tlm[kGyroDimension] = {0, 0, 0};
-  for (size_t i = 0; i < kGyroDimension; i++) {
+  int temperature_c_tlm[s2e::components::kGyroDimension] = {0, 0, 0};
+  for (size_t i = 0; i < s2e::components::kGyroDimension; i++) {
     temperature_c_tlm[i] = ConvertTemp2Tlm(temperature_c_degC_[i]);
     for (int j = 0; j < kTempByte; j++) {
       tlm[i * kTempByte + j] = (unsigned char)(temperature_c_tlm[i] >> kByte2Bit * (kTempByte - j - 1)) & 0xff;
@@ -249,7 +249,7 @@ void Stim210::SetTlm(std::vector<unsigned char> tlm, int &offset, size_t tlm_siz
 }
 
 int32_t Stim210::ConvertOmega2Tlm(double angular_velocity_c_rad_s) {
-  double angular_velocity_c_dps = angular_velocity_c_rad_s * 180.0 / libra::pi;
+  double angular_velocity_c_dps = angular_velocity_c_rad_s * 180.0 / s2e::math::pi;
   int32_t angular_velocity_c_bit = int32_t(angular_velocity_c_dps * pow(2, 14));
 
   // Limits

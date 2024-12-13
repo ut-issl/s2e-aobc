@@ -15,7 +15,7 @@
  * @class SampleCase
  * @brief An example of user defined simulation class
  */
-class SampleCase : public SimulationCase {
+class SampleCase : public s2e::simulation::SimulationCase {
  public:
   /**
    * @fn SampleCase
@@ -24,7 +24,8 @@ class SampleCase : public SimulationCase {
    * @param [in] monte_carlo_simulator: Monte Carlo simulator
    * @param [in] log_path: Log file path
    */
-  SampleCase(const std::string initialize_base_file, MonteCarloSimulationExecutor &monte_carlo_simulator, const std::string log_path);
+  SampleCase(const std::string initialize_base_file, s2e::simulation::MonteCarloSimulationExecutor &monte_carlo_simulator,
+             const std::string log_path);
 
   /**
    * @fn ~SampleCase
@@ -44,8 +45,8 @@ class SampleCase : public SimulationCase {
   virtual std::string GetLogValue() const;
 
  private:
-  SampleSatellite *spacecraft_;                          //!< Instance of spacecraft
-  MonteCarloSimulationExecutor &monte_carlo_simulator_;  //!< Instance of ground station
+  SampleSatellite *spacecraft_;                                           //!< Instance of spacecraft
+  s2e::simulation::MonteCarloSimulationExecutor &monte_carlo_simulator_;  //!< Instance of ground station
 
   /**
    * @fn InitializeTargetObjects

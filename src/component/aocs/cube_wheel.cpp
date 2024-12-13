@@ -87,14 +87,14 @@ std::string CubeWheel::GetLogHeader() const {
   std::string str_tmp = "";
   const std::string st_id = std::to_string(static_cast<long long>(port_id_));
 
-  str_tmp += WriteScalar("cubewheel_angular_velocity" + st_id, "rad/s");
-  str_tmp += WriteScalar("cubewheel_angular_velocity_rpm" + st_id, "rpm");
-  str_tmp += WriteScalar("cubewheel_angular_velocity_upperlimit" + st_id, "rpm");
-  str_tmp += WriteScalar("cubewheel_angular_acceleration" + st_id, "rad/s^2");
+  str_tmp += s2e::logger::WriteScalar("cubewheel_angular_velocity" + st_id, "rad/s");
+  str_tmp += s2e::logger::WriteScalar("cubewheel_angular_velocity_rpm" + st_id, "rpm");
+  str_tmp += s2e::logger::WriteScalar("cubewheel_angular_velocity_upperlimit" + st_id, "rpm");
+  str_tmp += s2e::logger::WriteScalar("cubewheel_angular_acceleration" + st_id, "rad/s^2");
 
   if (is_logged_jitter_) {
-    str_tmp += WriteVector("cubewheel_jitter_force" + st_id, "c", "N", 3);
-    str_tmp += WriteVector("cubewheel_jitter_torque" + st_id, "c", "Nm", 3);
+    str_tmp += s2e::logger::WriteVector("cubewheel_jitter_force" + st_id, "c", "N", 3);
+    str_tmp += s2e::logger::WriteVector("cubewheel_jitter_torque" + st_id, "c", "Nm", 3);
   }
 
   return str_tmp;

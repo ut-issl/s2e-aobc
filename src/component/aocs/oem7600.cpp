@@ -6,8 +6,8 @@
 #include "oem7600.hpp"
 
 #include <algorithm>  // toupper
-#include <library/utilities/macros.hpp>
 #include <locale>
+#include <utilities/macros.hpp>
 
 #define MAX_CMD_LEN 1024                        // TBD
 #define MAX_TLM_LEN 1024                        // TBD
@@ -18,13 +18,17 @@
 #define _USE_MATH_DEFINES
 // #define TLM_FUNCTION_DEBUG_MODE
 
-Oem7600::Oem7600(GnssReceiver gnss_receiver, const int sils_port_id, OnBoardComputer *obc, const unsigned char telemetry_channel)
-    : GnssReceiver(gnss_receiver), UartCommunicationWithObc(sils_port_id, obc), telemetry_channel_(telemetry_channel) {}
+Oem7600::Oem7600(s2e::components::GnssReceiver gnss_receiver, const int sils_port_id, s2e::components::OnBoardComputer *obc,
+                 const unsigned char telemetry_channel)
+    : s2e::components::GnssReceiver(gnss_receiver),
+      s2e::components::UartCommunicationWithObc(sils_port_id, obc),
+      telemetry_channel_(telemetry_channel) {}
 
-Oem7600::Oem7600(GnssReceiver gnss_receiver, const int sils_port_id, OnBoardComputer *obc, const unsigned char telemetry_channel,
-                 const unsigned int hils_port_id, const unsigned int baud_rate, HilsPortManager *hils_port_manager)
-    : GnssReceiver(gnss_receiver),
-      UartCommunicationWithObc(sils_port_id, obc, hils_port_id, baud_rate, hils_port_manager),
+Oem7600::Oem7600(s2e::components::GnssReceiver gnss_receiver, const int sils_port_id, s2e::components::OnBoardComputer *obc,
+                 const unsigned char telemetry_channel, const unsigned int hils_port_id, const unsigned int baud_rate,
+                 s2e::simulation::HilsPortManager *hils_port_manager)
+    : s2e::components::GnssReceiver(gnss_receiver),
+      s2e::components::UartCommunicationWithObc(sils_port_id, obc, hils_port_id, baud_rate, hils_port_manager),
       telemetry_channel_(telemetry_channel) {}
 
 void Oem7600::MainRoutine(const int time_count) {
@@ -55,26 +59,26 @@ void Oem7600::MainRoutine(const int time_count) {
 
 // update positioning information(to be removed after core_oss modification)
 void Oem7600::UpdateLocal() {
-  // check visibility (transfer method from GnssReceiver Class)
-  Vector<3> pos_true_eci_m = dynamics_->GetOrbit().GetPosition_i_m();
-  libra::Quaternion q_i2b = dynamics_->GetAttitude().GetQuaternion_i2b();
+  // check visibility (transfer method from s2e::components::GnssReceiver Class)
+  s2e::math::Vector<3> pos_true_eci_m = dynamics_->GetOrbit().GetPosition_i_m();
+  s2e::math::Quaternion q_i2b = dynamics_->GetAttitude().GetQuaternion_i2b();
 
   CheckAntenna(pos_true_eci_m, q_i2b);
 
   if (is_gnss_visible_ == 1) {  // Antenna of GNSS-R can detect GNSS signal
 
     // should be modified to add noise in the future
-    Vector<3> pos_true_ecef_m = dynamics_->GetOrbit().GetPosition_ecef_m();
+    s2e::math::Vector<3> pos_true_ecef_m = dynamics_->GetOrbit().GetPosition_ecef_m();
     velocity_ecef_m_s_ = dynamics_->GetOrbit().GetVelocity_ecef_m_s();
-    position_llh_ = dynamics_->GetOrbit().GetLatLonAlt();
     AddNoise(pos_true_eci_m, pos_true_ecef_m);
+    geodetic_position_.UpdateFromEcef(pos_true_ecef_m);
 
     last_position_fix_time_local_ = simulation_time_->GetElapsedTime_s();  // store position fixed time [sec]
     utc_ = simulation_time_->GetCurrentUtc();
-    ConvertJulianDayToGPSTime(simulation_time_->GetCurrentTime_jd());
+    ConvertJulianDayToGpsTime(simulation_time_->GetCurrentTime_jd());
   } else {
     utc_ = simulation_time_->GetCurrentUtc();
-    ConvertJulianDayToGPSTime(simulation_time_->GetCurrentTime_jd());
+    ConvertJulianDayToGpsTime(simulation_time_->GetCurrentTime_jd());
   }
 }
 
@@ -261,10 +265,10 @@ std::string Oem7600::GenerateTelemetryPacket(const std::string telemetry_name) {
     if (tlm_length > 0) {
       const char *tlm_data_char = str_tmp.c_str();
       unsigned int crc32 = CalculateCrc32(tlm_data_char, tlm_length);
-      str_tmp += "*";                 // separator before CRC for ASCII format;
-      str_tmp += WriteScalar(crc32);  // CRC in string format
-      str_tmp.pop_back();             // erase unnecessary comma
-      str_tmp += "\r\n";              // footer for ASCII format;
+      str_tmp += "*";                              // separator before CRC for ASCII format;
+      str_tmp += s2e::logger::WriteScalar(crc32);  // CRC in string format
+      str_tmp.pop_back();                          // erase unnecessary comma
+      str_tmp += "\r\n";                           // footer for ASCII format;
     }
 
     return str_tmp;
@@ -311,10 +315,10 @@ std::string Oem7600::GenerateTelemetryHeaderAscii(const std::string telemetry_na
   std::locale loc = std::locale::classic();
   std::transform(telemetry_name.begin(), telemetry_name.end(), (str_tmp.begin() + 1), [loc](char c) { return std::toupper(c, loc); });
 
-  std::string port = "COM" + WriteScalar((int)(telemetry_channel_), 1);  // Port
-  str_tmp += "," + port;                                                 // after port, "," is already added (WriteScalar did it)
-  str_tmp += "0";                                                        // Sequence number
-  str_tmp += ",90.5";                                                    // CPU idle time (currently dummy data is padded)
+  std::string port = "COM" + s2e::logger::WriteScalar((int)(telemetry_channel_), 1);  // Port
+  str_tmp += "," + port;  // after port, "," is already added (s2e::logger::WriteScalar did it)
+  str_tmp += "0";         // Sequence number
+  str_tmp += ",90.5";     // CPU idle time (currently dummy data is padded)
 
   // Time status
   if (is_gnss_visible_) {
@@ -323,8 +327,8 @@ std::string Oem7600::GenerateTelemetryHeaderAscii(const std::string telemetry_na
     str_tmp += ",UNKNOWN";
   }
 
-  str_tmp += WriteScalar(gps_time_week_);
-  str_tmp += WriteScalar(gps_time_s_);
+  str_tmp += s2e::logger::WriteScalar(gps_time_week_);
+  str_tmp += s2e::logger::WriteScalar(gps_time_s_);
   str_tmp += "02000000";    // Receiver status summary (currently dummy data is padded)
   str_tmp += str_reserved;  // footer
 
@@ -420,23 +424,24 @@ std::string Oem7600::GenerateBestxyzTelemetryAscii(void) {
     sol_status = "INSUFFICIENT_OBS";
   }
 
-  str_tmp += sol_status + ",SINGLE,";             // position solution status
-  str_tmp += WriteVector(position_ecef_m_, 11);   // postion computed
-  str_tmp += "72.5816,61.3924,159.6638,";         // std 1-sigma of computed position(currently dummy data is padded)
-  str_tmp += sol_status + ",DOPPLER_VELOCITY,";   // velocity solution status
-  str_tmp += WriteVector(velocity_ecef_m_s_, 8);  // velocity computed
-  str_tmp += "0.5747,0.4413,1.4830,";             // std 1-sigma of computed velocity(currently dummy data is padded)
-  str_tmp += " ,";                                // base station ID of differential positioning (ignored in this model)
-  str_tmp += "0.000,";                            // V-latency (velocity measurement time delay, currently dummy data is padded)
-  str_tmp += "0.000,";                            // diff_age (differential age in seconds, basically the ouput value is fixed to zero)
+  str_tmp += sol_status + ",SINGLE,";                          // position solution status
+  str_tmp += s2e::logger::WriteVector(position_ecef_m_, 11);   // postion computed
+  str_tmp += "72.5816,61.3924,159.6638,";                      // std 1-sigma of computed position(currently dummy data is padded)
+  str_tmp += sol_status + ",DOPPLER_VELOCITY,";                // velocity solution status
+  str_tmp += s2e::logger::WriteVector(velocity_ecef_m_s_, 8);  // velocity computed
+  str_tmp += "0.5747,0.4413,1.4830,";                          // std 1-sigma of computed velocity(currently dummy data is padded)
+  str_tmp += " ,";                                             // base station ID of differential positioning (ignored in this model)
+  str_tmp += "0.000,";                                         // V-latency (velocity measurement time delay, currently dummy data is padded)
+  str_tmp += "0.000,";                                         // diff_age (differential age in seconds, basically the ouput value is fixed to zero)
 
   // sol_age (solution age in seconds)
   double sol_age = simulation_time_->GetElapsedTime_s() - last_position_fix_time_local_;
-  str_tmp += WriteScalar(sol_age);
+  str_tmp += s2e::logger::WriteScalar(sol_age);
 
-  str_tmp += WriteScalar(visible_satellite_number_);  // number of satellites tracked
-  str_tmp += WriteScalar(visible_satellite_number_);  // number of satellites used in solution (currently dummy data is padded)
-  str_tmp += WriteScalar(visible_satellite_number_);  // number of satellites with L1/E1/B1 signals used in solution (currently dummy data is padded)
+  str_tmp += s2e::logger::WriteScalar(visible_satellite_number_);  // number of satellites tracked
+  str_tmp += s2e::logger::WriteScalar(visible_satellite_number_);  // number of satellites used in solution (currently dummy data is padded)
+  str_tmp += s2e::logger::WriteScalar(
+      visible_satellite_number_);  // number of satellites with L1/E1/B1 signals used in solution (currently dummy data is padded)
 
   str_tmp += "0,";   // number of satellites with multi-frequency signals used in solution (currently dummy data is padded)
   str_tmp += "0,";   // reserved
@@ -600,12 +605,12 @@ std::string Oem7600::GenerateTimeTelemetryAscii(void) {
   str_tmp += "-17.99999999852,";   // GPST offset in seconds from UTC (UTC = GPST + offset), currently fixed number at A.C.2020 (=-18sec)is padded
 
   // UTC
-  str_tmp += WriteScalar(utc_.year);
-  str_tmp += WriteScalar(utc_.month);
-  str_tmp += WriteScalar(utc_.day);
-  str_tmp += WriteScalar(utc_.hour);
-  str_tmp += WriteScalar(utc_.minute);
-  str_tmp += WriteScalar((unsigned int)(utc_.second * 1000));  // sec in [msec] format
+  str_tmp += s2e::logger::WriteScalar(utc_.year);
+  str_tmp += s2e::logger::WriteScalar(utc_.month);
+  str_tmp += s2e::logger::WriteScalar(utc_.day);
+  str_tmp += s2e::logger::WriteScalar(utc_.hour);
+  str_tmp += s2e::logger::WriteScalar(utc_.minute);
+  str_tmp += s2e::logger::WriteScalar((unsigned int)(utc_.second * 1000));  // sec in [msec] format
   str_tmp += clock_status;  // UTC status (in real HW, UTC status is not always equal to clock status, but is deal to be equal in this model )
 
   return str_tmp;
@@ -736,22 +741,22 @@ std::string Oem7600::GenerateGpggaTelemetry(void) {
   // in case of position fixed
   else {
     // UTC
-    std::string str_utc_tmp = WriteScalar(utc_.hour, 2);
-    str_utc_tmp.erase(str_utc_tmp.end() - 1);  // since "," added in "WriteScalar" is unnecessary in this case, erase it here
+    std::string str_utc_tmp = s2e::logger::WriteScalar(utc_.hour, 2);
+    str_utc_tmp.erase(str_utc_tmp.end() - 1);  // since "," added in "s2e::logger::WriteScalar" is unnecessary in this case, erase it here
     str_tmp += StringZeroPaddingLocal(str_utc_tmp, 2);
 
-    str_utc_tmp = WriteScalar(utc_.minute, 2);
-    str_utc_tmp.erase(str_utc_tmp.end() - 1);  // since "," added in "WriteScalar" is unnecessary in this case, erase it here
+    str_utc_tmp = s2e::logger::WriteScalar(utc_.minute, 2);
+    str_utc_tmp.erase(str_utc_tmp.end() - 1);  // since "," added in "s2e::logger::WriteScalar" is unnecessary in this case, erase it here
     str_tmp += StringZeroPaddingLocal(str_utc_tmp, 2);
 
-    str_utc_tmp = WriteScalar(utc_.second, 4);
+    str_utc_tmp = s2e::logger::WriteScalar(utc_.second, 4);
     str_tmp += StringZeroPaddingLocal(str_utc_tmp, 6);
 
     // lat in [ddmm.mm] + indicator "N" or "S"
-    str_tmp += ConvLatLonToNmea(position_llh_[0], "lat");
+    str_tmp += ConvLatLonToNmea(geodetic_position_.GetLatitude_rad(), "lat");
 
     // lon in [dddmm.mm] + indicator "E" or "W"
-    str_tmp += ConvLatLonToNmea(position_llh_[1], "lon");
+    str_tmp += ConvLatLonToNmea(geodetic_position_.GetLongitude_rad(), "lon");
 
     // quality
     if (is_gnss_visible_) {
@@ -761,13 +766,13 @@ std::string Oem7600::GenerateGpggaTelemetry(void) {
     }
 
     // number of vis sat
-    str_tmp += WriteScalar(visible_satellite_number_);
+    str_tmp += s2e::logger::WriteScalar(visible_satellite_number_);
 
     // H-DOP (currently dummy data is padded)
     str_tmp += "1.0,";
 
     // alt in [m]
-    str_tmp += WriteScalar(position_llh_[2]);
+    str_tmp += s2e::logger::WriteScalar(geodetic_position_.GetAltitude_m());
 
     // units of alt(fix to M in default)
     str_tmp += "M,";
@@ -779,8 +784,8 @@ std::string Oem7600::GenerateGpggaTelemetry(void) {
     str_tmp += "M,";
 
     // age of correction data in [sec]
-    str_tmp += WriteScalar((unsigned int)(elapsed_sec), 2);
-    str_tmp.erase(str_tmp.end() - 1);  // since "," added in "WriteScalar" is unnecessary in this case, erase it here
+    str_tmp += s2e::logger::WriteScalar((unsigned int)(elapsed_sec), 2);
+    str_tmp.erase(str_tmp.end() - 1);  // since "," added in "s2e::logger::WriteScalar" is unnecessary in this case, erase it here
 
     // check sum (currently dummy data is padded)
     str_tmp += "*60";
@@ -824,7 +829,7 @@ unsigned short Oem7600::GetTlmLengthOfBinaryTlm(const std::string telemetry_name
 
 // convert lat/lon in [rad] to NMEA format
 std::string Oem7600::ConvLatLonToNmea(const double angle_rad, const std::string type) {
-  const double rad2deg = 180.0 / libra::pi;
+  const double rad2deg = 180.0 / s2e::math::pi;
   const double deg2arcmin = 60.0;
 
   std::string str_tmp = "";
@@ -833,15 +838,15 @@ std::string Oem7600::ConvLatLonToNmea(const double angle_rad, const std::string 
   unsigned int angle_dd = (unsigned int)(angle_deg);
   double angle_rem_amin = (angle_deg - (double)(angle_dd)) * deg2arcmin;
 
-  std::string str_deg = WriteScalar(angle_dd);
-  str_deg.erase(str_deg.end() - 1);  // since "," added in "WriteScalar" is unnecessary in this case, erase it here
+  std::string str_deg = s2e::logger::WriteScalar(angle_dd);
+  str_deg.erase(str_deg.end() - 1);  // since "," added in "s2e::logger::WriteScalar" is unnecessary in this case, erase it here
   if (type == "lat") {
     str_tmp += StringZeroPaddingLocal(str_deg, 2);
   } else {
     str_tmp += StringZeroPaddingLocal(str_deg, 3);
   }
 
-  str_tmp += WriteScalar(angle_rem_amin, 4);
+  str_tmp += s2e::logger::WriteScalar(angle_rem_amin, 4);
 
   if (type == "lat") {
     if (angle_rad < 0) {
@@ -959,19 +964,19 @@ unsigned int Oem7600::CalculateCrc32Subroutine(const unsigned int initial_value)
 std::string Oem7600::GetLogHeader() const {
   std::string str_tmp = "";
   std::string section = "OEM7600";
-  str_tmp += WriteScalar("OEM7600_year");
-  str_tmp += WriteScalar("OEM7600_month");
-  str_tmp += WriteScalar("OEM7600_day");
-  str_tmp += WriteScalar("OEM7600_hour");
-  str_tmp += WriteScalar("OEM7600_min");
-  str_tmp += WriteScalar("OEM7600_sec");
-  str_tmp += WriteVector(section, "posXYZ_ECEF", "m", 3);
-  str_tmp += WriteVector(section, "velXYZ_ECEF", "m/s", 3);
-  str_tmp += WriteScalar("OEM7600_lat", "rad");
-  str_tmp += WriteScalar("OEM7600_lon", "rad");
-  str_tmp += WriteScalar("OEM7600_alt", "m");
-  str_tmp += WriteScalar("OEM7600vis_flag");
-  str_tmp += WriteScalar("OEM7600vis_num");
+  str_tmp += s2e::logger::WriteScalar("OEM7600_year");
+  str_tmp += s2e::logger::WriteScalar("OEM7600_month");
+  str_tmp += s2e::logger::WriteScalar("OEM7600_day");
+  str_tmp += s2e::logger::WriteScalar("OEM7600_hour");
+  str_tmp += s2e::logger::WriteScalar("OEM7600_min");
+  str_tmp += s2e::logger::WriteScalar("OEM7600_sec");
+  str_tmp += s2e::logger::WriteVector(section, "posXYZ_ECEF", "m", 3);
+  str_tmp += s2e::logger::WriteVector(section, "velXYZ_ECEF", "m/s", 3);
+  str_tmp += s2e::logger::WriteScalar("OEM7600_lat", "rad");
+  str_tmp += s2e::logger::WriteScalar("OEM7600_lon", "rad");
+  str_tmp += s2e::logger::WriteScalar("OEM7600_alt", "m");
+  str_tmp += s2e::logger::WriteScalar("OEM7600vis_flag");
+  str_tmp += s2e::logger::WriteScalar("OEM7600vis_num");
 
   return str_tmp;
 }

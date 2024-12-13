@@ -17,7 +17,7 @@
  * @class Rw0003
  * @brief Class to emulate RW0.003 reaction wheel
  */
-class Rw0003 : public ReactionWheel, public I2cTargetCommunicationWithObc {
+class Rw0003 : public s2e::components::ReactionWheel, public s2e::components::I2cTargetCommunicationWithObc {
  public:
   /**
    * @fn Rw0003
@@ -29,8 +29,8 @@ class Rw0003 : public ReactionWheel, public I2cTargetCommunicationWithObc {
    * @param [in] obc: Connected OBC
    * @param [in] hils_port_manager: HILS port manager
    */
-  Rw0003(ReactionWheel rw, const int sils_port_id, const unsigned int hils_port_id, const unsigned char i2c_address, OnBoardComputer *obc,
-         HilsPortManager *hils_port_manager);
+  Rw0003(s2e::components::ReactionWheel rw, const int sils_port_id, const unsigned int hils_port_id, const unsigned char i2c_address,
+         s2e::components::OnBoardComputer *obc, s2e::simulation::HilsPortManager *hils_port_manager);
 
   // Override functions for Component
   /**
@@ -48,6 +48,7 @@ class Rw0003 : public ReactionWheel, public I2cTargetCommunicationWithObc {
  private:
   bool is_rw_initialized_ = false;  //!< Flag to detect initializing operation
   double temperature_degC_ = 30.0;  //!< RW measured temperature [degC] (dummy data)
+  float fault_state_ = 0.0;         //!< 1.0: wheel is in an fault, 0.0: otherwise
 
   // Communication
   uint16_t crc_;                             //!< Calculated CRC value
@@ -71,6 +72,7 @@ class Rw0003 : public ReactionWheel, public I2cTargetCommunicationWithObc {
   // Register address
   static const uint8_t kReadAddressTemperature_ = 0x03;  //!< Register address of temperature measurement
   static const uint8_t kReadAddressSpeed_ = 0x15;        //!< Register address of rotation speed measurement
+  static const uint8_t kReadAddressFaultState_ = 0x19;   //!< Register address of fault state
   static const uint8_t kReadAddressLimitSpeed1_ = 0x33;  //!< Register address of limit speed 1
   static const uint8_t kReadAddressLimitSpeed2_ = 0x34;  //!< Register address of limit speed 2
 

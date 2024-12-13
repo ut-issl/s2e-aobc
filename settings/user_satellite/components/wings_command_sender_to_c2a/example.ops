@@ -1,0 +1,12 @@
+.# ===== SILS Test =====
+.#
+.# 
+.AOBC_RT.Cmd_APP_AOCS_MANAGER_SET_MASS 12.6
+ wait_sec 15
+ AOBC_RT.Cmd_MM_START_TRANSITION 2
+ wait_sec 3
+ check_value AOBC_ANOMALY.TEMPERATURE.THRESHOLD.PIC_UPPER_DEGC == 90  # check_valueは今は使えない
+ check_value AOBC_ANOMALY.TEMPERATURE.THRESHOLD.PIC_LOWER_DEGC == -40 # check_valueは今は使えない
+ let mode_id = 2 # letはいまはつかえない
+ AOBC_RT.Cmd_MM_START_TRANSITION {mode_id} # letを前提とした{}付きの引数があるとコマンドは送信されない
+.# 変更反映を確認

@@ -7,12 +7,13 @@
 
 #include <math.h>
 
-#include <library/utilities/macros.hpp>
-#include <library/utilities/slip.hpp>
+#include <utilities/macros.hpp>
+#include <utilities/slip.hpp>
 
-Rw0003::Rw0003(ReactionWheel rw, const int sils_port_id, const unsigned int hils_port_id, const unsigned char i2c_address, OnBoardComputer *obc,
-               HilsPortManager *hils_port_manager)
-    : ReactionWheel(rw), I2cTargetCommunicationWithObc(sils_port_id, hils_port_id, i2c_address, obc, hils_port_manager) {
+Rw0003::Rw0003(s2e::components::ReactionWheel rw, const int sils_port_id, const unsigned int hils_port_id, const unsigned char i2c_address,
+               s2e::components::OnBoardComputer *obc, s2e::simulation::HilsPortManager *hils_port_manager)
+    : s2e::components::ReactionWheel(rw),
+      s2e::components::I2cTargetCommunicationWithObc(sils_port_id, hils_port_id, i2c_address, obc, hils_port_manager) {
   Initialize();
 }
 
@@ -32,6 +33,7 @@ void Rw0003::MainRoutine(const int time_count) {
     CalcTorque();
     WriteFloatTlm(kReadAddressTemperature_, (float)temperature_degC_);
     WriteFloatTlm(kReadAddressSpeed_, (float)angular_velocity_rad_s_);
+    WriteFloatTlm(kReadAddressFaultState_, (float)fault_state_);
   }
 
   is_command_written_ = false;
@@ -41,15 +43,15 @@ void Rw0003::MainRoutine(const int time_count) {
 std::string Rw0003::GetLogHeader() const {
   std::string str_tmp = "";
 
-  str_tmp += WriteScalar("RW0003_angular_velocity", "rad/s");
-  str_tmp += WriteScalar("RW0003_angular_velocity", "rpm");
-  str_tmp += WriteScalar("RW0003_angular_velocity_upper_limit", "rpm");
-  str_tmp += WriteScalar("RW0003_target_angular_acceleration", "rad/s2");
-  str_tmp += WriteScalar("RW0003_angular_acceleration", "rad/s^2");
+  str_tmp += s2e::logger::WriteScalar("RW0003_angular_velocity", "rad/s");
+  str_tmp += s2e::logger::WriteScalar("RW0003_angular_velocity", "rpm");
+  str_tmp += s2e::logger::WriteScalar("RW0003_angular_velocity_upper_limit", "rpm");
+  str_tmp += s2e::logger::WriteScalar("RW0003_target_angular_acceleration", "rad/s2");
+  str_tmp += s2e::logger::WriteScalar("RW0003_angular_acceleration", "rad/s^2");
 
   if (is_logged_jitter_) {
-    str_tmp += WriteVector("RW0003_jitter_force", "c", "N", 3);
-    str_tmp += WriteVector("RW0003_jitter_torque", "c", "Nm", 3);
+    str_tmp += s2e::logger::WriteVector("RW0003_jitter_force", "c", "N", 3);
+    str_tmp += s2e::logger::WriteVector("RW0003_jitter_torque", "c", "Nm", 3);
   }
 
   return str_tmp;
@@ -61,7 +63,7 @@ void Rw0003::ReadCmd() {
 
   // Decode SLIP
   std::vector<uint8_t> rx_data_v(rx_data, rx_data + kMaxCmdLength_);
-  std::vector<uint8_t> decoded_rx = decode_slip(rx_data_v);
+  std::vector<uint8_t> decoded_rx = s2e::utilities::decode_slip(rx_data_v);
   if (decoded_rx.size() <= kHeaderSize_ + kCrcSize_) return;  // no payload
 
   // Source Address
@@ -189,7 +191,7 @@ void Rw0003::WriteFloatTlm(uint8_t address, float value) {
 
   // SLIP
   std::vector<uint8_t> tlm_slip;
-  tlm_slip = encode_slip(tlm);
+  tlm_slip = s2e::utilities::encode_slip(tlm);
 
   // Write Tlm
   WriteRegister(address, &tlm_slip[0], (uint8_t)tlm_slip.size());

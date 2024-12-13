@@ -55,7 +55,7 @@ struct Oem7600Telemetry {
  * @class OEM7600
  * @brief Class to emulate EM7600 GNSS receiver
  */
-class Oem7600 : public GnssReceiver, public UartCommunicationWithObc {
+class Oem7600 : public s2e::components::GnssReceiver, public s2e::components::UartCommunicationWithObc {
  public:
   /**
    * @fn Oem7600
@@ -65,7 +65,8 @@ class Oem7600 : public GnssReceiver, public UartCommunicationWithObc {
    * @param [in] obc: Connected OBC
    * @param [in] telemetry_channel: OEM7600 telemetry channel
    */
-  Oem7600(GnssReceiver gnss_receiver, const int sils_port_id, OnBoardComputer *obc, const unsigned char telemetry_channel);
+  Oem7600(s2e::components::GnssReceiver gnss_receiver, const int sils_port_id, s2e::components::OnBoardComputer *obc,
+          const unsigned char telemetry_channel);
   /**
    * @fn Oem7600
    * @brief Constructor with HILS setting
@@ -77,8 +78,9 @@ class Oem7600 : public GnssReceiver, public UartCommunicationWithObc {
    * @param [in] baud_rate: UART baud rate
    * @param [in] hils_port_manager: HILS port manager
    */
-  Oem7600(GnssReceiver gnss_receiver, const int sils_port_id, OnBoardComputer *obc, const unsigned char telemetry_channel,
-          const unsigned int hils_port_id, const unsigned int baud_rate, HilsPortManager *hils_port_manager);
+  Oem7600(s2e::components::GnssReceiver gnss_receiver, const int sils_port_id, s2e::components::OnBoardComputer *obc,
+          const unsigned char telemetry_channel, const unsigned int hils_port_id, const unsigned int baud_rate,
+          s2e::simulation::HilsPortManager *hils_port_manager);
 
   // Override functions for Component
   /**

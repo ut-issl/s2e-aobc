@@ -14,7 +14,7 @@
  * @class MtqSeiren
  * @brief Class to emulate MTQ developed by Seiren
  */
-class MtqSeiren : public Magnetorquer, public GpioConnectionWithObc {
+class MtqSeiren : public s2e::components::Magnetorquer, public s2e::components::GpioConnectionWithObc {
  public:
   /**
    * @fn MtqSeiren
@@ -23,7 +23,7 @@ class MtqSeiren : public Magnetorquer, public GpioConnectionWithObc {
    * @param [in] gpio_port: Port ID for GPIO
    * @param [in] obc: Connected OBC
    */
-  MtqSeiren(Magnetorquer magnetorquer, std::vector<int> gpio_ports, OnBoardComputer *obc);
+  MtqSeiren(s2e::components::Magnetorquer magnetorquer, std::vector<int> gpio_ports, s2e::components::OnBoardComputer *obc);
   /**
    * @fn ~MtqSeiren
    * @brief Destructor
@@ -57,7 +57,7 @@ class MtqSeiren : public Magnetorquer, public GpioConnectionWithObc {
     GPIO_Z_NEGATIVE,
   } MtqGpioIdx;
 
-  libra::Vector<kMtqDimension> polarity_;  //!< Polarity information of MTQ
+  s2e::math::Vector<s2e::components::kMtqDimension> polarity_;  //!< Polarity information of MTQ
 
   /**
    * @fn ConvertGPIOState2Polarity

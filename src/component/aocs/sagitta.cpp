@@ -6,13 +6,14 @@
 
 #include "sagitta.hpp"
 
-#include <library/utilities/slip.hpp>
+#include <utilities/slip.hpp>
 
-Sagitta::Sagitta(StarSensor stt, const int sils_port_id, OnBoardComputer *obc) : StarSensor(stt), UartCommunicationWithObc(sils_port_id, obc) {}
+Sagitta::Sagitta(s2e::components::StarSensor stt, const int sils_port_id, s2e::components::OnBoardComputer *obc)
+    : s2e::components::StarSensor(stt), s2e::components::UartCommunicationWithObc(sils_port_id, obc) {}
 
-Sagitta::Sagitta(StarSensor stt, const int sils_port_id, OnBoardComputer *obc, const unsigned int hils_port_id, const unsigned int baud_rate,
-                 HilsPortManager *hils_port_manager)
-    : StarSensor(stt), UartCommunicationWithObc(sils_port_id, obc, hils_port_id, baud_rate, hils_port_manager) {}
+Sagitta::Sagitta(s2e::components::StarSensor stt, const int sils_port_id, s2e::components::OnBoardComputer *obc, const unsigned int hils_port_id,
+                 const unsigned int baud_rate, s2e::simulation::HilsPortManager *hils_port_manager)
+    : s2e::components::StarSensor(stt), s2e::components::UartCommunicationWithObc(sils_port_id, obc, hils_port_id, baud_rate, hils_port_manager) {}
 
 void Sagitta::MainRoutine(const int time_count) {
   int receive_data_size = ReceiveCommand(0, kMaxCmdSize_);
@@ -47,13 +48,13 @@ void Sagitta::MainRoutine(const int time_count) {
 
 int Sagitta::ParseCommand(const int command_size) {
   if (command_size < 1) return -1;
-  std::vector<uint8_t> decoded_rx = decode_slip_with_header(rx_buffer_);
+  std::vector<uint8_t> decoded_rx = s2e::utilities::decode_slip_with_header(rx_buffer_);
   if (decoded_rx.size() < sizeof(kAddress_) + kXxhashSize_) return -1;
 
   if (!is_initialized_) {
     return AnalyzeCmdBoot(decoded_rx);
   } else {
-    return AnalyzeCmdRequestTlm(decoded_rx);
+    return AnalyzeCmd(decoded_rx);
   }
 }
 
@@ -110,10 +111,34 @@ int Sagitta::AnalyzeCmdBoot(std::vector<uint8_t> decoded_rx) {
   return 1;
 }
 
-int Sagitta::AnalyzeCmdRequestTlm(std::vector<uint8_t> decoded_rx) {
+int Sagitta::AnalyzeCmd(std::vector<uint8_t> decoded_rx) {
   if (decoded_rx[0] != kAddress_) return -1;
+  const int cmd_id = decoded_rx[1];
 
-  if (decoded_rx[1] == kCmdSetParam_ && decoded_rx[2] == kParamSubscription) {
+  switch (cmd_id) {
+    case kCmdSetParam_:
+      AnalyzeCmdRequestTlm(decoded_rx);
+      break;
+    case kCmdAction_:
+      AnalyzeCmdSetTime(decoded_rx);
+      break;
+    default:
+      return -1;
+  }
+
+  return 1;
+}
+
+int Sagitta::AnalyzeCmdSetTime(std::vector<uint8_t> decoded_rx) {
+  if (decoded_rx[2] != kActionIdSetTime_) return -1;
+
+  memcpy(&unix_time_us_, &decoded_rx[3], sizeof(unix_time_us_));
+
+  return 1;
+}
+
+int Sagitta::AnalyzeCmdRequestTlm(std::vector<uint8_t> decoded_rx) {
+  if (decoded_rx[2] == kParamSubscription) {
     tlm_reply_mode_ = TLM_REPLY_MODE_ASYNCHRONOUS;
     // TODO 3種類以上の非同期テレメに対応
     if (decoded_rx[3] == kTelemIdTemperature_ || decoded_rx[4] == kTelemIdTemperature_) {
@@ -170,7 +195,7 @@ int Sagitta::GenerateTelemetryRunTime(const uint8_t command_reply_tlm) {
   uint32_t xxhash = XXHash32::hash(&tlm[0], kTlmSize - kXxhashSize_, kXxhashSeed_);
   memcpy(&tlm[kTlmSize - kXxhashSize_], &xxhash, sizeof(xxhash));
 
-  std::vector<uint8_t> encoded_tx = encode_slip_with_header(tlm);
+  std::vector<uint8_t> encoded_tx = s2e::utilities::encode_slip_with_header(tlm);
   tx_buffer_.assign(encoded_tx.begin(), encoded_tx.end());
   return (int)encoded_tx.size();
 }
@@ -194,7 +219,7 @@ int Sagitta::GenerateTelemetryQuaternion(const uint8_t command_reply_tlm) {
   uint32_t xxhash = XXHash32::hash(&tlm[0], kTlmSize - kXxhashSize_, kXxhashSeed_);
   memcpy(&tlm[kTlmSize - kXxhashSize_], &xxhash, sizeof(xxhash));
 
-  std::vector<uint8_t> encoded_tx = encode_slip_with_header(tlm);
+  std::vector<uint8_t> encoded_tx = s2e::utilities::encode_slip_with_header(tlm);
   tx_buffer_.assign(encoded_tx.begin(), encoded_tx.end());
   return (int)encoded_tx.size();
 }
@@ -216,7 +241,7 @@ int Sagitta::GenerateTelemetryTemperature(const uint8_t command_reply_tlm) {
   uint32_t xxhash = XXHash32::hash(&tlm[0], kTlmSize - kXxhashSize_, kXxhashSeed_);
   memcpy(&tlm[kTlmSize - kXxhashSize_], &xxhash, sizeof(xxhash));
 
-  std::vector<uint8_t> encoded_tx = encode_slip_with_header(tlm);
+  std::vector<uint8_t> encoded_tx = s2e::utilities::encode_slip_with_header(tlm);
   tx_buffer_.assign(encoded_tx.begin(), encoded_tx.end());
   return (int)encoded_tx.size();
 }

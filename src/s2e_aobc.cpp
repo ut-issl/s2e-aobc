@@ -15,9 +15,9 @@
 #include <string>
 
 // Simulator includes
-#include <library/logger/initialize_log.hpp>
-#include <library/utilities/macros.hpp>
+#include <logger/initialize_log.hpp>
 #include <simulation/monte_carlo_simulation/initialize_monte_carlo_simulation.hpp>
+#include <utilities/macros.hpp>
 
 // Add custom include files
 #include "./simulation/case/sample_case.hpp"
@@ -39,8 +39,8 @@ int main(int argc, char *argv[]) {
   UNUSED(argv);
 
   std::string ini_file = "../../data/initialize_files/simulation_base.ini";
-  MonteCarloSimulationExecutor *monte_carlo_simulator = InitMonteCarloSimulation(ini_file);
-  Logger *log_monte_carlo_simulator = InitMonteCarloLog(ini_file, monte_carlo_simulator->IsEnabled());
+  s2e::simulation::MonteCarloSimulationExecutor *monte_carlo_simulator = s2e::simulation::InitMonteCarloSimulation(ini_file);
+  s2e::logger::Logger *log_monte_carlo_simulator = s2e::logger::InitMonteCarloLog(ini_file, monte_carlo_simulator->IsEnabled());
 
   std::cout << "Starting simulation..." << std::endl;
   std::cout << "\tIni file: ";
@@ -50,7 +50,7 @@ int main(int argc, char *argv[]) {
     std::chrono::system_clock::time_point start, end;
     start = std::chrono::system_clock::now();
 
-    auto simulation_case = SampleCase(ini_file, *monte_carlo_simulator, log_monte_carlo_simulator->GetLogPath());
+    auto simulation_case = SampleCase(ini_file, *monte_carlo_simulator, log_monte_carlo_simulator->GetLogPath().u8string());
     // Initialize
     log_monte_carlo_simulator->AddLogList(&simulation_case);
     if (monte_carlo_simulator->GetNumberOfExecutionsDone() == 0) {
