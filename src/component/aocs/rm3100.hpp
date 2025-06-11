@@ -45,6 +45,7 @@ class Rm3100 : public Magnetometer, public I2cTargetCommunicationWithObc {
 
  private:
   const unsigned char i2c_address_;         //!< I2C Address
+  uint8_t ep_;
 
   // Mode setting
   unsigned char mode_ = 0;                      //!< Measurement mode 0: CMM, others: Polling
@@ -74,8 +75,8 @@ class Rm3100 : public Magnetometer, public I2cTargetCommunicationWithObc {
 
 extern "C" {
 uint32_t PICOMPO_open(const char *name);
-int32_t PICOMPO_send(uint32_t handle, uint8_t *data, uint32_t data_len);
-int32_t PICOMPO_recv(uint32_t handle, uint8_t *buf, uint32_t buf_len);
+int32_t PICOMPO_send(uint32_t handle, uint8_t ep, uint8_t *data, uint32_t data_len);
+int32_t PICOMPO_recv(uint32_t handle, uint8_t ep, uint8_t *buf, uint32_t buf_len);
 }
 
 typedef struct {

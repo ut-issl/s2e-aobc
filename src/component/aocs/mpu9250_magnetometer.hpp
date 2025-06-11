@@ -96,8 +96,8 @@ class Mpu9250Magnetometer : public Magnetometer, public I2cTargetCommunicationWi
 
 extern "C" {
 uint32_t PICOMPO_open(const char *name);
-int32_t PICOMPO_send(uint32_t handle, uint8_t *data, uint32_t data_len);
-int32_t PICOMPO_recv(uint32_t handle, uint8_t *buf, uint32_t buf_len);
+int32_t PICOMPO_send(uint32_t handle, uint8_t ep, uint8_t *data, uint32_t data_len);
+int32_t PICOMPO_recv(uint32_t handle, uint8_t ep, uint8_t *buf, uint32_t buf_len);
 }
 
 typedef struct {

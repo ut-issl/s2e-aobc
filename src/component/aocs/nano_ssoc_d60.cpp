@@ -51,7 +51,7 @@ int NanoSsocD60::GenerateTelemetry() {
   output.angular_position_angle_y = ConvertAngle2Tlm(beta_rad_);
   output.angular_position_sun_detection = ConvertFloat2FloatingPoint(float(sun_intensity_percent_));
   output.angular_position_error_code = GenerateErrorCode();
-  PICOMPO_send(picompo_handle_, reinterpret_cast<uint8_t *>(&output), sizeof(output));
+  PICOMPO_send(picompo_handle_, 1, reinterpret_cast<uint8_t *>(&output), sizeof(output));
 
   return kTlmSize;
 }

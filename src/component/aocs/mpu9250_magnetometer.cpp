@@ -78,7 +78,7 @@ void Mpu9250Magnetometer::WriteMagTlm() {
   }
   output.st1 = 0x01;
   output.st2 = 0x10;
-  PICOMPO_send(picompo_handle_, reinterpret_cast<uint8_t *>(&output), sizeof(output));
+  PICOMPO_send(picompo_handle_, 1, reinterpret_cast<uint8_t *>(&output), sizeof(output));
 
 
 

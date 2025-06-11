@@ -126,7 +126,7 @@ void Mpu9250GyroSensor::WriteGyroTlm() {
     // WriteRegister(reg_id, tlm, kMpuTlmSize_);
     // reg_id += kMpuTlmSize_;
   }
-  PICOMPO_send(picompo_handle_, reinterpret_cast<uint8_t *>(&output), sizeof(output));
+  PICOMPO_send(picompo_handle_, 1, reinterpret_cast<uint8_t *>(&output), sizeof(output));
 
 
 

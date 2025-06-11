@@ -12,10 +12,9 @@ Rm3100::Rm3100(Magnetometer magnetometer, const int sils_port_id, const unsigned
     : Magnetometer(magnetometer), 
       I2cTargetCommunicationWithObc(sils_port_id, hils_port_id, i2c_address, obc, hils_port_manager),
       i2c_address_(i2c_address) {
-        char buffer[20];
-        sprintf(buffer, "FAKE_RM3100_0X%02X", i2c_address);
-        picompo_handle_ = PICOMPO_open(buffer);
-  printf("i2c_address %02x handle: %d\n", i2c_address, picompo_handle_);
+        ep_ = hils_port_id;
+        picompo_handle_ = PICOMPO_open("FAKE_RM3100");
+        printf("i2c_address %02x handle: %d, %d\n", i2c_address, picompo_handle_, hils_port_id);
       }
 
 void Rm3100::MainRoutine(const int time_count) {
@@ -71,7 +70,7 @@ int Rm3100::GenerateTelemetry() {
   // output.mx = mag_c_tlm[0]/kLsb2nT_;
   // output.my = mag_c_tlm[1]/kLsb2nT_;
   // output.mz = mag_c_tlm[2]/kLsb2nT_;
-  PICOMPO_send(picompo_handle_, reinterpret_cast<uint8_t *>(&output), sizeof(output));
+  PICOMPO_send(picompo_handle_, ep_, reinterpret_cast<uint8_t *>(&output), sizeof(output));
 
 
   return kTlmSize;
