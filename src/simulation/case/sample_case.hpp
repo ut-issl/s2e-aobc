@@ -44,6 +44,9 @@ class SampleCase : public s2e::simulation::SimulationCase {
    */
   virtual std::string GetLogValue() const;
 
+  // FFI accessor
+  SampleSatellite *GetSpacecraft() const { return spacecraft_; }
+
  private:
   SampleSatellite *spacecraft_;                                           //!< Instance of spacecraft
   s2e::simulation::MonteCarloSimulationExecutor &monte_carlo_simulator_;  //!< Instance of ground station

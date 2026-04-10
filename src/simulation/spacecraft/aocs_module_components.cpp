@@ -30,7 +30,11 @@ AocsModuleComponents::AocsModuleComponents(const s2e::dynamics::Dynamics *dynami
 
   // CDH
   double compo_step_sec = global_environment_->GetSimulationTime().GetComponentStepTime_s();
+  #ifdef USE_C2A
   aobc_ = new s2e::components::ObcWithC2a(clock_generator, 10);
+#else
+  aobc_ = new s2e::components::OnBoardComputer(clock_generator);
+#endif
   hils_port_manager_ = new s2e::simulation::HilsPortManager();
 
   // Power
@@ -193,9 +197,11 @@ AocsModuleComponents::AocsModuleComponents(const s2e::dynamics::Dynamics *dynami
                                                                              &(local_environment_->GetCelestialInformation())));
 
   // Communication
+#ifdef USE_C2A
   const std::string command_sender_ini_path = ini_access.ReadString("COMPONENTS_FILE", "command_sender_file");
   wings_command_sender_to_c2a_ = new s2e::components::WingsCommandSenderToC2a(
       s2e::components::InitWingsCommandSenderToC2a(clock_generator, compo_step_sec, command_sender_ini_path));
+#endif
 
 // HILS IF Board
 #ifdef USE_HILS
@@ -206,7 +212,9 @@ AocsModuleComponents::AocsModuleComponents(const s2e::dynamics::Dynamics *dynami
 }
 
 AocsModuleComponents::~AocsModuleComponents() {
+  #ifdef USE_C2A
   delete wings_command_sender_to_c2a_;
+#endif
   delete telescope_;
   delete sagitta_;
   delete stim210_;

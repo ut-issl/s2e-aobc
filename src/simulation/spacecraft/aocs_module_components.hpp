@@ -11,7 +11,11 @@
 #include <simulation/spacecraft/installed_components.hpp>
 
 // CDH
+#ifdef USE_C2A
 #include <components/real/cdh/on_board_computer_with_c2a.hpp>
+#else
+#include <components/real/cdh/on_board_computer.hpp>
+#endif
 // Power
 #include "../../component/power/ina260.hpp"
 #include "../../component/power/power_controller.hpp"
@@ -34,7 +38,9 @@
 // HILS IF
 #include "../../interface/hils/hils_if_driver.hpp"
 // Communication
+#ifdef USE_C2A
 #include <components/real/communication/wings_command_sender_to_c2a.hpp>
+#endif
 
 /**
  * @class AocsModuleComponents
@@ -81,9 +87,23 @@ class AocsModuleComponents : public s2e::spacecraft::InstalledComponents {
    */
   void LogSetup(s2e::logger::Logger &logger) override;
 
+  // ---- FFI accessors (added for s7e cross-validation) ----
+  s2e::components::OnBoardComputer *GetObc() const { return aobc_; }
+  const Mpu9250GyroSensor *GetMpu9250GyroSensor() const { return mpu9250_gyro_sensor_; }
+  const Mpu9250Magnetometer *GetMpu9250Magnetometer() const { return mpu9250_magnetometer_; }
+  const Rm3100 *GetRm3100Aobc() const { return rm3100_aobc_; }
+  const Rm3100 *GetRm3100External() const { return rm3100_external_; }
+  const NanoSsocD60 *GetNanoSsocD60(size_t idx) const { return idx < nano_ssoc_d60_.size() ? nano_ssoc_d60_[idx] : nullptr; }
+  size_t GetNanoSsocD60Count() const { return nano_ssoc_d60_.size(); }
+  const MtqSeiren *GetMtqSeiren() const { return mtq_seiren_; }
+
  private:
   // CDH
-  s2e::components::ObcWithC2a *aobc_;  //!< Attitude On Board Computer
+#ifdef USE_C2A
+  s2e::components::ObcWithC2a *aobc_;  //!< AOBC with C2A
+#else
+  s2e::components::OnBoardComputer *aobc_;  //!< AOBC without C2A
+#endif
   // Power
   PowerController *power_controller_;  //!< Power switch controller
   std::vector<Ina260> ina260s_;        //!< Ina260 current sensor
@@ -113,7 +133,9 @@ class AocsModuleComponents : public s2e::spacecraft::InstalledComponents {
   s2e::simulation::HilsPortManager *hils_port_manager_;
   HilsIfDriver *hils_if_driver_;
   // Communication
+#ifdef USE_C2A
   s2e::components::WingsCommandSenderToC2a *wings_command_sender_to_c2a_;
+#endif
 
   // States
   const s2e::dynamics::Dynamics *dynamics_;                        //!< Dynamics information of the spacecraft
